@@ -25,11 +25,25 @@ Thumbs.db
 *.pem
 
 # next.js
-/.next/
-/out/
+.next/
+out/
 
 # vercel
 .vercel
 
 # env files (can opt-in for committing if needed)
 .env*
+!.env.example
+
+# testing
+coverage/
+
+# production
+/build
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# prisma generated client
+/apps/api/src/generated/

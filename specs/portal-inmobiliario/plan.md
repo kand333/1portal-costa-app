@@ -2,14 +2,15 @@
 
 ## 1. Arquitectura
 
-Next.js se utilizará como framework full stack manteniendo una arquitectura REST clara.
+Monorepo (npm workspaces) con dos aplicaciones Next.js separadas y una arquitectura REST clara.
 
 ```text
-Next.js + React
+apps/web (Next.js + React, puerto 3000)
       │
-    fetch()
-      │
-      ▼
+    fetch(/api/**) ── proxy (rewrites) ──┐
+                                         │
+                                         ▼
+apps/api (Next.js Route Handlers, puerto 4000)
 API REST /api/**
       │
       ▼
@@ -49,25 +50,35 @@ Web3Forms   → contacto
 - No exigir latitud/longitud en el formulario ADMIN.
 - No implementar funcionalidades especulativas fuera de `spec.md`.
 
-## 4. Estructura sugerida
+## 4. Estructura (monorepo)
 
 ```text
-src/
-├── app/
-│   ├── api/
-│   ├── admin/
-│   ├── account/
-│   ├── properties/
-│   └── ...
-├── components/
-├── services/
-├── repositories/
-├── lib/
-├── types/
-└── ...
+apps/
+├── web/                 # @portal/web — frontend Next.js (sin acceso a DB)
+│   └── src/
+│       ├── app/         # páginas: /, /properties, /account, /admin, ...
+│       ├── components/
+│       ├── hooks/
+│       └── lib/         # cliente REST, formateo, utilidades de UI
+└── api/                 # @portal/api — backend Next.js (solo Route Handlers)
+    ├── prisma/          # schema, migraciones y seed
+    └── src/
+        ├── app/api/     # Route Handlers REST
+        ├── services/
+        ├── repositories/
+        └── lib/         # Prisma, entorno, errores HTTP
+packages/
+└── shared/              # @portal/shared — contrato REST compartido
+    └── src/             # tipos de respuesta, enums y esquemas Zod
 ```
 
-Adaptar cuando las convenciones actuales de Next.js lo justifiquen sin romper la separación de responsabilidades.
+Reglas del monorepo:
+
+- `apps/web` no depende de Prisma ni de `apps/api`; solo de `@portal/shared`.
+- El navegador solo conoce el origen del frontend: `apps/web` reenvía `/api/**` a `apps/api` mediante rewrites (`API_INTERNAL_URL`). Mismo origen: cookies de sesión sin CORS.
+- Los Server Components del frontend pueden llamar al backend por `API_INTERNAL_URL`.
+- Los enums compartidos deben coincidir con los de Prisma (verificado por pruebas en `apps/api`).
+- Adaptar cuando las convenciones actuales de Next.js lo justifiquen sin romper la separación de responsabilidades.
 
 ## 5. Modelo de datos
 
@@ -312,7 +323,7 @@ Utilizar variables de entorno para:
 - configuración Google Maps;
 - clave Web3Forms.
 
-Crear `.env.example` sin secretos reales.
+Crear `.env.example` sin secretos reales en cada aplicación: `apps/api` (PostgreSQL, autenticación, Cloudinary, Web3Forms) y `apps/web` (URL pública, Google Maps, `API_INTERNAL_URL`).
 
 ## 16. Validación
 

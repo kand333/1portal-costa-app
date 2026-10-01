@@ -1,0 +1,157 @@
+// Prisma schema. The connection URL is configured in prisma.config.ts.
+// CHECK constraints are not expressible here: they live in the migration SQL.
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum OperationType {
+  SALE
+  RENT
+}
+
+enum PropertyType {
+  HOUSE
+  APARTMENT
+  LAND
+  OFFICE
+  COMMERCIAL
+  OTHER
+}
+
+enum Currency {
+  USD
+}
+
+model User {
+  id           String   @id @default(uuid(7)) @db.Uuid
+  // Stored normalized (trimmed, lowercase) by the service layer.
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         UserRole @default(USER)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  favorites Favorite[]
+  inquiries Inquiry[]
+}
+
+model Property {
+  id            String        @id @default(uuid(7)) @db.Uuid
+  title         String
+  description   String
+  operationType OperationType
+  propertyType  PropertyType
+  price         Decimal       @db.Decimal(14, 2)
+  currency      Currency      @default(USD)
+  // Optional fields: they do not apply to every property type (e.g. LAND).
+  usableArea    Decimal?      @db.Decimal(10, 2)
+  totalArea     Decimal?      @db.Decimal(10, 2)
+  bedrooms      Int?
+  bathrooms     Int?
+  parkingSpaces Int?
+  ageInYears    Int?
+  // Location is textual; coordinates are never requested from ADMIN.
+  address       String
+  commune       String
+  city          String
+  region        String
+  isPublished   Boolean       @default(false)
+  isFeatured    Boolean       @default(false)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  images    PropertyImage[]
+  features  PropertyFeature[]
+  favorites Favorite[]
+  inquiries Inquiry[]
+
+  @@index([isPublished, operationType])
+  @@index([isPublished, isFeatured])
+  @@index([isPublished, createdAt])
+}
+
+model PropertyImage {
+  id         String   @id @default(uuid(7)) @db.Uuid
+  propertyId String   @db.Uuid
+  url        String
+  // Cloudinary public_id, required to delete the remote asset.
+  publicId   String   @unique
+  position   Int
+  isMain     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  @@index([propertyId, position])
+  // At most one main image per property.
+  @@unique([propertyId], where: { isMain: true }, map: "PropertyImage_single_main_per_property_key")
+}
+
+model Feature {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  name      String   @unique
+  createdAt DateTime @default(now())
+
+  properties PropertyFeature[]
+}
+
+model PropertyFeature {
+  propertyId String @db.Uuid
+  featureId  String @db.Uuid
+
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  // A feature in use cannot be deleted; it must be detached first.
+  feature  Feature  @relation(fields: [featureId], references: [id], onDelete: Restrict)
+
+  @@id([propertyId, featureId])
+  @@index([featureId])
+}
+
+model Favorite {
+  userId     String   @db.Uuid
+  propertyId String   @db.Uuid
+  createdAt  DateTime @default(now())
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+
+  // The composite primary key prevents duplicated favorites.
+  @@id([userId, propertyId])
+  @@index([propertyId])
+}
+
+model Inquiry {
+  id            String   @id @default(uuid(7)) @db.Uuid
+  // Nullable so a lead survives the deletion of its property.
+  propertyId    String?  @db.Uuid
+  // Snapshot of the title at submission time.
+  propertyTitle String
+  // Null for visitors who are not authenticated.
+  userId        String?  @db.Uuid
+  name          String
+  email         String
+  phone         String?
+  message       String
+  createdAt     DateTime @default(now())
+
+  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([propertyId])
+  @@index([userId])
+  @@index([createdAt])
+}
