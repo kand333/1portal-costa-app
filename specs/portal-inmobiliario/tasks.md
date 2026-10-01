@@ -4,24 +4,24 @@
 
 ## Fase 1 — Fundamentos
 
-- [ ] **Paso 1 — Crear proyecto Next.js**
+- [x] **Paso 1 — Crear proyecto Next.js**
   - Crear proyecto con React y TypeScript.
   - Configurar estructura básica.
   - Crear `.env.example`.
   - Validar servidor de desarrollo y build.
 
-- [ ] **Paso 2 — Layout y navegación**
+- [x] **Paso 2 — Layout y navegación**
   - Crear header, navegación, footer y layout.
   - Agregar diseño responsive base.
   - Navegación: Inicio, Propiedades, Comprar, Arrendar, Ingresar.
 
-- [ ] **Paso 3 — Configurar PostgreSQL**
+- [x] **Paso 3 — Configurar PostgreSQL**
   - Configurar PostgreSQL.
   - Seleccionar y configurar ORM.
   - Configurar migraciones.
   - Validar conexión.
 
-- [ ] **Paso 4 — Crear modelo de dominio**
+- [x] **Paso 4 — Crear modelo de dominio**
   - User.
   - Property.
   - PropertyImage.
@@ -31,25 +31,32 @@
   - Crear relaciones y constraints.
   - Ejecutar migraciones.
 
-- [ ] **Paso 5 — Crear seed**
+- [x] **Paso 5 — Crear seed**
   - Propiedades realistas de venta y arriendo.
   - Casas, departamentos, terrenos y oficinas.
   - Diferentes comunas, precios y características.
 
 ## Fase 2 — Portal público
 
-- [ ] **Paso 6 — API REST pública de propiedades**
+- [x] **Paso 6 — API REST pública de propiedades**
   - `GET /api/properties`.
   - `GET /api/properties/{id}`.
   - Mostrar públicamente solo propiedades publicadas.
   - Separar API, servicios y persistencia.
 
-- [ ] **Paso 7 — Landing page**
+- [x] **Paso 7 — Landing page**
   - Hero.
   - Buscador.
   - Propiedades destacadas.
   - Secciones comprar y arrendar.
   - Llamadas a la acción.
+
+- [x] **Paso 7.1 — Reorganizar en monorepo**
+  - npm workspaces: `apps/web`, `apps/api`, `packages/shared`.
+  - Frontend y backend como aplicaciones Next.js separadas.
+  - Proxy `/api/**` del frontend al backend.
+  - Contrato REST compartido (tipos, enums, esquemas).
+  - Mantener pruebas, build y comportamiento existentes.
 
 - [ ] **Paso 8 — PropertyCard y grid responsive**
   - Crear componente reutilizable.
@@ -183,6 +190,7 @@
   - Seleccionar principal.
   - Ordenar.
   - Mantener sincronizados Cloudinary y PostgreSQL.
+  - No destruir en Cloudinary imágenes con `publicId` `seed-placeholder/*` (placeholders del seed, ver `apps/api/prisma/seed/images.ts`).
 
 - [ ] **Paso 28 — Características**
   - Múltiples características por propiedad.
