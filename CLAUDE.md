@@ -45,6 +45,7 @@ Integraciones previstas en `plan.md`: Cloudinary (imágenes), Leaflet + OpenStre
 - El movimiento debe respetar `prefers-reduced-motion`.
 - Código, nombres y commits en inglés; UI y documentación en español. Nombres explícitos, sin abreviaturas. TypeScript estricto, sin `any`.
 - Valida toda entrada en el backend con los esquemas de `@portal/shared`. Protege USER/ADMIN también en el servidor.
+- Autorización: cada Route Handler protegido empieza con `requireUser`/`requireAdmin` (`apps/api/src/lib/auth/authorization.ts`). En la web, cada página privada (no solo su layout) llama a `requireSessionUser`/`getAdminUser` (`apps/web/src/lib/session.ts`): un chequeo solo en el layout deja pasar el contenido de la página en la respuesta.
 
 ## Comandos (raíz)
 

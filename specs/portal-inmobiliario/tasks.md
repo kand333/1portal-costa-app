@@ -117,22 +117,24 @@
   - Incluir ID/título de propiedad.
   - Estados enviando/éxito/error.
   - Validar datos.
-  - Hecho: `POST /api/inquiries` guarda primero en PostgreSQL y luego el navegador envía a Web3Forms (el plan gratuito no acepta envíos desde servidor). Clave `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` en `apps/web`. Validación compartida (Zod), honeypot. Si el correo falla, la consulta queda guardada. Usuario autenticado: se enlazará en el Paso 17. Pendiente: probar el correo con una clave real.
+  - Hecho: `POST /api/inquiries` guarda primero en PostgreSQL y luego el navegador envía a Web3Forms (el plan gratuito no acepta envíos desde servidor). Clave `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` en `apps/web`. Validación compartida (Zod), honeypot. Si el correo falla, la consulta queda guardada. Usuario autenticado: se enlazará en el Paso 21. Pendiente: probar el correo con una clave real.
 
 ## Fase 3 — Autenticación y usuario
 
-- [ ] **Paso 17 — Registro y login REST**
+- [x] **Paso 17 — Registro y login REST**
   - Registro.
   - Login.
   - Logout.
   - Endpoint de usuario actual.
   - Hashing seguro.
+  - Hecho: `/api/auth/register|login|logout|me`, scrypt + cookie de sesión firmada (HMAC, httpOnly, SameSite=Lax), límite de intentos de login, cuentas desactivadas rechazadas. Páginas `/login` y `/register` y sesión en el header. Requiere `AUTH_SECRET` (≥ 32 caracteres) en `apps/api/.env.local` y `.env.test.local`.
 
-- [ ] **Paso 18 — Autorización USER y ADMIN**
+- [x] **Paso 18 — Autorización USER y ADMIN**
   - Crear roles.
   - Proteger APIs.
   - Proteger páginas.
   - Aplicar permisos en backend.
+  - Hecho: roles USER/ADMIN (enum compartido verificado contra Prisma). API: `requireUser`/`requireAdmin` (401/403, usuario leído de la BD en cada petición), listos para los endpoints de favoritos y administración. Web: `proxy.ts` + verificación en layout y en cada página (`/account` para USER/ADMIN, `/admin` solo ADMIN; un USER ve «Acceso restringido»). `/account` y `/admin` son páginas mínimas que se completan en el Paso 19 y en la Fase 4.
 
 - [ ] **Paso 19 — Cuenta de usuario**
   - Crear `/account`.

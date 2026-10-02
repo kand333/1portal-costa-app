@@ -8,7 +8,8 @@ export default defineConfig({
   schema: "prisma/schema.prisma",
   migrations: {
     path: "prisma/migrations",
-    seed: "tsx prisma/seed.ts",
+    // react-server: lets the seed import server-only modules (password hashing of the test users).
+    seed: "tsx --conditions=react-server prisma/seed.ts",
   },
   datasource: {
     // Optional here so `prisma generate` works without a database;

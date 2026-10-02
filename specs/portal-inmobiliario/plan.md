@@ -266,6 +266,23 @@ Requisitos:
 - endpoints ADMIN requieren ADMIN;
 - endpoints privados USER requieren autenticación.
 
+Implementación (sin dependencias nuevas, con `node:crypto`):
+
+- Contraseñas con scrypt (N=2^17, r=8, p=1, sal aleatoria), guardadas como `scrypt$N$r$p$sal$clave` para poder subir el coste más adelante.
+- Sesión: token `payload.firma` (id de usuario y expiración a 7 días, firmado con HMAC-SHA256 y `AUTH_SECRET` de al menos 32 caracteres) en la cookie `portal_session`, con `HttpOnly`, `SameSite=Lax`, `Path=/` y `Secure` en producción. Llega al navegador por el proxy `/api` (mismo origen). No se usa `localStorage`.
+- Logout borra la cookie. El token no se revoca en el servidor, pero `GET /api/auth/me` (y toda protección futura) vuelve a leer el usuario: si fue eliminado o desactivado responde 401 y borra la cookie.
+- Login: el mismo mensaje y el mismo tiempo para un email inexistente y una contraseña errónea (401); cuenta desactivada → 403. Tras 10 fallos en 15 minutos para un email → 429 (en memoria, por proceso).
+- Registro → 201 e inicio de sesión; email ya registrado → 409. Rol USER por defecto.
+- Web: páginas `/login` y `/register` (vuelven a `?next=` solo si es una ruta del sitio) y el header muestra el nombre con «Salir». El usuario actual se lee con SWR (`/api/auth/me`).
+
+Autorización:
+
+- API: todo Route Handler protegido empieza con `requireUser(request)` o `requireAdmin(request)` (`apps/api/src/lib/auth/authorization.ts`). Leen la cookie y cargan el usuario de la BD en cada petición: 401 sin sesión válida o con cuenta desactivada, 403 sin el rol. Un cambio de rol o una desactivación rige en la siguiente petición.
+- Web, en tres capas:
+  1. `proxy.ts` (optimista, solo mira si existe la cookie) redirige `/account/**` y `/admin/**` a `/login?next=…`.
+  2. Los layouts y **cada página** privada validan la sesión con la API desde el servidor (`lib/session.ts`: `requireSessionUser`, `getAdminUser`). En `/admin`, un USER ve «Acceso restringido». El chequeo debe estar también en la página: Next renderiza layout y página en paralelo y, con el chequeo solo en el layout, el contenido de la página viaja igual en la respuesta.
+  3. La API vuelve a verificar en cada endpoint protegido: es la defensa real.
+
 ## 11. Cloudinary
 
 Flujo:
@@ -332,7 +349,7 @@ Definir un comportamiento claro ante fallos para evitar perder silenciosamente u
 Implementación (híbrida, porque el plan gratuito de Web3Forms solo acepta envíos desde el navegador; desde un servidor exige plan pago y lista blanca de IP):
 
 1. El formulario valida en el navegador con el mismo esquema Zod que la API (`@portal/shared/inquiry`).
-2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` nulo hasta que existan sesiones (Paso 17), y responde 201.
+2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` nulo hasta el Paso 21, y responde 201.
 3. Con la consulta ya guardada, el navegador la envía a Web3Forms con `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (pública por diseño: solo entrega correos a la casilla dueña de la clave). Incluye ID y título de la propiedad e ID de la consulta.
 4. Si el correo falla, el usuario igual ve «Consulta enviada»: la consulta está en PostgreSQL y el ADMIN la verá en su panel. Si falla la API, se muestra el error y no se envía correo.
 5. Anti-spam: campo trampa (honeypot) oculto. Sin limitación de tasa en la API por ahora.
