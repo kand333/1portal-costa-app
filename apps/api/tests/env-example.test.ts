@@ -8,10 +8,9 @@ const requiredVariableNames = [
   "CLOUDINARY_CLOUD_NAME",
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
-  "WEB3FORMS_ACCESS_KEY",
 ];
 
-const secretVariableNames = ["AUTH_SECRET", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET", "WEB3FORMS_ACCESS_KEY"];
+const secretVariableNames = ["AUTH_SECRET", "CLOUDINARY_API_KEY", "CLOUDINARY_API_SECRET"];
 
 function parseEnvironmentFile(content: string): Map<string, string> {
   const variables = new Map<string, string>();
@@ -37,6 +36,12 @@ describe("apps/api .env.example", () => {
   it("does not contain secret values", () => {
     for (const variableName of secretVariableNames) {
       expect(environmentVariables.get(variableName), variableName).toBe("");
+    }
+  });
+
+  it("keeps unused integrations commented out", () => {
+    for (const variableName of ["GOOGLE_MAPS_API_KEY", "WEB3FORMS_ACCESS_KEY"]) {
+      expect(environmentVariables.has(variableName), variableName).toBe(false);
     }
   });
 

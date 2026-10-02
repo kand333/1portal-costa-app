@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const requiredVariableNames = ["NEXT_PUBLIC_SITE_URL", "API_INTERNAL_URL"];
+const requiredVariableNames = ["NEXT_PUBLIC_SITE_URL", "API_INTERNAL_URL", "NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY"];
 
 // Backend-only variables that must never reach the frontend app.
 const backendVariableNames = [
@@ -10,7 +10,6 @@ const backendVariableNames = [
   "AUTH_SECRET",
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
-  "WEB3FORMS_ACCESS_KEY",
 ];
 
 function parseEnvironmentFile(content: string): Map<string, string> {

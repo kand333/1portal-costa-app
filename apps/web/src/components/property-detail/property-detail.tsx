@@ -8,6 +8,7 @@ import {
   propertyTypeLabels,
 } from "@/lib/property-format";
 import { buildGoogleMapsUrl, buildMapQuery, formatPropertyAddress, type MapLocation } from "@/lib/property-location";
+import { PropertyContactForm } from "./property-contact-form";
 import { PropertyGallery } from "./property-gallery";
 import { PropertyMap } from "./property-map";
 
@@ -113,7 +114,8 @@ export function PropertyDetail({ property, mapLocation }: PropertyDetailProps) {
           </section>
         </div>
 
-        <aside aria-labelledby="facts-title" className="lg:sticky lg:top-24 lg:self-start">
+        {/* Not sticky: with the contact form it is taller than the screen. */}
+        <aside aria-label="Ficha y contacto" className="space-y-6 lg:self-start">
           <div className="rounded-[1.25rem] border border-line bg-surface p-6 shadow-soft">
             <h2 id="facts-title" className="font-display text-2xl font-semibold tracking-tight text-ink">
               Ficha de la propiedad
@@ -127,6 +129,8 @@ export function PropertyDetail({ property, mapLocation }: PropertyDetailProps) {
               ))}
             </dl>
           </div>
+
+          <PropertyContactForm propertyId={property.id} propertyTitle={property.title} />
         </aside>
       </div>
     </article>

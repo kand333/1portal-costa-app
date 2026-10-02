@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApiClientError, fetchJson } from "./api-client";
+import { ApiClientError, fetchJson, postJson } from "./api-client";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -26,5 +26,27 @@ describe("fetchJson", () => {
     const error = await fetchJson("/api/properties").catch((caught: unknown) => caught);
     expect(error).toBeInstanceOf(ApiClientError);
     expect(error).toMatchObject({ status: 502, message: "No fue posible cargar la información" });
+  });
+});
+
+describe("postJson", () => {
+  it("sends the body as JSON and returns the parsed response", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ id: "1" }, { status: 201 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(postJson("/api/inquiries", { name: "Ana" })).resolves.toEqual({ id: "1" });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/inquiries",
+      expect.objectContaining({ method: "POST", body: '{"name":"Ana"}' }),
+    );
+    expect(fetchMock.mock.calls[0][1].headers).toMatchObject({ "Content-Type": "application/json" });
+  });
+
+  it("throws ApiClientError with the REST message on errors", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ message: "Ingresa tu nombre", status: 400 }, { status: 400 })),
+    );
+    await expect(postJson("/api/inquiries", {})).rejects.toMatchObject({ status: 400, message: "Ingresa tu nombre" });
   });
 });
