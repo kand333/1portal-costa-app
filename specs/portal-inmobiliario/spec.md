@@ -26,7 +26,7 @@ Puede:
 - consultar el detalle de una propiedad;
 - visualizar la galería;
 - consultar características;
-- visualizar la ubicación mediante Google Maps;
+- visualizar la ubicación en un mapa (OpenStreetMap);
 - enviar una solicitud de información;
 - registrarse;
 - iniciar sesión.
@@ -177,7 +177,7 @@ Santiago
 Región Metropolitana
 ```
 
-La aplicación construirá una dirección completa utilizable por Google Maps.
+La aplicación construirá una dirección completa utilizable para ubicar la propiedad en el mapa.
 
 ```text
 Av. Apoquindo 3000, Las Condes, Santiago, Región Metropolitana, Chile
@@ -311,11 +311,11 @@ Mostrar:
 
 ---
 
-## 13. Google Maps
+## 13. Mapa (Leaflet + OpenStreetMap)
 
-El detalle debe mostrar Google Maps utilizando la dirección textual de la propiedad.
+El detalle debe mostrar un mapa de OpenStreetMap (Leaflet) ubicado a partir de la dirección textual de la propiedad.
 
-La configuración debe manejarse mediante variables de entorno.
+No requiere claves de API.
 
 El administrador no necesita conocer coordenadas geográficas.
 
@@ -542,7 +542,7 @@ El producto está funcionalmente terminado cuando:
 - funciona el ordenamiento;
 - funciona el detalle;
 - funciona la galería;
-- funciona Google Maps;
+- funciona el mapa;
 - funciona el contacto;
 - los usuarios pueden registrarse y autenticarse;
 - USER puede administrar favoritos;

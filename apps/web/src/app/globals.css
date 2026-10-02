@@ -118,6 +118,13 @@
   }
 }
 
+/* Gallery: each new photo fades in. */
+@keyframes gallery-fade {
+  from {
+    opacity: 0;
+  }
+}
+
 /* The only entrance animation: the hero headline and search bar settle in once on load. */
 @keyframes rise {
   from {

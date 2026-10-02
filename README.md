@@ -35,7 +35,7 @@ Define **qué debe hacer la aplicación**: funcionalidades, usuarios, propiedade
 
 ### `plan.md`
 
-Define **cómo se construirá técnicamente**: arquitectura, PostgreSQL, API REST, autenticación, Cloudinary, Google Maps, Web3Forms y separación de responsabilidades.
+Define **cómo se construirá técnicamente**: arquitectura, PostgreSQL, API REST, autenticación, Cloudinary, Leaflet + OpenStreetMap, Web3Forms y separación de responsabilidades.
 
 ### `tasks.md`
 

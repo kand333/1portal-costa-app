@@ -27,7 +27,7 @@ Integraciones externas:
 
 ```text
 Cloudinary  → imágenes
-Google Maps → ubicación
+OpenStreetMap → mapa de ubicación (Leaflet; geocodificación con Nominatim)
 Web3Forms   → contacto
 ```
 
@@ -39,7 +39,7 @@ Web3Forms   → contacto
 - PostgreSQL
 - API REST con Route Handlers de Next.js
 - Cloudinary
-- Google Maps
+- Leaflet + React-Leaflet + OpenStreetMap
 - Web3Forms
 
 ## 3. Restricciones
@@ -295,7 +295,7 @@ Validar:
 
 La eliminación debe mantener sincronizados Cloudinary y PostgreSQL.
 
-## 12. Google Maps
+## 12. Mapa (Leaflet + OpenStreetMap)
 
 Construir la ubicación utilizando:
 
@@ -306,6 +306,13 @@ Construir la ubicación utilizando:
 - país.
 
 No solicitar coordenadas manuales.
+
+Implementación (sin claves):
+
+- El page del detalle geocodifica en el servidor de `apps/web` con Nominatim (`lib/geocoding.ts`) la consulta «dirección, comuna, ciudad, región, Chile» (el país no se guarda: todas las propiedades están en Chile). Si no encuentra la calle, usa la comuna con un zoom más alejado. Caché de 30 días y `User-Agent` propio, según la política de uso de Nominatim (≈1 req/s).
+- El mapa usa Leaflet + React-Leaflet con tiles de OpenStreetMap y atribución OSM. Se carga solo en el navegador (`next/dynamic` con `ssr: false`).
+- La dirección (en azul, sobre el mapa) y el enlace «Abrir en Google Maps» (debajo del mapa) abren Google Maps con la dirección, sin clave. Si la geocodificación falla, se ve solo el enlace.
+- Con tráfico real, guardar las coordenadas en la BD desde la API al guardar la propiedad (transparente para ADMIN).
 
 Si posteriormente se requiere geocodificación interna, debe ser transparente para ADMIN y no modificar los campos obligatorios del formulario.
 
@@ -321,6 +328,14 @@ Flujo:
 6. devolver una respuesta REST consistente.
 
 Definir un comportamiento claro ante fallos para evitar perder silenciosamente una consulta.
+
+Implementación (híbrida, porque el plan gratuito de Web3Forms solo acepta envíos desde el navegador; desde un servidor exige plan pago y lista blanca de IP):
+
+1. El formulario valida en el navegador con el mismo esquema Zod que la API (`@portal/shared/inquiry`).
+2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` nulo hasta que existan sesiones (Paso 17), y responde 201.
+3. Con la consulta ya guardada, el navegador la envía a Web3Forms con `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (pública por diseño: solo entrega correos a la casilla dueña de la clave). Incluye ID y título de la propiedad e ID de la consulta.
+4. Si el correo falla, el usuario igual ve «Consulta enviada»: la consulta está en PostgreSQL y el ADMIN la verá en su panel. Si falla la API, se muestra el error y no se envía correo.
+5. Anti-spam: campo trampa (honeypot) oculto. Sin limitación de tasa en la API por ahora.
 
 ## 14. Errores
 
@@ -351,10 +366,11 @@ Utilizar variables de entorno para:
 - conexión PostgreSQL;
 - secretos de autenticación;
 - credenciales Cloudinary;
-- configuración Google Maps;
-- clave Web3Forms.
+- clave pública de Web3Forms (en `apps/web`).
 
-Crear `.env.example` sin secretos reales en cada aplicación: `apps/api` (PostgreSQL, autenticación, Cloudinary, Web3Forms) y `apps/web` (URL pública, Google Maps, `API_INTERNAL_URL`).
+Crear `.env.example` sin secretos reales en cada aplicación: `apps/api` (PostgreSQL, autenticación, Cloudinary) y `apps/web` (URL pública, `API_INTERNAL_URL`, clave pública de Web3Forms).
+
+Los `.env.example` son el registro único de integraciones: cada servicio nuevo se documenta ahí (sección numerada, enlace para crear la clave, paso y si es secreto) con la plantilla del final de `apps/api/.env.example`. Google Maps no se usa (mapa OSM sin clave); su variable `GOOGLE_MAPS_API_KEY` queda solo documentada y comentada.
 
 ## 16. Validación
 

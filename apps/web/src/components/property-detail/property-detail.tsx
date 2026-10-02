@@ -1,5 +1,4 @@
 import type { PropertyDetail as PropertyDetailData } from "@portal/shared/property";
-import Image from "next/image";
 import Link from "next/link";
 import {
   formatLocation,
@@ -8,22 +7,22 @@ import {
   operationLabels,
   propertyTypeLabels,
 } from "@/lib/property-format";
+import { buildGoogleMapsUrl, buildMapQuery, formatPropertyAddress, type MapLocation } from "@/lib/property-location";
+import { PropertyContactForm } from "./property-contact-form";
+import { PropertyGallery } from "./property-gallery";
+import { PropertyMap } from "./property-map";
 
 type PropertyDetailProps = {
   property: PropertyDetailData;
+  /** Geocoded point of the address, or null when it could not be found. */
+  mapLocation: MapLocation | null;
 };
 
-/** Main photo: the one marked as main, or the first by position. The full gallery is a later step. */
-function getMainImage(property: PropertyDetailData) {
-  return property.images.find((image) => image.isMain) ?? property.images[0] ?? null;
-}
-
-export function PropertyDetail({ property }: PropertyDetailProps) {
+export function PropertyDetail({ property, mapLocation }: PropertyDetailProps) {
   const location = formatLocation(property.commune, property.city);
   const propertyTypeLabel = propertyTypeLabels[property.propertyType];
-  const mainImage = getMainImage(property);
   const facts = getPropertyFacts(property);
-  const fullAddress = [property.address, property.commune, property.city, property.region].join(", ");
+  const fullAddress = formatPropertyAddress(property);
 
   return (
     <article className="mx-auto w-full max-w-7xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
@@ -48,22 +47,11 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
         </p>
       </header>
 
-      <div className="relative mt-10 aspect-[16/10] overflow-hidden rounded-[1.75rem] bg-line/40 sm:aspect-[16/8]">
-        {mainImage ? (
-          <Image
-            src={mainImage.url}
-            alt={`${propertyTypeLabel} en ${location}: ${property.title}`}
-            fill
-            sizes="(min-width: 1280px) 1216px, 100vw"
-            className="object-cover"
-            preload
-          />
-        ) : (
-          <div className="flex h-full items-center justify-center text-muted">Sin fotografía</div>
-        )}
-        <span className="absolute left-5 top-5 rounded-full border border-white/50 bg-white/75 px-4 py-1.5 text-sm font-semibold text-[#121719] backdrop-blur-md">
-          {operationLabels[property.operationType]}
-        </span>
+      <div className="mt-10">
+        <PropertyGallery
+          images={property.images}
+          imageDescription={`${propertyTypeLabel} en ${location}: ${property.title}`}
+        />
       </div>
 
       <div className="mt-14 grid gap-14 lg:grid-cols-[minmax(0,1fr)_22rem]">
@@ -109,11 +97,25 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
             <h2 id="location-title" className="font-display text-3xl font-semibold tracking-tight text-ink">
               Ubicación
             </h2>
-            <address className="mt-5 not-italic text-lg text-ink/85">{fullAddress}</address>
+            <address className="mt-5 not-italic text-lg text-ink/85">
+              <a
+                href={buildGoogleMapsUrl(buildMapQuery(property))}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-700 hover:underline dark:text-blue-400"
+              >
+                {fullAddress}
+                <span className="sr-only"> (abre Google Maps en una pestaña nueva)</span>
+              </a>
+            </address>
+            <div className="mt-6">
+              <PropertyMap query={buildMapQuery(property)} location={mapLocation} />
+            </div>
           </section>
         </div>
 
-        <aside aria-labelledby="facts-title" className="lg:sticky lg:top-24 lg:self-start">
+        {/* Not sticky: with the contact form it is taller than the screen. */}
+        <aside aria-label="Ficha y contacto" className="space-y-6 lg:self-start">
           <div className="rounded-[1.25rem] border border-line bg-surface p-6 shadow-soft">
             <h2 id="facts-title" className="font-display text-2xl font-semibold tracking-tight text-ink">
               Ficha de la propiedad
@@ -127,6 +129,8 @@ export function PropertyDetail({ property }: PropertyDetailProps) {
               ))}
             </dl>
           </div>
+
+          <PropertyContactForm propertyId={property.id} propertyTitle={property.title} />
         </aside>
       </div>
     </article>

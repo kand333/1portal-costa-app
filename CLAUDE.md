@@ -29,7 +29,7 @@ Monorepo npm workspaces:
 - `packages/shared` (`@portal/shared`): contrato REST, con tipos, enums, límites y esquemas Zod. Los enums deben coincidir con Prisma (hay un test que lo comprueba).
 
 Prohibido: Server Actions; acceder a la BD desde `apps/web`; secretos en variables `NEXT_PUBLIC_*`; imágenes binarias en BD.
-Integraciones previstas en `plan.md`: Cloudinary (imágenes), Google Maps (ubicación) y Web3Forms (contacto). Credenciales siempre por env (`.env.example` en cada app).
+Integraciones previstas en `plan.md`: Cloudinary (imágenes), Leaflet + OpenStreetMap con geocodificación Nominatim (ubicación, sin clave) y Web3Forms (contacto: la API guarda la consulta y el navegador envía el correo con la clave pública `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`). Credenciales siempre por env (`.env.example` en cada app).
 
 ## Reglas no obvias
 
