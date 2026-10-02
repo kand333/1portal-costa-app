@@ -56,7 +56,7 @@ export function PropertyCatalog() {
   else if (search) emptyMessage = `No encontramos propiedades que coincidan con «${search}». Prueba con otras palabras.`;
 
   return (
-    <div className={areFiltersOpen ? "lg:grid lg:grid-cols-[17rem_minmax(0,1fr)] lg:items-start lg:gap-8" : undefined}>
+    <div className={areFiltersOpen ? "lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:items-start lg:gap-10" : undefined}>
       {/* When open on large screens: sticky and scrollable, since the panel may be taller than the screen. */}
       <aside
         aria-label="Filtros"
@@ -76,7 +76,7 @@ export function PropertyCatalog() {
         <CatalogSearchForm search={search} />
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
-          <p aria-live="polite" className="min-h-6 text-zinc-600 dark:text-zinc-400">
+          <p aria-live="polite" className="min-h-6 text-muted tabular-nums">
             {data && total > 0 && !isPageOutOfRange && (
               <>
                 {total} {total === 1 ? "propiedad" : "propiedades"}

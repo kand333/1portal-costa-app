@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatAge,
   formatArea,
   formatLocation,
   formatPrice,
+  getPropertyFacts,
   getPropertyHighlights,
   operationLabels,
   propertyTypeLabels,
@@ -68,5 +70,60 @@ describe("getPropertyHighlights", () => {
   it("omits facts that do not apply", () => {
     expect(getPropertyHighlights(empty)).toEqual([]);
     expect(getPropertyHighlights({ ...empty, bedrooms: 0, bathrooms: 0 })).toEqual([]);
+  });
+});
+
+describe("formatAge", () => {
+  it("calls a new building brand new", () => {
+    expect(formatAge(0)).toBe("A estrenar");
+  });
+
+  it("counts years in singular and plural", () => {
+    expect(formatAge(1)).toBe("1 año");
+    expect(formatAge(12)).toBe("12 años");
+  });
+});
+
+describe("getPropertyFacts", () => {
+  const apartment = {
+    operationType: "SALE" as const,
+    propertyType: "APARTMENT" as const,
+    usableArea: 80.5,
+    totalArea: 90,
+    bedrooms: 2,
+    bathrooms: 2,
+    parkingSpaces: 1,
+    ageInYears: 0,
+  };
+
+  it("lists every fact in the order of the data sheet", () => {
+    expect(getPropertyFacts(apartment)).toEqual([
+      { label: "Operación", value: "Venta" },
+      { label: "Tipo", value: "Departamento" },
+      { label: "Superficie útil", value: "80,5 m²" },
+      { label: "Superficie total", value: "90 m²" },
+      { label: "Dormitorios", value: "2" },
+      { label: "Baños", value: "2" },
+      { label: "Estacionamientos", value: "1" },
+      { label: "Antigüedad", value: "A estrenar" },
+    ]);
+  });
+
+  it("leaves out facts without a value, but keeps zero", () => {
+    const land = {
+      ...apartment,
+      propertyType: "LAND" as const,
+      usableArea: null,
+      bedrooms: null,
+      bathrooms: null,
+      parkingSpaces: 0,
+      ageInYears: null,
+    };
+    expect(getPropertyFacts(land).map((fact) => fact.label)).toEqual([
+      "Operación",
+      "Tipo",
+      "Superficie total",
+      "Estacionamientos",
+    ]);
   });
 });

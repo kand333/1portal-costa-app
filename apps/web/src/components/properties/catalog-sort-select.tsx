@@ -25,14 +25,14 @@ export function CatalogSortSelect({ sort }: CatalogSortSelectProps) {
 
   return (
     <div className="flex items-center gap-2">
-      <label htmlFor="catalog-sort" className="text-sm font-medium text-zinc-800 dark:text-zinc-200">
+      <label htmlFor="catalog-sort" className="text-sm font-medium text-muted">
         Ordenar por
       </label>
       <select
         id="catalog-sort"
         value={sort ?? DEFAULT_PROPERTY_SORT}
         onChange={handleChange}
-        className="h-10 rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+        className="h-11 rounded-full border border-line bg-surface px-4 text-sm text-ink transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
       >
         {PROPERTY_SORTS.map((option) => (
           <option key={option} value={option}>

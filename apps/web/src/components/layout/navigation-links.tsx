@@ -18,19 +18,21 @@ export function NavigationLinks({ activeHref, orientation, onNavigate }: Navigat
     >
       {navigationItems.map((item) => {
         const isActive = item.href === activeHref;
+        const isLogin = item.href === "/login";
         return (
-          <li key={item.href}>
+          <li key={item.href} className={cn(isLogin && orientation === "horizontal" && "ml-3")}>
             <Link
               href={item.href}
               onClick={onNavigate}
               aria-current={isActive ? "page" : undefined}
               className={cn(
-                "block rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600",
-                isActive
-                  ? "bg-sky-50 text-sky-800 dark:bg-sky-950 dark:text-sky-200"
-                  : "text-zinc-700 hover:bg-zinc-100 hover:text-zinc-950 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-white",
-                orientation === "vertical" && "px-4 py-3 text-base",
+                "relative block px-3 py-2 text-sm font-medium transition-colors duration-200",
+                // Active page: a fine brass rule under the label instead of a filled pill.
+                "after:absolute after:inset-x-3 after:bottom-0.5 after:h-px after:origin-left after:bg-brass after:transition-transform after:duration-300 after:content-['']",
+                isActive ? "text-ink after:scale-x-100" : "text-muted hover:text-ink after:scale-x-0 hover:after:scale-x-100",
+                isLogin &&
+                  "rounded-full border border-line px-5 after:hidden hover:border-brass hover:bg-surface",
+                orientation === "vertical" && "px-4 py-3 text-base after:inset-x-4",
               )}
             >
               {item.label}

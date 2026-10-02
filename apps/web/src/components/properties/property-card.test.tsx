@@ -28,7 +28,8 @@ describe("PropertyCard", () => {
 
     expect(html).toContain("US$1.450 /mes");
     expect(html).toContain(property.title);
-    expect(html).toContain("Departamento · Las Condes, Santiago");
+    expect(html).toContain("Departamento");
+    expect(html).toContain("Las Condes, Santiago");
     expect(html).toContain("Arriendo");
     expect(html).toContain(`href="/properties/${property.id}"`);
   });

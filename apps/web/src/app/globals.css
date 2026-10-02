@@ -1,25 +1,149 @@
 @import "tailwindcss";
 
+/* Palette: bone paper, ink, deep pine and brass. Dark mode keeps the same roles. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --paper: #f6f5f2;
+  --surface: #ffffff;
+  --ink: #121719;
+  --muted: #596064;
+  --line: #dad9d4;
+  --accent: #1e3b3a;
+  --accent-hover: #162d2c;
+  --on-accent: #f6f5f2;
+  --brass: #a98b5b;
+  --brass-text: #7a6238;
+  --shadow-ink: 18 23 25;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --paper: #0e1213;
+    --surface: #151b1d;
+    --ink: #ecebe7;
+    --muted: #a3a9ab;
+    --line: #2a3235;
+    --accent: #c2a574;
+    --accent-hover: #d2b886;
+    --on-accent: #121719;
+    --brass: #c2a574;
+    --brass-text: #c2a574;
+    --shadow-ink: 0 0 0;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-on-accent: var(--on-accent);
+  --color-brass: var(--brass);
+  --color-brass-text: var(--brass-text);
+  --font-sans: var(--font-hanken);
+  --font-display: var(--font-cormorant);
+  --shadow-soft: 0 1px 2px rgb(var(--shadow-ink) / 0.05), 0 14px 32px -14px rgb(var(--shadow-ink) / 0.14);
+  --shadow-lift: 0 2px 4px rgb(var(--shadow-ink) / 0.06), 0 30px 60px -22px rgb(var(--shadow-ink) / 0.32);
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+    scroll-padding-top: 5rem;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  a,
+  button,
+  select,
+  input,
+  label {
+    touch-action: manipulation;
+  }
+
+  /* One visible focus style for the whole site; components only opt out when they draw their own. */
+  :focus-visible {
+    outline: 2px solid var(--brass-text);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brass) 40%, transparent);
+  }
+}
+
+/* A light that follows the pointer. `PointerGlow` writes --x/--y; nothing here re-renders React. */
+.glow-spot,
+.glow-ring {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.glow-spot {
+  background: radial-gradient(520px circle at var(--x, 50%) var(--y, 50%), rgb(255 255 255 / 0.16), transparent 60%);
+}
+
+.glow-ring {
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(280px circle at var(--x, 50%) var(--y, 50%), var(--brass), transparent 70%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box exclude,
+    linear-gradient(#000 0 0);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .glow-host:hover > .glow-spot,
+  .glow-host:hover > .glow-ring {
+    opacity: 1;
+  }
+}
+
+/* The only entrance animation: the hero headline and search bar settle in once on load. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  animation-delay: var(--delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0s !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .glow-spot,
+  .glow-ring {
+    display: none;
+  }
 }

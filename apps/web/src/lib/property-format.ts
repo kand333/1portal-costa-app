@@ -68,6 +68,38 @@ export function getPropertyHighlights(property: HighlightSource): PropertyHighli
   return highlights;
 }
 
+/** Age of a building: 0 means brand new. */
+export function formatAge(ageInYears: number): string {
+  return ageInYears === 0 ? "A estrenar" : pluralize(ageInYears, "año", "años");
+}
+
+export type PropertyFact = {
+  label: string;
+  value: string;
+};
+
+type FactSource = HighlightSource & {
+  operationType: OperationType;
+  propertyType: PropertyType;
+  parkingSpaces: number | null;
+  ageInYears: number | null;
+};
+
+/** Data sheet of the detail page. Facts without a value (e.g. bedrooms of a plot of land) are left out. */
+export function getPropertyFacts(property: FactSource): PropertyFact[] {
+  const facts: (PropertyFact | null)[] = [
+    { label: "Operación", value: operationLabels[property.operationType] },
+    { label: "Tipo", value: propertyTypeLabels[property.propertyType] },
+    property.usableArea !== null ? { label: "Superficie útil", value: formatArea(property.usableArea) } : null,
+    property.totalArea !== null ? { label: "Superficie total", value: formatArea(property.totalArea) } : null,
+    property.bedrooms !== null ? { label: "Dormitorios", value: String(property.bedrooms) } : null,
+    property.bathrooms !== null ? { label: "Baños", value: String(property.bathrooms) } : null,
+    property.parkingSpaces !== null ? { label: "Estacionamientos", value: String(property.parkingSpaces) } : null,
+    property.ageInYears !== null ? { label: "Antigüedad", value: formatAge(property.ageInYears) } : null,
+  ];
+  return facts.filter((fact) => fact !== null);
+}
+
 export const sortLabels: Record<PropertySort, string> = {
   newest: "Más recientes",
   "price-asc": "Precio: menor a mayor",

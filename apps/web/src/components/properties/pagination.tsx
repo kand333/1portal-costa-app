@@ -10,10 +10,10 @@ type PaginationProps = {
 };
 
 const itemClassName =
-  "inline-flex h-10 min-w-10 items-center justify-center rounded-md border px-3 text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600";
+  "inline-flex h-11 min-w-11 items-center justify-center rounded-full border px-4 text-sm font-medium tabular-nums transition-colors duration-200";
 const linkClassName =
-  "border-zinc-300 text-zinc-700 hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-300 dark:hover:bg-zinc-800";
-const disabledClassName = "border-zinc-200 text-zinc-400 dark:border-zinc-800 dark:text-zinc-600";
+  "border-line text-ink hover:border-brass hover:bg-surface";
+const disabledClassName = "border-line/60 text-muted/50";
 
 /** Page links that keep the rest of the query string. Renders nothing when there is a single page. */
 export function Pagination({ pathname, searchParams, currentPage, totalPages }: PaginationProps) {
@@ -24,7 +24,7 @@ export function Pagination({ pathname, searchParams, currentPage, totalPages }: 
   const hasNext = currentPage < totalPages;
 
   return (
-    <nav aria-label="Paginación" className="mt-10">
+    <nav aria-label="Paginación" className="mt-14">
       <ul className="flex flex-wrap items-center justify-center gap-2">
         <li>
           {hasPrevious ? (
@@ -40,7 +40,7 @@ export function Pagination({ pathname, searchParams, currentPage, totalPages }: 
         </li>
         {buildPaginationItems(currentPage, totalPages).map((item, index) =>
           item === "ellipsis" ? (
-            <li key={`ellipsis-${index}`} aria-hidden="true" className="px-1 text-zinc-500">
+            <li key={`ellipsis-${index}`} aria-hidden="true" className="px-1 text-muted">
               …
             </li>
           ) : (
@@ -51,7 +51,7 @@ export function Pagination({ pathname, searchParams, currentPage, totalPages }: 
                 aria-current={item === currentPage ? "page" : undefined}
                 className={cn(
                   itemClassName,
-                  item === currentPage ? "border-sky-700 bg-sky-700 text-white" : linkClassName,
+                  item === currentPage ? "border-accent bg-accent text-on-accent" : linkClassName,
                 )}
               >
                 {item}

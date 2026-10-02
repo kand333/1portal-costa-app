@@ -6,7 +6,7 @@ import { operationLabels, propertyTypeLabels } from "@/lib/property-format";
 import { buildPropertySearchHref } from "@/lib/property-search";
 
 const fieldClassName =
-  "h-12 w-full rounded-lg border border-zinc-300 bg-white px-3 text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
+  "h-14 w-full rounded-2xl border border-transparent bg-paper/70 px-4 text-ink transition-colors duration-200 hover:border-line focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
 
 export function PropertySearchForm() {
   const router = useRouter();
@@ -31,7 +31,7 @@ export function PropertySearchForm() {
       role="search"
       aria-label="Buscar propiedades"
       onSubmit={handleSubmit}
-      className="grid gap-3 rounded-2xl bg-white/95 p-4 shadow-lg backdrop-blur sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto] dark:bg-zinc-950/90"
+      className="grid gap-2 rounded-[1.75rem] border border-white/50 bg-surface/80 p-2.5 shadow-lift backdrop-blur-2xl sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_auto] dark:border-white/10"
     >
       <div className="sm:col-span-2 lg:col-span-1">
         <label htmlFor="search" className="sr-only">
@@ -41,6 +41,7 @@ export function PropertySearchForm() {
           id="search"
           name="search"
           type="search"
+          autoComplete="off"
           placeholder="Comuna, ciudad o palabra clave"
           className={fieldClassName}
         />
@@ -70,7 +71,7 @@ export function PropertySearchForm() {
       </div>
       <button
         type="submit"
-        className="h-12 rounded-lg bg-sky-700 px-6 font-semibold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 sm:col-span-2 lg:col-span-1"
+        className="h-14 rounded-2xl bg-accent px-8 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 sm:col-span-2 lg:col-span-1"
       >
         Buscar
       </button>
