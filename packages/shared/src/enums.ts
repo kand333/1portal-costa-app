@@ -10,6 +10,9 @@ export type PropertyType = (typeof PROPERTY_TYPES)[number];
 export const CURRENCIES = ["USD"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
+export const USER_ROLES = ["USER", "ADMIN"] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
 /** Catalog sort orders: newest first (default), price and area ascending or descending. */
 export const PROPERTY_SORTS = ["newest", "price-asc", "price-desc", "area-asc", "area-desc"] as const;
 export type PropertySort = (typeof PROPERTY_SORTS)[number];

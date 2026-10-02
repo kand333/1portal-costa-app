@@ -18,7 +18,7 @@ export async function createInquiry(data: InquiryCreateData): Promise<InquiryCre
   const inquiry = await insertInquiry({
     propertyId: property.id,
     propertyTitle: property.title,
-    // Visitors only for now: the authenticated user is linked once sessions exist (task 17).
+    // Visitors only for now: linking the authenticated user is task 21.
     userId: null,
     name: data.name,
     email: data.email,

@@ -115,7 +115,7 @@ Todos se ejecutan desde la raíz.
 | `npm run db:migrate` | Crear/aplicar migraciones en desarrollo |
 | `npm run db:deploy` | Aplicar migraciones existentes |
 | `npm run db:status` | Estado de migraciones |
-| `npm run db:seed` | Cargar datos de desarrollo (re-ejecutable, no duplica) |
+| `npm run db:seed` | Cargar datos de desarrollo y los usuarios de prueba (re-ejecutable, no duplica) |
 | `npm run db:generate` | Regenerar el cliente Prisma |
 
 ### 5. pgAdmin (opcional)

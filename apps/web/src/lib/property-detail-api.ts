@@ -1,8 +1,6 @@
 import type { PropertyDetail } from "@portal/shared/property";
 import { propertyIdSchema } from "@portal/shared/property-query";
-
-/** Backend base URL, reachable from this server (same value as the /api rewrites). */
-const apiInternalUrl = () => process.env.API_INTERNAL_URL ?? "http://localhost:4000";
+import { apiInternalUrl } from "./api-internal-url";
 
 /**
  * Loads a published property from the REST API, for Server Components.

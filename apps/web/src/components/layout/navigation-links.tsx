@@ -6,9 +6,14 @@ type NavigationLinksProps = {
   activeHref: string | null;
   orientation: "horizontal" | "vertical";
   onNavigate?: () => void;
+  /** Name of the logged-in user: replaces «Ingresar» with the name and a «Salir» button. */
+  userName?: string;
+  onLogout?: () => void;
 };
 
-export function NavigationLinks({ activeHref, orientation, onNavigate }: NavigationLinksProps) {
+const accountPillClassName = "rounded-full border border-line px-5 after:hidden hover:border-brass hover:bg-surface";
+
+export function NavigationLinks({ activeHref, orientation, onNavigate, userName, onLogout }: NavigationLinksProps) {
   return (
     <ul
       className={cn(
@@ -19,6 +24,30 @@ export function NavigationLinks({ activeHref, orientation, onNavigate }: Navigat
       {navigationItems.map((item) => {
         const isActive = item.href === activeHref;
         const isLogin = item.href === "/login";
+
+        if (isLogin && userName) {
+          return (
+            <li
+              key={item.href}
+              className={cn(
+                "flex items-center gap-2",
+                orientation === "horizontal" ? "ml-3" : "justify-between px-4 py-2",
+              )}
+            >
+              <span className="max-w-40 truncate text-sm font-medium text-ink" title={userName}>
+                {userName}
+              </span>
+              <button
+                type="button"
+                onClick={onLogout}
+                className={cn("py-2 text-sm font-medium text-muted transition-colors duration-200 hover:text-ink", accountPillClassName)}
+              >
+                Salir
+              </button>
+            </li>
+          );
+        }
+
         return (
           <li key={item.href} className={cn(isLogin && orientation === "horizontal" && "ml-3")}>
             <Link
@@ -30,8 +59,7 @@ export function NavigationLinks({ activeHref, orientation, onNavigate }: Navigat
                 // Active page: a fine brass rule under the label instead of a filled pill.
                 "after:absolute after:inset-x-3 after:bottom-0.5 after:h-px after:origin-left after:bg-brass after:transition-transform after:duration-300 after:content-['']",
                 isActive ? "text-ink after:scale-x-100" : "text-muted hover:text-ink after:scale-x-0 hover:after:scale-x-100",
-                isLogin &&
-                  "rounded-full border border-line px-5 after:hidden hover:border-brass hover:bg-surface",
+                isLogin && accountPillClassName,
                 orientation === "vertical" && "px-4 py-3 text-base after:inset-x-4",
               )}
             >

@@ -1,7 +1,9 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type KeyboardEvent } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { logOut } from "@/lib/auth-client";
 import { getActiveNavigationHref } from "./navigation-items";
 import { NavigationLinks } from "./navigation-links";
 
@@ -9,6 +11,8 @@ const mobileNavigationId = "mobile-navigation";
 
 export function SiteNavigation() {
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: currentUser } = useCurrentUser();
   const searchParams = useSearchParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
@@ -17,6 +21,12 @@ export function SiteNavigation() {
 
   function closeMenu() {
     setIsMenuOpen(false);
+  }
+
+  async function handleLogout() {
+    closeMenu();
+    await logOut().catch(() => undefined);
+    router.refresh();
   }
 
   function handleMobileNavigationKeyDown(event: KeyboardEvent<HTMLElement>) {
@@ -28,7 +38,12 @@ export function SiteNavigation() {
   return (
     <>
       <nav aria-label="Principal" className="hidden md:block">
-        <NavigationLinks activeHref={activeHref} orientation="horizontal" />
+        <NavigationLinks
+          activeHref={activeHref}
+          orientation="horizontal"
+          userName={currentUser?.name}
+          onLogout={handleLogout}
+        />
       </nav>
 
       <button
@@ -52,7 +67,13 @@ export function SiteNavigation() {
           className="absolute inset-x-0 top-full border-b border-line/60 bg-paper/95 px-4 py-3 shadow-soft backdrop-blur-xl md:hidden"
           onKeyDown={handleMobileNavigationKeyDown}
         >
-          <NavigationLinks activeHref={activeHref} orientation="vertical" onNavigate={closeMenu} />
+          <NavigationLinks
+            activeHref={activeHref}
+            orientation="vertical"
+            onNavigate={closeMenu}
+            userName={currentUser?.name}
+            onLogout={handleLogout}
+          />
         </nav>
       )}
     </>
