@@ -43,6 +43,9 @@ describe.skipIf(!hasDatabaseUrl)("public properties API", () => {
   let publishedId: string;
   let draftId: string;
   let featuredRentId: string;
+  let searchTargetId: string;
+  let accentedId: string;
+  let unaccentedId: string;
 
   beforeAll(async () => {
     const prisma = await getPrisma();
@@ -85,7 +88,44 @@ describe.skipIf(!hasDatabaseUrl)("public properties API", () => {
     const featuredRent = await prisma.property.create({
       data: { ...baseProperty, title: `Featured rent ${testRunId}`, operationType: "RENT", price: "1450", isPublished: true, isFeatured: true },
     });
+    const searchTarget = await prisma.property.create({
+      data: {
+        ...baseProperty,
+        title: `Casona Zzquux ${testRunId}`,
+        description: `Antigua casa con jardín interior y estilo colonial ${testRunId}`,
+        commune: `Peñalolén${testRunId}`,
+        city: `Ciudad Vxyzw ${testRunId}`,
+        region: `Región Qwerty ${testRunId}`,
+        isPublished: true,
+      },
+    });
+    await prisma.property.create({
+      data: { ...baseProperty, title: `Draft Zzquux ${testRunId}`, isPublished: false },
+    });
+    // Stored WITH accents: "Ñandú" in the title, "Maipú" and "Ñuñoa" in the location.
+    const accented = await prisma.property.create({
+      data: {
+        ...baseProperty,
+        title: `Ñandú Quillón ${testRunId}`,
+        description: "Casa con pingüinera",
+        commune: `Maipú${testRunId}`,
+        city: `Ñuñoa${testRunId}`,
+        isPublished: true,
+      },
+    });
+    // Stored WITHOUT accents (as an admin may type them): "Rapel" and "Penaflor".
+    const unaccented = await prisma.property.create({
+      data: {
+        ...baseProperty,
+        title: `Parcela Rapel ${testRunId}`,
+        commune: `Penaflor${testRunId}`,
+        isPublished: true,
+      },
+    });
+    accentedId = accented.id;
+    unaccentedId = unaccented.id;
     publishedId = published.id;
+    searchTargetId = searchTarget.id;
     featuredRentId = featuredRent.id;
     draftId = draft.id;
   });
@@ -152,6 +192,144 @@ describe.skipIf(!hasDatabaseUrl)("public properties API", () => {
       const featuredSale = (await listProperties("?featured=true&operation=SALE")).body as PaginatedResponse<PropertySummary>;
       expect(featuredSale.data).toEqual([]);
       expect(featuredSale.meta.total).toBe(0);
+    });
+
+    describe("search", () => {
+      const searchIds = async (query: string) => {
+        const { status, body } = await listProperties(`?pageSize=50&search=${encodeURIComponent(query)}`);
+        expect(status).toBe(200);
+        return (body as PaginatedResponse<PropertySummary>).data.map((item) => item.id);
+      };
+
+      it.each([
+        ["title", "Zzquux"],
+        ["description", "colonial"],
+        ["commune", "Peñalolén"],
+        ["city", "Vxyzw"],
+        ["region", "Qwerty"],
+      ])("matches the %s", async (_field, term) => {
+        expect(await searchIds(`${term} ${testRunId}`)).toEqual([searchTargetId]);
+      });
+
+      describe("accents", () => {
+        it.each([
+          ["maipu", "text without accents finds an accented commune"],
+          ["Maipú", "accented text finds the same accented commune"],
+          ["MAIPÚ", "uppercase accented text"],
+          ["MAIPU", "uppercase text without accents"],
+          ["maipú", "lowercase accented text"],
+        ])("finds the property stored as Maipú when searching %s (%s)", async (query) => {
+          expect(await searchIds(`${query}${testRunId}`)).toEqual([accentedId]);
+        });
+
+        it.each(["nunoa", "Ñuñoa", "ÑUÑOA", "NUNOA", "ñunoa", "nuñoa"])("finds Ñuñoa when searching %s", async (query) => {
+          expect(await searchIds(`${query}${testRunId}`)).toEqual([accentedId]);
+        });
+
+        it("finds accented text in the title and the description", async () => {
+          expect(await searchIds(`nandu quillon ${testRunId}`)).toEqual([accentedId]);
+          expect(await searchIds(`ÑANDÚ QUILLÓN ${testRunId}`)).toEqual([accentedId]);
+          expect(await searchIds(`pinguinera ${testRunId}`)).toEqual([accentedId]);
+          expect(await searchIds(`pingüinera ${testRunId}`)).toEqual([accentedId]);
+        });
+
+        it("finds text stored without accents when the search has accents", async () => {
+          expect(await searchIds(`Peñaflor${testRunId}`)).toEqual([unaccentedId]);
+          expect(await searchIds(`penaflor${testRunId}`)).toEqual([unaccentedId]);
+          expect(await searchIds(`Rápel ${testRunId}`)).toEqual([unaccentedId]);
+        });
+
+        it("accepts decomposed Unicode (letter plus separate accent)", async () => {
+          expect(await searchIds(`Maipu\u0301${testRunId}`)).toEqual([accentedId]);
+          expect(await searchIds(`N\u0303un\u0303oa${testRunId}`)).toEqual([accentedId]);
+        });
+
+        it("matches several words with mixed accents", async () => {
+          expect(await searchIds(`Maipú nunoa ñandú ${testRunId}`)).toEqual([accentedId]);
+        });
+
+        it("does not treat different letters as equal", async () => {
+          expect(await searchIds(`mainu${testRunId}`)).toEqual([]);
+          expect(await searchIds(`maipo${testRunId}`)).toEqual([]);
+        });
+
+        it("keeps the search column up to date when a property is edited", async () => {
+          const prisma = await getPrisma();
+          await prisma.property.update({
+            where: { id: unaccentedId },
+            data: { commune: `Ñiquén${testRunId}` },
+          });
+
+          expect(await searchIds(`niquen${testRunId}`)).toEqual([unaccentedId]);
+          expect(await searchIds(`Ñiquén${testRunId}`)).toEqual([unaccentedId]);
+          expect(await searchIds(`penaflor${testRunId}`)).toEqual([]);
+        });
+
+        it("never exposes the search column in the API responses", async () => {
+          const { body } = await listProperties(`?search=${encodeURIComponent(`maipu${testRunId}`)}`);
+          expect(JSON.stringify(body)).not.toContain("searchText");
+          const detail = await getProperty(accentedId);
+          expect(JSON.stringify(detail.body)).not.toContain("searchText");
+        });
+      });
+
+      it("ignores case", async () => {
+        expect(await searchIds(`ZZQUUX ${testRunId}`)).toEqual([searchTargetId]);
+        expect(await searchIds(`zzquux ${testRunId}`)).toEqual([searchTargetId]);
+      });
+
+      it("requires every word, each one in any field", async () => {
+        expect(await searchIds(`zzquux colonial vxyzw ${testRunId}`)).toEqual([searchTargetId]);
+        expect(await searchIds(`zzquux inexistente ${testRunId}`)).toEqual([]);
+      });
+
+      it("matches partial words", async () => {
+        expect(await searchIds(`zzqu ${testRunId}`)).toEqual([searchTargetId]);
+      });
+
+      it("never returns unpublished properties", async () => {
+        expect(await searchIds(`draft ${testRunId}`)).toEqual([]);
+        expect(await searchIds(`Draft Zzquux ${testRunId}`)).toEqual([]);
+      });
+
+      it("treats % and _ as plain characters instead of wildcards", async () => {
+        expect(await searchIds("%")).toEqual([]);
+        expect(await searchIds("_")).toEqual([]);
+        expect(await searchIds(`zzq_ux ${testRunId}`)).toEqual([]);
+      });
+
+      it("treats quotes and SQL-looking text as plain text", async () => {
+        expect(await searchIds("'; DROP TABLE \"Property\"; --")).toEqual([]);
+        const { body } = await listProperties("?pageSize=1");
+        expect((body as PaginatedResponse<PropertySummary>).meta.total).toBeGreaterThan(0);
+      });
+
+      it("counts and paginates only the matches", async () => {
+        const { body } = await listProperties(`?pageSize=1&search=${encodeURIComponent(`zzquux ${testRunId}`)}`);
+        expect((body as PaginatedResponse<PropertySummary>).meta).toEqual({
+          page: 1,
+          pageSize: 1,
+          total: 1,
+          totalPages: 1,
+        });
+      });
+
+      it("combines with the other filters", async () => {
+        const text = encodeURIComponent(`zzquux ${testRunId}`);
+        const rent = await listProperties(`?operation=RENT&search=${text}`);
+        expect((rent.body as PaginatedResponse<PropertySummary>).data).toEqual([]);
+        const sale = await listProperties(`?operation=SALE&search=${text}`);
+        expect((sale.body as PaginatedResponse<PropertySummary>).data).toHaveLength(1);
+      });
+
+      it("ignores an empty search and rejects an excessively long one", async () => {
+        const all = await listProperties("?pageSize=1");
+        const empty = await listProperties("?pageSize=1&search=%20%20");
+        expect((empty.body as PaginatedResponse<PropertySummary>).meta.total).toBe(
+          (all.body as PaginatedResponse<PropertySummary>).meta.total,
+        );
+        expect((await listProperties(`?search=${"a".repeat(101)}`)).status).toBe(400);
+      });
     });
 
     it("returns 400 for invalid filters", async () => {

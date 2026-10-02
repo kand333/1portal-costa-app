@@ -221,6 +221,37 @@ sort
 
 El filtrado y ordenamiento debe ejecutarse principalmente en PostgreSQL y no cargando todo el catálogo en el navegador.
 
+### Filtros
+
+- Todos se combinan (AND) y viven en la URL con los mismos nombres que en la API.
+- `bedrooms`, `bathrooms` y `minUsableArea` son mínimos («3» = 3 o más); excluyen propiedades sin ese dato (p. ej. terrenos sin dormitorios).
+- `commune`, `city` y `region` usan slugs (`las-condes`, `nunoa`, `region-metropolitana`), insensibles a mayúsculas y acentos. La API los traduce a los nombres guardados; un slug desconocido devuelve 0 resultados.
+- Las ubicaciones admiten varios valores repitiendo el parámetro (`?commune=las-condes&commune=providencia`, máx. 20 por campo): coincide cualquiera de ellos. Repetir un parámetro de valor único (p. ej. `type`) devuelve 400.
+- En el catálogo la barra de filtros va a la izquierda y es plegable en todas las pantallas (abierta por defecto en escritorio, plegada en móvil); las ubicaciones se eligen con casillas.
+- `GET /api/properties/filter-options` entrega las regiones, ciudades y comunas con propiedades publicadas (`{ slug, name }`) para el formulario.
+- La API responde 400 a valores inválidos (`minPrice` > `maxPrice` con mensaje específico). El catálogo ignora valores inválidos de una URL editada en vez de fallar.
+
+### Ordenamiento
+
+- Parámetro `sort`: `newest` (por defecto, más recientes), `price-asc`, `price-desc`, `area-asc`, `area-desc`. Un valor desconocido o repetido devuelve 400; la URL del catálogo omite el valor por defecto.
+- Todos los órdenes terminan con los mismos desempates (fecha e id), así la paginación no repite ni omite propiedades entre páginas.
+- «Superficie» es la superficie útil; las propiedades sin ella (terrenos) quedan al final, ordenadas por superficie total.
+- El precio ordena en USD sin distinguir operación: con venta y arriendo mezclados, los arriendos (mensuales) quedan al principio de «menor a mayor». Para comparar, filtrar antes por operación.
+
+### Estados del catálogo
+
+- Carga inicial: esqueletos. Al cambiar página, filtros, búsqueda u orden, la lista previa permanece atenuada (`aria-busy`) hasta que llegan los nuevos resultados, sin parpadeo.
+- Error: mensaje con botón «Reintentar». Vacío: mensaje según el contexto (sin publicadas, sin coincidencias con búsqueda o filtros, página inexistente).
+
+### Búsqueda textual
+
+- Busca en título, descripción, comuna, ciudad y región, **sin distinguir mayúsculas ni acentos** (`maipu` encuentra «Maipú»; `nunoa`, «Ñuñoa»; y viceversa).
+- Varias palabras: todas deben aparecer, cada una en cualquiera de los campos. Máximo 5 palabras y 100 caracteres.
+- `Property.searchText` guarda el texto normalizado (minúsculas, sin diacríticos mediante Unicode NFD) y lo mantiene un trigger de PostgreSQL (`search_normalize()`): ninguna escritura debe asignarlo. La API normaliza las palabras buscadas con la misma regla (`normalizeSearchText`); un test compara ambas implementaciones.
+- Los comodines `%` y `_` se escapan: se buscan como texto literal.
+- No se usa la extensión `unaccent`: evita requerir permisos de extensión. Requiere PostgreSQL 13+ y base UTF8.
+- Si el catálogo crece, añadir un índice trigram (`pg_trgm`, GIN) sobre `searchText`.
+
 ## 10. Autenticación y autorización
 
 Utilizar un mecanismo seguro compatible con la API REST.

@@ -9,6 +9,7 @@ export function PropertyCardSkeleton() {
         <div className="h-5 w-1/3 rounded bg-zinc-200 dark:bg-zinc-800" />
         <div className="h-4 w-4/5 rounded bg-zinc-200 dark:bg-zinc-800" />
         <div className="h-4 w-1/2 rounded bg-zinc-200 dark:bg-zinc-800" />
+        <div className="mt-2 h-4 w-3/4 rounded bg-zinc-200 dark:bg-zinc-800" />
       </div>
     </div>
   );

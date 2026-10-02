@@ -49,3 +49,16 @@ export type PaginatedResponse<Item> = {
   data: Item[];
   meta: PaginationMeta;
 };
+
+/** A location value available as a filter: the slug used in URLs and the name to display. */
+export type LocationOption = {
+  slug: string;
+  name: string;
+};
+
+/** Values available for the catalog filters, taken from the published properties. */
+export type PropertyFilterOptions = {
+  regions: LocationOption[];
+  cities: LocationOption[];
+  communes: LocationOption[];
+};
