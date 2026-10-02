@@ -10,11 +10,11 @@ export const metadata: Metadata = {
 
 export default function PropertiesPage() {
   return (
-    <section aria-labelledby="catalog-title" className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 id="catalog-title" className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-white">
+    <section aria-labelledby="catalog-title" className="mx-auto w-full max-w-7xl px-4 pb-20 pt-14 sm:px-6 lg:px-8">
+      <h1 id="catalog-title" className="font-display text-5xl font-semibold tracking-tight text-ink sm:text-6xl">
         Propiedades
       </h1>
-      <p className="mt-2 mb-6 text-zinc-600 dark:text-zinc-400">
+      <p className="mt-3 mb-10 max-w-xl text-lg text-muted">
         Explora las propiedades publicadas en venta y arriendo.
       </p>
       {/* useSearchParams needs a Suspense boundary so the rest of the page can be prerendered. */}

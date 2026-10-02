@@ -34,7 +34,7 @@ export function SiteNavigation() {
       <button
         ref={menuButtonRef}
         type="button"
-        className="inline-flex size-10 items-center justify-center rounded-md text-zinc-700 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 md:hidden dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className="inline-flex size-11 items-center justify-center rounded-full border border-line text-ink transition-colors duration-200 hover:bg-surface md:hidden"
         aria-expanded={isMenuOpen}
         aria-controls={mobileNavigationId}
         aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -49,7 +49,7 @@ export function SiteNavigation() {
         <nav
           id={mobileNavigationId}
           aria-label="Principal"
-          className="absolute inset-x-0 top-full border-b border-zinc-200 bg-background px-4 py-3 shadow-sm md:hidden dark:border-zinc-800"
+          className="absolute inset-x-0 top-full border-b border-line/60 bg-paper/95 px-4 py-3 shadow-soft backdrop-blur-xl md:hidden"
           onKeyDown={handleMobileNavigationKeyDown}
         >
           <NavigationLinks activeHref={activeHref} orientation="vertical" onNavigate={closeMenu} />

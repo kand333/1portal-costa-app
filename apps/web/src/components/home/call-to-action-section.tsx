@@ -6,48 +6,72 @@ const actions = [
     description: "Explora casas, departamentos, oficinas y terrenos en venta en todo Chile.",
     href: "/properties?operation=SALE",
     label: "Ver propiedades en venta",
+    tone: "dark",
   },
   {
     title: "¿Buscas arriendo?",
     description: "Encuentra tu próximo hogar u oficina en arriendo con información completa.",
     href: "/properties?operation=RENT",
     label: "Ver propiedades en arriendo",
+    tone: "light",
   },
-];
+] as const;
 
 const buttonClassName =
-  "inline-flex rounded-lg px-5 py-3 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600";
+  "inline-flex h-12 items-center rounded-full px-7 font-semibold transition-[background-color,color,border-color,transform] duration-200 hover:-translate-y-px active:translate-y-0";
 
 export function CallToActionSection() {
   return (
-    <section aria-labelledby="call-to-action-title" className="bg-zinc-50 dark:bg-zinc-900">
-      <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
-        <h2 id="call-to-action-title" className="sr-only">
-          Comienza tu búsqueda
-        </h2>
-        <div className="grid gap-6 md:grid-cols-2">
-          {actions.map((action) => (
-            <div
-              key={action.href}
-              className="flex flex-col items-start gap-3 rounded-2xl border border-zinc-200 bg-white p-8 dark:border-zinc-800 dark:bg-zinc-950"
+    <section aria-labelledby="call-to-action-title" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <h2 id="call-to-action-title" className="sr-only">
+        Comienza tu búsqueda
+      </h2>
+      <div className="grid gap-5 md:grid-cols-2">
+        {actions.map((action) => (
+          <div
+            key={action.href}
+            className={
+              action.tone === "dark"
+                ? "relative isolate flex min-h-72 flex-col items-start justify-end gap-4 overflow-hidden rounded-[1.75rem] bg-[#1e3b3a] p-8 text-[#f6f5f2] sm:p-10"
+                : "relative isolate flex min-h-72 flex-col items-start justify-end gap-4 overflow-hidden rounded-[1.75rem] border border-line bg-surface p-8 text-ink sm:p-10"
+            }
+          >
+            {action.tone === "dark" && (
+              <div
+                aria-hidden="true"
+                className="absolute -right-24 -top-24 -z-10 size-80 rounded-full bg-[radial-gradient(circle,rgb(169_139_91/0.35),transparent_65%)]"
+              />
+            )}
+            <h3 className="font-display text-4xl font-semibold leading-tight tracking-tight">{action.title}</h3>
+            <p className={action.tone === "dark" ? "max-w-sm text-[#f6f5f2]/75" : "max-w-sm text-muted"}>
+              {action.description}
+            </p>
+            <Link
+              href={action.href}
+              className={
+                action.tone === "dark"
+                  ? `${buttonClassName} mt-2 bg-[#f6f5f2] text-[#121719] hover:bg-white`
+                  : `${buttonClassName} mt-2 bg-accent text-on-accent hover:bg-accent-hover`
+              }
             >
-              <h3 className="text-xl font-bold text-zinc-900 dark:text-white">{action.title}</h3>
-              <p className="text-zinc-600 dark:text-zinc-400">{action.description}</p>
-              <Link href={action.href} className={`${buttonClassName} mt-2 bg-sky-700 text-white hover:bg-sky-800`}>
-                {action.label}
-              </Link>
-            </div>
-          ))}
-        </div>
-        <div className="mt-6 flex flex-col items-start gap-4 rounded-2xl bg-sky-800 p-8 text-white sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h3 className="text-xl font-bold">Guarda las propiedades que te interesan</h3>
-            <p className="mt-1 text-sky-100">Ingresa para guardar favoritos y revisar tus consultas.</p>
+              {action.label}
+            </Link>
           </div>
-          <Link href="/login" className={`${buttonClassName} bg-white text-sky-900 hover:bg-sky-50`}>
-            Ingresar
-          </Link>
+        ))}
+      </div>
+      <div className="mt-5 flex flex-col items-start gap-5 rounded-[1.75rem] border border-line px-8 py-7 sm:flex-row sm:items-center sm:justify-between sm:px-10">
+        <div>
+          <h3 className="font-display text-2xl font-semibold tracking-tight text-ink">
+            Guarda las propiedades que te interesan
+          </h3>
+          <p className="mt-1 text-muted">Ingresa para guardar favoritos y revisar tus consultas.</p>
         </div>
+        <Link
+          href="/login"
+          className={`${buttonClassName} shrink-0 border border-line text-ink hover:border-brass hover:bg-surface`}
+        >
+          Ingresar
+        </Link>
       </div>
     </section>
   );

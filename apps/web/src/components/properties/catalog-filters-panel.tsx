@@ -24,8 +24,8 @@ const priceErrorId = "catalog-filters-price-error";
 const ROOM_OPTIONS = [1, 2, 3, 4, 5];
 
 const fieldClassName =
-  "h-10 w-full rounded-lg border border-zinc-300 bg-white px-3 text-sm text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100";
-const labelClassName = "mb-1 block text-sm font-medium text-zinc-800 dark:text-zinc-200";
+  "h-11 w-full rounded-xl border border-line bg-surface px-3.5 text-sm text-ink transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
+const labelClassName = "mb-1.5 block text-sm font-medium text-ink";
 
 const toText = (value: number | string | undefined) => (value === undefined ? "" : String(value));
 
@@ -163,14 +163,14 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
         <legend className={labelClassName}>
           {legend}
           {selected.length > 0 && (
-            <span className="font-normal text-zinc-500"> ({selected.length} seleccionadas)</span>
+            <span className="font-normal text-muted"> ({selected.length} seleccionadas)</span>
           )}
         </legend>
         {optionsLoading && items.length === 0 ? (
-          <p className="text-sm text-zinc-500">Cargando…</p>
+          <p className="text-sm text-muted">Cargando…</p>
         ) : (
           // Scrolls when the list is long so the panel keeps a reasonable height.
-          <ul className="max-h-44 space-y-1 overflow-y-auto rounded-lg border border-zinc-200 p-2 dark:border-zinc-800">
+          <ul className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-line p-3">
             {items.map((option) => {
               const checkboxId = `filter-${filterName}-${option.slug}`;
               return (
@@ -182,9 +182,9 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
                     value={option.slug}
                     checked={selected.includes(option.slug)}
                     onChange={handleCheckboxChange}
-                    className="size-4 rounded border-zinc-300 accent-sky-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600"
+                    className="size-4 rounded accent-[var(--accent)]"
                   />
-                  <label htmlFor={checkboxId} className="text-sm text-zinc-800 dark:text-zinc-200">
+                  <label htmlFor={checkboxId} className="text-sm text-ink">
                     {option.name}
                   </label>
                 </li>
@@ -204,14 +204,14 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
         aria-expanded={isOpen}
         aria-controls={panelId}
         onClick={onToggle}
-        className="mb-4 inline-flex h-11 items-center gap-2 rounded-lg border border-zinc-300 px-4 text-sm font-semibold text-zinc-800 hover:bg-zinc-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+        className="mb-4 inline-flex h-11 items-center gap-2 rounded-full border border-line px-5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-brass hover:bg-surface"
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
           <path d="M4 6h16M7 12h10M10 18h4" />
         </svg>
         {isOpen ? "Ocultar filtros" : "Mostrar filtros"}
         {activeCount > 0 && (
-          <span className="rounded-full bg-sky-700 px-2 py-0.5 text-xs text-white">
+          <span className="rounded-full bg-accent px-2 py-0.5 text-xs text-on-accent">
             {activeCount}
             <span className="sr-only"> {activeCount === 1 ? "filtro activo" : "filtros activos"}</span>
           </span>
@@ -226,9 +226,9 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
         noValidate
         hidden={!isOpen}
         onSubmit={handleSubmit}
-        className="space-y-4 rounded-xl border border-zinc-200 p-4 dark:border-zinc-800"
+        className="space-y-5 rounded-[1.25rem] border border-line bg-surface p-5"
       >
-        <h2 className="text-base font-semibold text-zinc-900 dark:text-white">Filtrar propiedades</h2>
+        <h2 className="font-display text-2xl font-semibold tracking-tight text-ink">Filtrar propiedades</h2>
 
         <fieldset>
           <legend className={labelClassName}>Operación</legend>
@@ -242,9 +242,9 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
                   value={operation}
                   checked={values.operation.includes(operation)}
                   onChange={handleCheckboxChange}
-                  className="size-4 rounded border-zinc-300 accent-sky-700 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600"
+                  className="size-4 rounded accent-[var(--accent)]"
                 />
-                <label htmlFor={`filter-operation-${operation}`} className="text-sm text-zinc-800 dark:text-zinc-200">
+                <label htmlFor={`filter-operation-${operation}`} className="text-sm text-ink">
                   {operationLabels[operation]}
                 </label>
               </div>
@@ -363,20 +363,20 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
         {locationSelect("city", "Ciudad", options?.cities)}
         {locationSelect("region", "Región", options?.regions)}
         {optionsError && (
-          <p className="text-sm text-zinc-600 dark:text-zinc-400">No pudimos cargar las ubicaciones disponibles.</p>
+          <p className="text-sm text-muted">No pudimos cargar las ubicaciones disponibles.</p>
         )}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button
             type="submit"
-            className="h-10 rounded-lg bg-sky-700 px-4 text-sm font-semibold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+            className="h-11 rounded-full bg-accent px-6 text-sm font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0"
           >
             Aplicar filtros
           </button>
           {activeCount > 0 && (
             <Link
               href={buildCatalogFiltersHref(pathname, currentParams(), {})}
-              className="text-sm font-semibold text-sky-700 hover:text-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:text-sky-400"
+              className="border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
             >
               Limpiar filtros
             </Link>

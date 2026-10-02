@@ -14,13 +14,14 @@ function SiteNavigationFallback() {
 
 export function SiteHeader() {
   return (
-    <header className="sticky top-0 z-40 border-b border-zinc-200 bg-background/95 backdrop-blur dark:border-zinc-800">
-      <div className="relative mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-40 border-b border-line/60 bg-paper/75 backdrop-blur-xl">
+      <div className="relative mx-auto flex h-18 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="rounded-md text-lg font-semibold tracking-tight text-zinc-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:text-white"
+          translate="no"
+          className="font-display text-2xl font-semibold tracking-tight text-ink"
         >
-          Portal <span className="text-sky-700 dark:text-sky-400">Inmobiliario</span>
+          Portal Inmobiliario
         </Link>
         <Suspense fallback={<SiteNavigationFallback />}>
           <SiteNavigation />

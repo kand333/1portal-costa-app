@@ -25,19 +25,19 @@ export function PropertyShowcaseSection({
   const titleId = `${id}-title`;
 
   return (
-    <section id={id} aria-labelledby={titleId} className="mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-      <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+    <section id={id} aria-labelledby={titleId} className="mx-auto w-full max-w-7xl px-4 py-16 sm:px-6 lg:px-8 first-of-type:pt-24">
+      <div className="mb-10 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h2 id={titleId} className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+          <h2 id={titleId} className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
             {title}
           </h2>
-          <p className="mt-1 text-zinc-600 dark:text-zinc-400">{description}</p>
+          <p className="mt-2 max-w-xl text-muted">{description}</p>
         </div>
         <Link
           href={viewAllHref}
-          className="rounded-md text-sm font-semibold text-sky-700 hover:text-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:text-sky-400"
+          className="w-fit border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
         >
-          {viewAllLabel} <span aria-hidden="true">→</span>
+          {viewAllLabel}
         </Link>
       </div>
 

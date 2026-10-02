@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { PointerGlow } from "@/components/ui/pointer-glow";
 import type { PropertySummary } from "@portal/shared/property";
 import {
   formatLocation,
@@ -27,28 +28,30 @@ export function PropertyCard({ property }: PropertyCardProps) {
   const highlights = getPropertyHighlights(property);
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-zinc-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900">
-      <div className="relative aspect-[4/3] bg-zinc-100 dark:bg-zinc-800">
+    <PointerGlow className="relative h-full rounded-[1.25rem] transition-transform duration-500 ease-out hover:-translate-y-0.5 motion-reduce:transform-none">
+    <article className="group relative flex h-full flex-col overflow-hidden rounded-[1.25rem] border border-line/70 bg-surface shadow-soft transition-shadow duration-500 hover:shadow-lift">
+      <div className="relative aspect-[5/4] overflow-hidden bg-line/40">
         {property.mainImageUrl ? (
           <Image
             src={property.mainImageUrl}
             alt={`${propertyTypeLabel} en ${location}: ${property.title}`}
             fill
             sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-[1.03] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (
-          <div className="flex h-full items-center justify-center text-sm text-zinc-500">Sin fotografía</div>
+          <div className="flex h-full items-center justify-center text-sm text-muted">Sin fotografía</div>
         )}
-        <span className="absolute left-3 top-3 rounded-full bg-white/95 px-3 py-1 text-xs font-semibold text-zinc-900 shadow-sm">
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent" />
+        <span className="absolute left-4 top-4 rounded-full border border-white/50 bg-white/75 px-3.5 py-1 text-xs font-semibold text-[#121719] backdrop-blur-md">
           {operationLabels[property.operationType]}
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <p className="text-lg font-semibold text-sky-800 dark:text-sky-300">
+      <div className="flex flex-1 flex-col gap-1.5 p-6">
+        <p className="font-display text-3xl font-semibold leading-none tracking-tight text-ink tabular-nums">
           {formatPrice(property.price, property.currency, property.operationType)}
         </p>
-        <h3 className="line-clamp-2 font-medium text-zinc-900 dark:text-zinc-100">
+        <h3 className="mt-1 line-clamp-2 font-medium leading-snug text-ink">
           {/* The stretched link makes the whole card clickable while keeping one focusable element. */}
           <Link
             href={`/properties/${property.id}`}
@@ -57,20 +60,21 @@ export function PropertyCard({ property }: PropertyCardProps) {
             {property.title}
           </Link>
         </h3>
-        <p className="text-sm text-zinc-600 dark:text-zinc-400">
-          {propertyTypeLabel} · {location}
+        <p className="flex flex-wrap gap-x-2 text-sm text-muted">
+          <span className="font-medium text-ink/80">{propertyTypeLabel}</span>
+          <span>{location}</span>
         </p>
         {highlights.length > 0 && (
           <ul
             aria-label="Características principales"
-            className="mt-auto flex flex-wrap gap-x-4 gap-y-1 border-t border-zinc-100 pt-3 text-sm text-zinc-700 dark:border-zinc-800 dark:text-zinc-300"
+            className="mt-auto flex flex-wrap gap-x-5 gap-y-1 border-t border-line/70 pt-4 text-sm text-muted"
           >
             {highlights.map((highlight) => (
               <li key={highlight.kind} className="flex items-center gap-1.5">
                 <svg
                   aria-hidden="true"
                   viewBox="0 0 24 24"
-                  className="size-4 shrink-0 text-zinc-400"
+                  className="size-4 shrink-0 text-brass-text"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth={1.75}
@@ -86,5 +90,7 @@ export function PropertyCard({ property }: PropertyCardProps) {
         )}
       </div>
     </article>
+    <div className="glow-ring" aria-hidden="true" />
+    </PointerGlow>
   );
 }

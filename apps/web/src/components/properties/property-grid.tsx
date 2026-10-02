@@ -9,8 +9,8 @@ import { PropertyCardSkeleton } from "./property-card-skeleton";
 export type PropertyGridLayout = "full" | "withSidebar";
 
 const gridClassNames: Record<PropertyGridLayout, string> = {
-  full: "grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3",
-  withSidebar: "grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3",
+  full: "grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3",
+  withSidebar: "grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3",
 };
 
 type PropertyGridProps = {

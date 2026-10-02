@@ -37,7 +37,7 @@ export function CatalogSearchForm({ search }: CatalogSearchFormProps) {
   }
 
   return (
-    <form action={pathname} method="get" role="search" aria-label="Buscar en el catálogo" onSubmit={handleSubmit} className="mb-6 flex flex-wrap gap-3">
+    <form action={pathname} method="get" role="search" aria-label="Buscar en el catálogo" onSubmit={handleSubmit} className="mb-8 flex flex-wrap gap-3">
       <div className="min-w-0 flex-1 basis-64">
         <label htmlFor="catalog-search" className="sr-only">
           Buscar por título, comuna, ciudad, región o descripción
@@ -50,19 +50,19 @@ export function CatalogSearchForm({ search }: CatalogSearchFormProps) {
           onChange={handleChange}
           maxLength={MAX_SEARCH_LENGTH}
           placeholder="Busca por comuna, ciudad o palabra clave"
-          className="h-11 w-full rounded-lg border border-zinc-300 bg-white px-3 text-zinc-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100"
+          className="h-12 w-full rounded-full border border-line bg-surface px-5 text-ink shadow-soft transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
         />
       </div>
       <button
         type="submit"
-        className="h-11 rounded-lg bg-sky-700 px-5 font-semibold text-white hover:bg-sky-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
+        className="h-12 rounded-full bg-accent px-7 font-semibold text-on-accent transition-[background-color,transform] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0"
       >
         Buscar
       </button>
       {search && (
         <Link
           href={buildCatalogSearchHref(pathname, new URLSearchParams(searchParams.toString()), "")}
-          className="inline-flex h-11 items-center rounded-lg px-3 text-sm font-semibold text-sky-700 hover:text-sky-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600 dark:text-sky-400"
+          className="inline-flex h-12 items-center px-2 text-sm font-semibold text-ink underline decoration-brass decoration-1 underline-offset-4 transition-colors duration-200 hover:decoration-ink"
         >
           Limpiar búsqueda
         </Link>
