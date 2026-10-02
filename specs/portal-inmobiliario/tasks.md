@@ -92,10 +92,11 @@
   - Loading, vacío y error.
   - Skeletons cuando aporten valor.
 
-- [ ] **Paso 13 — Detalle de propiedad**
+- [x] **Paso 13 — Detalle de propiedad**
   - Crear `/properties/{id}`.
   - Mostrar información completa.
   - Consumir exclusivamente API REST.
+  - Hecho: Server Component que llama a la API por `API_INTERNAL_URL` (sin caché); 404 propio para id inválido o no publicada; error con «Reintentar». Muestra la foto principal; galería, mapa y contacto en los pasos 14–16.
 
 - [ ] **Paso 14 — Galería**
   - Imagen principal.
