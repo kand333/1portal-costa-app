@@ -38,6 +38,25 @@ describe("PropertyCard", () => {
     expect(html).toContain(`alt="Departamento en Las Condes, Santiago: ${property.title}"`);
   });
 
+  it("shows bedrooms, bathrooms and usable area as a labelled list", () => {
+    const html = renderToStaticMarkup(<PropertyCard property={property} />);
+
+    expect(html).toContain('aria-label="Características principales"');
+    expect(html).toContain("3 dormitorios");
+    expect(html).toContain("2 baños");
+    expect(html).toContain("95 m² útiles");
+  });
+
+  it("shows only the total area for land and hides the list when nothing applies", () => {
+    const land = { ...property, propertyType: "LAND" as const, bedrooms: null, bathrooms: null, usableArea: null, totalArea: 5000 };
+    const landHtml = renderToStaticMarkup(<PropertyCard property={land} />);
+    expect(landHtml).toContain("5.000 m² totales");
+    expect(landHtml).not.toContain("dormitorio");
+
+    const bare = { ...land, totalArea: null };
+    expect(renderToStaticMarkup(<PropertyCard property={bare} />)).not.toContain("Características principales");
+  });
+
   it("shows a placeholder when the property has no image", () => {
     const html = renderToStaticMarkup(<PropertyCard property={{ ...property, mainImageUrl: null }} />);
     expect(html).not.toContain("<img");

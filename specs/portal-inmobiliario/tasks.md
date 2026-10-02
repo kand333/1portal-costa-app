@@ -58,22 +58,22 @@
   - Contrato REST compartido (tipos, enums, esquemas).
   - Mantener pruebas, build y comportamiento existentes.
 
-- [ ] **Paso 8 — PropertyCard y grid responsive**
+- [x] **Paso 8 — PropertyCard y grid responsive**
   - Crear componente reutilizable.
   - Imagen, título, precio, operación, ubicación, dormitorios, baños y superficie.
   - Crear grid responsive.
 
-- [ ] **Paso 9 — Catálogo**
+- [x] **Paso 9 — Catálogo**
   - Crear `/properties`.
   - Consumir API REST.
   - Mostrar propiedades publicadas.
 
-- [ ] **Paso 10 — Búsqueda**
+- [x] **Paso 10 — Búsqueda**
   - Búsqueda textual.
   - Título, comuna, ciudad, región y descripción.
   - Reflejar búsqueda en query parameters.
 
-- [ ] **Paso 11 — Filtros**
+- [x] **Paso 11 — Filtros**
   - Venta/arriendo.
   - Tipo.
   - Rango de precio.
@@ -82,8 +82,10 @@
   - Superficie mínima.
   - Comuna/ciudad/región.
   - Permitir filtros combinados.
+  - [x] Ajuste: barra lateral izquierda plegable y selección múltiple de región/ciudad/comuna (casillas).
+  - [x] Ajuste: Operación con casillas Venta/Arriendo; orden final Comuna (casillas) → Ciudad → Región (selects de un valor).
 
-- [ ] **Paso 12 — Ordenamiento y estados**
+- [x] **Paso 12 — Ordenamiento y estados**
   - Más recientes.
   - Precio ascendente/descendente.
   - Superficie ascendente/descendente.

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { ApiError } from "@/lib/http/api-error";
 import * as propertyRepository from "@/repositories/property-repository";
-import { getPublishedPropertyDetail, listPublishedProperties } from "./property-service";
+import { getPublishedPropertyDetail, listPublishedProperties, splitSearchTerms } from "./property-service";
 
 vi.mock("@/repositories/property-repository", () => ({
   findPublishedProperties: vi.fn(),
@@ -51,8 +51,9 @@ describe("listPublishedProperties", () => {
     const result = await listPublishedProperties({ page: 3, pageSize: 10 });
 
     expect(propertyRepository.findPublishedProperties).toHaveBeenCalledWith(
-      { operationType: undefined, isFeatured: undefined },
+      { operationType: undefined, isFeatured: undefined, searchTerms: [] },
       { skip: 20, take: 10 },
+      undefined,
     );
     expect(result.meta).toEqual({ page: 3, pageSize: 10, total: 25, totalPages: 3 });
   });
@@ -92,8 +93,33 @@ describe("listPublishedProperties", () => {
     await listPublishedProperties({ page: 1, pageSize: 6, operation: "RENT", featured: true });
 
     expect(propertyRepository.findPublishedProperties).toHaveBeenCalledWith(
-      { operationType: "RENT", isFeatured: true },
+      { operationType: "RENT", isFeatured: true, searchTerms: [] },
       { skip: 0, take: 6 },
+      undefined,
+    );
+  });
+
+  it("passes the search words to the repository", async () => {
+    vi.mocked(propertyRepository.findPublishedProperties).mockResolvedValue({ records: [], total: 0 });
+
+    await listPublishedProperties({ page: 1, pageSize: 12, search: "Casa  Providencia" });
+
+    expect(propertyRepository.findPublishedProperties).toHaveBeenCalledWith(
+      expect.objectContaining({ searchTerms: ["casa", "providencia"] }),
+      { skip: 0, take: 12 },
+      undefined,
+    );
+  });
+
+  it("passes the requested sort order to the repository", async () => {
+    vi.mocked(propertyRepository.findPublishedProperties).mockResolvedValue({ records: [], total: 0 });
+
+    await listPublishedProperties({ page: 2, pageSize: 6, sort: "price-desc" });
+
+    expect(propertyRepository.findPublishedProperties).toHaveBeenCalledWith(
+      expect.any(Object),
+      { skip: 6, take: 6 },
+      "price-desc",
     );
   });
 
@@ -126,5 +152,34 @@ describe("getPublishedPropertyDetail", () => {
 
     expect(error).toBeInstanceOf(ApiError);
     expect(error).toMatchObject({ status: 404, message: "Propiedad no encontrada" });
+  });
+});
+
+describe("splitSearchTerms", () => {
+  it("returns no terms for an empty search", () => {
+    expect(splitSearchTerms(undefined)).toEqual([]);
+    expect(splitSearchTerms("")).toEqual([]);
+    expect(splitSearchTerms("   ")).toEqual([]);
+  });
+
+  it("removes accents so the words match the normalized search column", () => {
+    expect(splitSearchTerms("Maipú Ñuñoa")).toEqual(["maipu", "nunoa"]);
+    expect(splitSearchTerms("CONCÓN")).toEqual(["concon"]);
+  });
+
+  it("treats words that only differ in accents or case as repeated", () => {
+    expect(splitSearchTerms("Maipú maipu MAIPÚ")).toEqual(["maipu"]);
+  });
+
+  it("splits on any whitespace and lowercases", () => {
+    expect(splitSearchTerms("  Casa 	 Las   Condes ")).toEqual(["casa", "las", "condes"]);
+  });
+
+  it("removes repeated words", () => {
+    expect(splitSearchTerms("casa CASA casa")).toEqual(["casa"]);
+  });
+
+  it("ignores words beyond the limit", () => {
+    expect(splitSearchTerms("a b c d e f g")).toEqual(["a", "b", "c", "d", "e"]);
   });
 });

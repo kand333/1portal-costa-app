@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { PropertyCard } from "@/components/properties/property-card";
-import { PropertyCardSkeleton } from "@/components/properties/property-card-skeleton";
+import { PropertyResults } from "@/components/properties/property-results";
 import { useProperties, type PropertiesQuery } from "@/hooks/use-properties";
 
 type PropertyShowcaseSectionProps = {
@@ -13,8 +12,6 @@ type PropertyShowcaseSectionProps = {
   viewAllHref: string;
   viewAllLabel: string;
 };
-
-const gridClassName = "grid gap-6 sm:grid-cols-2 lg:grid-cols-3";
 
 export function PropertyShowcaseSection({
   id,
@@ -44,42 +41,15 @@ export function PropertyShowcaseSection({
         </Link>
       </div>
 
-      {isLoading && (
-        <div className={gridClassName} role="status" aria-label={`Cargando ${title.toLowerCase()}`}>
-          {Array.from({ length: query.pageSize }, (_, index) => (
-            <PropertyCardSkeleton key={index} />
-          ))}
-        </div>
-      )}
-
-      {error && (
-        <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-800 dark:border-red-900 dark:bg-red-950 dark:text-red-200">
-          <p>No pudimos cargar las propiedades. {error.message}</p>
-          <button
-            type="button"
-            onClick={() => mutate()}
-            className="mt-3 rounded-md bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-          >
-            Reintentar
-          </button>
-        </div>
-      )}
-
-      {data && data.data.length === 0 && (
-        <p className="rounded-xl border border-dashed border-zinc-300 p-6 text-center text-zinc-600 dark:border-zinc-700 dark:text-zinc-400">
-          Aún no hay propiedades disponibles en esta sección.
-        </p>
-      )}
-
-      {data && data.data.length > 0 && (
-        <ul className={gridClassName}>
-          {data.data.map((property) => (
-            <li key={property.id}>
-              <PropertyCard property={property} />
-            </li>
-          ))}
-        </ul>
-      )}
+      <PropertyResults
+        data={data}
+        error={error}
+        isLoading={isLoading}
+        onRetry={() => mutate()}
+        skeletonCount={query.pageSize}
+        loadingLabel={`Cargando ${title.toLowerCase()}`}
+        emptyMessage="Aún no hay propiedades disponibles en esta sección."
+      />
     </section>
   );
 }

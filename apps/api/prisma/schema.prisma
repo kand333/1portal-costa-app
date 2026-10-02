@@ -71,6 +71,9 @@ model Property {
   region        String
   isPublished   Boolean       @default(false)
   isFeatured    Boolean       @default(false)
+  // Lowercase, accent-free text (ñ -> n) of title, description, commune, city and region used by
+  // the catalog search. Maintained by the "Property_set_search_text" database trigger: never write it.
+  searchText    String        @default("")
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
