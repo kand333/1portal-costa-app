@@ -98,16 +98,19 @@
   - Consumir exclusivamente API REST.
   - Hecho: Server Component que llama a la API por `API_INTERNAL_URL` (sin caché); 404 propio para id inválido o no publicada; error con «Reintentar». Muestra la foto principal; galería, mapa y contacto en los pasos 14–16.
 
-- [ ] **Paso 14 — Galería**
+- [x] **Paso 14 — Galería**
   - Imagen principal.
   - Miniaturas.
   - Navegación.
   - Responsive.
+  - Hecho: foto principal primero y luego por posición; botones anterior/siguiente con vuelta circular, contador, miniaturas (scroll horizontal en móvil) y flechas del teclado. Sin deslizar con el dedo (los botones cubren el táctil).
 
-- [ ] **Paso 15 — Google Maps**
+- [x] **Paso 15 — Mapa de ubicación (Leaflet + OpenStreetMap)**
   - Construir ubicación desde dirección, comuna, ciudad y región.
-  - Integrar Google Maps.
+  - Integrar el mapa.
   - No solicitar latitud/longitud manual.
+  - Hecho: dirección + comuna + ciudad + región + «Chile».
+  - Reemplazado Google Maps por Leaflet + OpenStreetMap: geocodificación Nominatim en el servidor (caché de 30 días; si no encuentra la calle, usa la comuna), mapa solo en cliente, pin rojo y enlaces a Google Maps (búsqueda de la dirección). Sin claves.
 
 - [ ] **Paso 16 — Contacto con Web3Forms**
   - Formulario de contacto.

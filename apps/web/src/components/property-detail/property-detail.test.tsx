@@ -1,6 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import type { PropertyDetail as PropertyDetailData } from "@portal/shared/property";
+import type { MapLocation } from "@/lib/property-location";
 import { PropertyDetail } from "./property-detail";
 
 const property: PropertyDetailData = {
@@ -31,8 +32,8 @@ const property: PropertyDetailData = {
   updatedAt: "2026-09-17T12:00:00.000Z",
 };
 
-const render = (overrides: Partial<PropertyDetailData> = {}) =>
-  renderToStaticMarkup(<PropertyDetail property={{ ...property, ...overrides }} />);
+const render = (overrides: Partial<PropertyDetailData> = {}, mapLocation: MapLocation | null = null) =>
+  renderToStaticMarkup(<PropertyDetail property={{ ...property, ...overrides }} mapLocation={mapLocation} />);
 
 describe("PropertyDetail", () => {
   it("shows the title as the page heading, the price and the description", () => {
@@ -69,20 +70,28 @@ describe("PropertyDetail", () => {
     expect(html).toContain("Camino La Dehesa 1234, Lo Barnechea, Santiago, Región Metropolitana");
   });
 
-  it("shows the main image with a descriptive alt text", () => {
+  it("shows the photo gallery, starting with the main photo", () => {
     const html = render();
-    expect(html).toContain("photo-1");
-    expect(html).not.toContain("photo-2");
-    expect(html).toContain('alt="Casa en Lo Barnechea, Santiago: Casa mediterránea con piscina"');
-  });
-
-  it("falls back to the first image, or to a placeholder without photos", () => {
-    expect(render({ images: [property.images[0]] })).toContain("photo-2");
-    expect(render({ images: [] })).toContain("Sin fotografía");
+    expect(html).toContain('aria-label="Galería de fotos"');
+    expect(html).toContain('alt="Casa en Lo Barnechea, Santiago: Casa mediterránea con piscina. Foto 1 de 2"');
   });
 
   it("hides the features section when there are none", () => {
     expect(render({ features: [] })).not.toContain("Características");
+  });
+
+  it("shows the map of the geocoded property", () => {
+    expect(render({}, { latitude: -33.35, longitude: -70.52, zoom: 17 })).toContain("Cargando mapa…");
+    expect(render()).not.toContain("Cargando mapa");
+  });
+
+  it("links the address, in blue, to Google Maps in a new tab", () => {
+    const html = render();
+    const googleMapsHref =
+      "https://www.google.com/maps/search/?api=1&amp;query=Camino+La+Dehesa+1234%2C+Lo+Barnechea%2C+Santiago%2C+Regi%C3%B3n+Metropolitana%2C+Chile";
+    expect(html).toMatch(
+      new RegExp(`<a href="${googleMapsHref.replace(/[.?+]/g, "\\$&")}" target="_blank" rel="noopener noreferrer" class="text-blue-700[^"]*">Camino La Dehesa 1234, Lo Barnechea`),
+    );
   });
 
   it("links back to the catalog", () => {

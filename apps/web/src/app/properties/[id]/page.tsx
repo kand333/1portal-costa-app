@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { PropertyDetail } from "@/components/property-detail/property-detail";
+import { geocodeAddress } from "@/lib/geocoding";
 import { fetchPropertyDetail } from "@/lib/property-detail-api";
 
 // One API request per render, shared by the metadata and the page.
@@ -19,5 +20,6 @@ export async function generateMetadata({ params }: PageProps<"/properties/[id]">
 export default async function PropertyDetailPage({ params }: PageProps<"/properties/[id]">) {
   const property = await getProperty((await params).id);
   if (!property) notFound();
-  return <PropertyDetail property={property} />;
+  const mapLocation = await geocodeAddress(property);
+  return <PropertyDetail property={property} mapLocation={mapLocation} />;
 }

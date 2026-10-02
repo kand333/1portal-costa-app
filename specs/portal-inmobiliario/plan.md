@@ -27,7 +27,7 @@ Integraciones externas:
 
 ```text
 Cloudinary  → imágenes
-Google Maps → ubicación
+OpenStreetMap → mapa de ubicación (Leaflet; geocodificación con Nominatim)
 Web3Forms   → contacto
 ```
 
@@ -39,7 +39,7 @@ Web3Forms   → contacto
 - PostgreSQL
 - API REST con Route Handlers de Next.js
 - Cloudinary
-- Google Maps
+- Leaflet + React-Leaflet + OpenStreetMap
 - Web3Forms
 
 ## 3. Restricciones
@@ -295,7 +295,7 @@ Validar:
 
 La eliminación debe mantener sincronizados Cloudinary y PostgreSQL.
 
-## 12. Google Maps
+## 12. Mapa (Leaflet + OpenStreetMap)
 
 Construir la ubicación utilizando:
 
@@ -306,6 +306,13 @@ Construir la ubicación utilizando:
 - país.
 
 No solicitar coordenadas manuales.
+
+Implementación (sin claves):
+
+- El page del detalle geocodifica en el servidor de `apps/web` con Nominatim (`lib/geocoding.ts`) la consulta «dirección, comuna, ciudad, región, Chile» (el país no se guarda: todas las propiedades están en Chile). Si no encuentra la calle, usa la comuna con un zoom más alejado. Caché de 30 días y `User-Agent` propio, según la política de uso de Nominatim (≈1 req/s).
+- El mapa usa Leaflet + React-Leaflet con tiles de OpenStreetMap y atribución OSM. Se carga solo en el navegador (`next/dynamic` con `ssr: false`).
+- La dirección (en azul, sobre el mapa) y el enlace «Abrir en Google Maps» (debajo del mapa) abren Google Maps con la dirección, sin clave. Si la geocodificación falla, se ve solo el enlace.
+- Con tráfico real, guardar las coordenadas en la BD desde la API al guardar la propiedad (transparente para ADMIN).
 
 Si posteriormente se requiere geocodificación interna, debe ser transparente para ADMIN y no modificar los campos obligatorios del formulario.
 
@@ -351,10 +358,9 @@ Utilizar variables de entorno para:
 - conexión PostgreSQL;
 - secretos de autenticación;
 - credenciales Cloudinary;
-- configuración Google Maps;
 - clave Web3Forms.
 
-Crear `.env.example` sin secretos reales en cada aplicación: `apps/api` (PostgreSQL, autenticación, Cloudinary, Web3Forms) y `apps/web` (URL pública, Google Maps, `API_INTERNAL_URL`).
+Crear `.env.example` sin secretos reales en cada aplicación: `apps/api` (PostgreSQL, autenticación, Cloudinary, Web3Forms) y `apps/web` (URL pública, `API_INTERNAL_URL`).
 
 ## 16. Validación
 
