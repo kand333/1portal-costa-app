@@ -79,13 +79,15 @@ describe.skipIf(!hasDatabaseUrl)("seedDatabase", () => {
     const prisma = await getPrisma();
     const [first] = seedProperties;
     const countsBefore = await countSeedRows();
-    await prisma.property.update({ where: { id: first.id }, data: { title: "Modified", features: { deleteMany: {} } } });
+    await prisma.property.update({ where: { id: first.id }, data: { title: "Modified", deletedAt: new Date(), features: { deleteMany: {} } } });
 
     await seedDatabase(prisma);
 
     expect(await countSeedRows()).toEqual(countsBefore);
     const restored = await prisma.property.findUniqueOrThrow({ where: { id: first.id } });
     expect(restored.title).toBe(first.title);
+    // A seed property soft-deleted by ADMIN comes back.
+    expect(restored.deletedAt).toBeNull();
   });
 
   it("keeps images uploaded by ADMIN and does not add placeholders next to them", async () => {

@@ -117,7 +117,7 @@
   - Incluir ID/título de propiedad.
   - Estados enviando/éxito/error.
   - Validar datos.
-  - Hecho: `POST /api/inquiries` guarda primero en PostgreSQL y luego el navegador envía a Web3Forms (el plan gratuito no acepta envíos desde servidor). Clave `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` en `apps/web`. Validación compartida (Zod), honeypot. Si el correo falla, la consulta queda guardada. Usuario autenticado: se enlazará en el Paso 21. Pendiente: probar el correo con una clave real.
+  - Hecho: `POST /api/inquiries` guarda primero en PostgreSQL y luego el navegador envía a Web3Forms (el plan gratuito no acepta envíos desde servidor). Clave `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` en `apps/web`. Validación compartida (Zod), honeypot. Si el correo falla, la consulta queda guardada. Usuario autenticado: enlazado en el Paso 21. Pendiente: probar el correo con una clave real.
 
 ## Fase 3 — Autenticación y usuario
 
@@ -136,46 +136,52 @@
   - Aplicar permisos en backend.
   - Hecho: roles USER/ADMIN (enum compartido verificado contra Prisma). API: `requireUser`/`requireAdmin` (401/403, usuario leído de la BD en cada petición), listos para los endpoints de favoritos y administración. Web: `proxy.ts` + verificación en layout y en cada página (`/account` para USER/ADMIN, `/admin` solo ADMIN; un USER ve «Acceso restringido»). `/account` y `/admin` son páginas mínimas que se completan en el Paso 19 y en la Fase 4.
 
-- [ ] **Paso 19 — Cuenta de usuario**
+- [x] **Paso 19 — Cuenta de usuario**
   - Crear `/account`.
   - Mostrar información básica.
   - Preparar secciones de propiedades interesadas y consultadas.
+  - Hecho: `/account` (protegida) con nombre, email y tipo de cuenta (enlace al panel para ADMIN) y las secciones «Propiedades guardadas» y «Propiedades consultadas» con su estado vacío; sus listas llegan en los Pasos 20 y 21. El nombre en el header enlaza a la cuenta.
 
-- [ ] **Paso 20 — Favoritos**
+- [x] **Paso 20 — Favoritos**
   - Listar.
   - Agregar.
   - Eliminar.
   - Evitar duplicados.
   - Integrar en interfaz.
+  - Hecho: `GET /api/favorites`, `POST|DELETE /api/favorites/{propertyId}` (sesión requerida, idempotentes, 204; duplicados imposibles por la clave primaria). Corazón en tarjetas y detalle (visitante → login), lista en `/account`. Las propiedades despublicadas dejan de aparecer.
 
-- [ ] **Paso 21 — Persistir consultas**
+- [x] **Paso 21 — Persistir consultas**
   - Crear consulta mediante REST.
   - Persistir en PostgreSQL.
   - Asociar propiedad.
   - Asociar usuario cuando exista.
   - Integrar envío Web3Forms.
+  - Hecho: creación, persistencia, propiedad y Web3Forms venían del Paso 16. Ahora, con sesión, la consulta se asocia al usuario; `GET /api/account/inquiries` las lista y `/account` las muestra en «Propiedades consultadas» (con enlace mientras la propiedad siga publicada).
 
 ## Fase 4 — Administración
 
-- [ ] **Paso 22 — Dashboard ADMIN**
+- [x] **Paso 22 — Dashboard ADMIN**
   - Crear `/admin`.
   - Mostrar indicadores.
   - Restringir a ADMIN.
+  - Hecho: `GET /api/admin/dashboard` (solo ADMIN) con total, publicadas, en venta, en arriendo, usuarios y consultas; `/admin` los muestra (con error y «Reintentar» si la API falla). Un USER ve «Acceso restringido» y no se piden los indicadores.
 
-- [ ] **Paso 23 — CRUD REST de propiedades**
+- [x] **Paso 23 — CRUD REST de propiedades**
   - Listar.
   - Crear.
   - Obtener.
   - Actualizar.
   - Eliminar.
   - Proteger endpoints.
+  - Hecho: `GET|POST /api/admin/properties` y `GET|PUT|DELETE /api/admin/properties/{id}`, solo ADMIN (401/403). Incluye las no publicadas, búsqueda y paginación; validación compartida sin latitud/longitud; características por nombre (reutiliza existentes sin distinguir mayúsculas). Eliminar aún no borra imágenes en Cloudinary (Paso 27).
 
-- [ ] **Paso 24 — Interfaz de administración**
+- [x] **Paso 24 — Interfaz de administración**
   - `/admin/properties`.
   - `/admin/properties/new`.
   - `/admin/properties/{id}/edit`.
+  - Hecho: `/admin/properties` lista todas (publicadas o no) desde el servidor, con búsqueda por GET en la URL (`?search=&page=`), paginación, estado (publicada/sin publicar, destacada) y acciones Ver (solo publicadas), Editar y Eliminar (con confirmación; recarga la lista). El panel enlaza a la lista. `/new` y `/{id}/edit` validan ADMIN en la página; editar carga la propiedad y responde 404 si no existe o el id no es UUID. El formulario queda para el Paso 25.
 
-- [ ] **Paso 25 — Formulario de propiedad**
+- [x] **Paso 25 — Formulario de propiedad**
   - Título y descripción.
   - Operación y tipo.
   - Precio.
@@ -186,6 +192,7 @@
   - Características.
   - Publicada/destacada.
   - No agregar latitud/longitud manual.
+  - Hecho: un formulario cliente para crear y editar, validado con `propertyInputSchema` antes de enviar (un error por campo, foco en el primero) y de nuevo en la API. Números opcionales en blanco = no aplica (`null`); acepta coma decimal. Precio en USD. Características como lista (Enter o «Agregar», sin repetir ignorando mayúsculas; la API reutiliza las existentes). Crear (`POST`) lleva a la edición con «Propiedad creada»; guardar (`PUT`) actualiza el encabezado.
 
 - [ ] **Paso 26 — Subida a Cloudinary**
   - Configurar Cloudinary.

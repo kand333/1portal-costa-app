@@ -8,6 +8,7 @@ import {
   propertyTypeLabels,
 } from "@/lib/property-format";
 import { buildGoogleMapsUrl, buildMapQuery, formatPropertyAddress, type MapLocation } from "@/lib/property-location";
+import { FavoriteButton } from "@/components/properties/favorite-button";
 import { PropertyContactForm } from "./property-contact-form";
 import { PropertyGallery } from "./property-gallery";
 import { PropertyMap } from "./property-map";
@@ -42,9 +43,12 @@ export function PropertyDetail({ property, mapLocation }: PropertyDetailProps) {
             {property.title}
           </h1>
         </div>
-        <p className="shrink-0 font-display text-4xl font-semibold tracking-tight text-ink tabular-nums sm:text-5xl">
-          {formatPrice(property.price, property.currency, property.operationType)}
-        </p>
+        <div className="flex shrink-0 flex-wrap items-center gap-5 lg:flex-col lg:items-end">
+          <p className="font-display text-4xl font-semibold tracking-tight text-ink tabular-nums sm:text-5xl">
+            {formatPrice(property.price, property.currency, property.operationType)}
+          </p>
+          <FavoriteButton propertyId={property.id} propertyTitle={property.title} variant="inline" />
+        </div>
       </header>
 
       <div className="mt-10">

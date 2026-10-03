@@ -1,5 +1,9 @@
 import type { InquiryCreateData, InquiryCreated } from "@portal/shared/inquiry";
+import { mutate } from "swr";
 import { ApiClientError, postJson } from "./api-client";
+
+/** Inquiries of the logged-in user (`GET /api/account/inquiries`), shown in /account. */
+export const MY_INQUIRIES_KEY = "/api/account/inquiries";
 
 const WEB3FORMS_SUBMIT_URL = "https://api.web3forms.com/submit";
 
@@ -61,6 +65,9 @@ export async function submitInquiry(
         : "No pudimos enviar tu consulta. Revisa tu conexión e inténtalo de nuevo.";
     return { status: "error", message };
   }
+
+  // A logged-in user sees the new inquiry in /account right away.
+  await mutate(MY_INQUIRIES_KEY);
 
   const emailSent = web3FormsAccessKey ? await sendInquiryEmail(web3FormsAccessKey, inquiry, data) : false;
   return { status: "sent", inquiry, emailSent };

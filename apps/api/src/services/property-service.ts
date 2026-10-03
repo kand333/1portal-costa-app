@@ -22,7 +22,7 @@ type DecimalLike = { toNumber(): number };
 
 const toNullableNumber = (value: DecimalLike | null) => (value === null ? null : value.toNumber());
 
-function toPropertySummary(record: PropertySummaryRecord): PropertySummary {
+export function toPropertySummary(record: PropertySummaryRecord): PropertySummary {
   const { images, price, usableArea, totalArea, createdAt, ...fields } = record;
   return {
     ...fields,
@@ -34,7 +34,7 @@ function toPropertySummary(record: PropertySummaryRecord): PropertySummary {
   };
 }
 
-function toPropertyDetail(record: PropertyDetailRecord): PropertyDetail {
+export function toPropertyDetail(record: PropertyDetailRecord): PropertyDetail {
   const { images, features, price, usableArea, totalArea, createdAt, updatedAt, ...fields } = record;
   return {
     ...fields,

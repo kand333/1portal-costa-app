@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { loginSchema, registerSchema } from "./auth";
+import { changePasswordSchema, loginSchema, registerSchema, updateProfileSchema } from "./auth";
 
 const firstMessage = (result: { success: boolean; error?: { issues: { message: string }[] } }) =>
   result.success ? null : result.error?.issues[0]?.message;
@@ -41,5 +41,40 @@ describe("loginSchema", () => {
     expect(firstMessage(loginSchema.safeParse({ email: "ana@correo.cl", password: "" }))).toBe(
       "Ingresa tu contraseña",
     );
+  });
+});
+
+describe("updateProfileSchema", () => {
+  it("normalizes like the registration and keeps the current password optional", () => {
+    expect(updateProfileSchema.parse({ name: " Ana ", email: " ANA@test.com " })).toEqual({
+      name: "Ana",
+      email: "ana@test.com",
+    });
+    expect(updateProfileSchema.parse({ name: "Ana", email: "ana@test.com", currentPassword: "x" }).currentPassword).toBe(
+      "x",
+    );
+  });
+
+  it("rejects an invalid email", () => {
+    expect(firstMessage(updateProfileSchema.safeParse({ name: "Ana", email: "ana@" }))).toBe(
+      "Ingresa un email válido, por ejemplo nombre@correo.cl",
+    );
+  });
+});
+
+describe("changePasswordSchema", () => {
+  it("accepts the current password and a valid new one", () => {
+    expect(changePasswordSchema.parse({ currentPassword: "test1234", newPassword: "nueva clave 1" })).toEqual({
+      currentPassword: "test1234",
+      newPassword: "nueva clave 1",
+    });
+  });
+
+  it.each([
+    [{ currentPassword: "", newPassword: "nueva clave 1" }, "Ingresa tu contraseña actual"],
+    [{ currentPassword: "test1234", newPassword: "corta" }, "La contraseña debe tener al menos 8 caracteres"],
+    [{ currentPassword: "test1234", newPassword: "test1234" }, "La nueva contraseña debe ser distinta de la actual"],
+  ])("rejects %o", (input, message) => {
+    expect(firstMessage(changePasswordSchema.safeParse(input))).toBe(message);
   });
 });

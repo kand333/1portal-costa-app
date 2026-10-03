@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { inquiryCreateSchema } from "./inquiry";
+import { adminInquiryListQuerySchema, INQUIRY_MESSAGE_MAX_LENGTH, inquiryCreateSchema, inquiryReplySchema } from "./inquiry";
 
 const validInput = {
   propertyId: "5eed0000-0000-4000-8000-000000000001",
@@ -47,5 +47,26 @@ describe("inquiryCreateSchema", () => {
     if (!result.success) {
       expect(result.error.issues.map((issue) => issue.path[0])).toEqual(["propertyId", "name", "email", "message"]);
     }
+  });
+});
+
+describe("inquiryReplySchema", () => {
+  it("trims the reply", () => {
+    expect(inquiryReplySchema.parse({ body: "  Hola, sí está disponible.  " })).toEqual({ body: "Hola, sí está disponible." });
+  });
+
+  it.each([
+    [{ body: "   " }, "Escribe tu respuesta"],
+    [{}, "Escribe tu respuesta"],
+    [{ body: "a".repeat(INQUIRY_MESSAGE_MAX_LENGTH + 1) }, `La respuesta admite hasta ${INQUIRY_MESSAGE_MAX_LENGTH} caracteres`],
+  ])("rejects %o", (input, message) => {
+    const result = inquiryReplySchema.safeParse(input);
+    expect(result.success ? null : result.error.issues[0].message).toBe(message);
+  });
+});
+
+describe("adminInquiryListQuerySchema", () => {
+  it("reads page, page size and search only", () => {
+    expect(adminInquiryListQuerySchema.parse({ page: "2", search: "casa", status: "x" })).toEqual({ page: 2, pageSize: 12, search: "casa" });
   });
 });

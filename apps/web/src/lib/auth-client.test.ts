@@ -1,5 +1,13 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { fetchCurrentUser, getSafeRedirectPath, logIn, logOut, registerAccount } from "./auth-client";
+import {
+  changePassword,
+  fetchCurrentUser,
+  getSafeRedirectPath,
+  logIn,
+  logOut,
+  registerAccount,
+  updateProfile,
+} from "./auth-client";
 
 const { mutateMock } = vi.hoisted(() => ({ mutateMock: vi.fn() }));
 vi.mock("swr", () => ({ mutate: mutateMock }));
@@ -80,5 +88,35 @@ describe("getSafeRedirectPath", () => {
     ["javascript:alert(1)", "/"],
   ])("%o → %o", (next, expected) => {
     expect(getSafeRedirectPath(next)).toBe(expected);
+  });
+});
+
+describe("account updates", () => {
+  it("saves the profile with PATCH and refreshes the session cache", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ ...user, name: "Ana Nueva" }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await updateProfile({ name: "Ana Nueva", email: "ana@correo.cl" });
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/account/profile");
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "PATCH" });
+    expect(mutateMock).toHaveBeenCalledWith("/api/auth/me", { ...user, name: "Ana Nueva" }, { revalidate: false });
+  });
+
+  it("changes the password with PUT and surfaces the API message on errors", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    await expect(changePassword({ currentPassword: "a", newPassword: "nueva clave 1" })).resolves.toBeUndefined();
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/account/password");
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "PUT" });
+
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        Response.json({ message: "La contraseña actual no es correcta", status: 400 }, { status: 400 }),
+      ),
+    );
+    await expect(changePassword({ currentPassword: "mala", newPassword: "nueva clave 1" })).rejects.toMatchObject({
+      message: "La contraseña actual no es correcta",
+    });
   });
 });

@@ -62,7 +62,8 @@ export async function seedDatabase(prisma: PrismaClient): Promise<SeedSummary> {
     await prisma.property.upsert({
       where: { id },
       create: { id, ...data, features: { create: featureLinks }, images: { create: placeholderImages } },
-      update: { ...data, features: { deleteMany: {}, create: featureLinks }, images },
+      // Re-seeding also restores a seed property that ADMIN soft-deleted.
+      update: { ...data, deletedAt: null, features: { deleteMany: {}, create: featureLinks }, images },
     });
   }
 

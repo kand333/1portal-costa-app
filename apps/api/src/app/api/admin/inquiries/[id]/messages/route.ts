@@ -1,0 +1,21 @@
+import { NextResponse, type NextRequest } from "next/server";
+import { requireAdmin } from "@/lib/auth/authorization";
+import { errorResponse, toErrorResponse } from "@/lib/http/api-error";
+import { replyAsAdmin } from "@/services/inquiry-conversation-service";
+import { inquiryIdSchema, inquiryReplySchema } from "@portal/shared/inquiry";
+
+/** ADMIN answers an inquiry; the reply is added to its conversation. */
+export async function POST(request: NextRequest, context: RouteContext<"/api/admin/inquiries/[id]/messages">) {
+  try {
+    const admin = await requireAdmin(request);
+    const { id } = await context.params;
+    if (!inquiryIdSchema.safeParse(id).success) return errorResponse(400, "Identificador de consulta inválido");
+    const body: unknown = await request.json().catch(() => undefined);
+    if (body === undefined) return errorResponse(400, "El cuerpo de la solicitud debe ser JSON válido");
+    const parsed = inquiryReplySchema.safeParse(body);
+    if (!parsed.success) return errorResponse(400, parsed.error.issues[0]?.message ?? "Respuesta inválida");
+    return NextResponse.json(await replyAsAdmin(admin, id, parsed.data), { status: 201 });
+  } catch (error) {
+    return toErrorResponse(error);
+  }
+}

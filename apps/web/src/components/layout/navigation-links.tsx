@@ -8,12 +8,14 @@ type NavigationLinksProps = {
   onNavigate?: () => void;
   /** Name of the logged-in user: replaces «Ingresar» with the name and a «Salir» button. */
   userName?: string;
+  /** The logged-in user is an ADMIN: the name leads to the administration instead of /account. */
+  isAdmin?: boolean;
   onLogout?: () => void;
 };
 
 const accountPillClassName = "rounded-full border border-line px-5 after:hidden hover:border-brass hover:bg-surface";
 
-export function NavigationLinks({ activeHref, orientation, onNavigate, userName, onLogout }: NavigationLinksProps) {
+export function NavigationLinks({ activeHref, orientation, onNavigate, userName, isAdmin = false, onLogout }: NavigationLinksProps) {
   return (
     <ul
       className={cn(
@@ -34,9 +36,16 @@ export function NavigationLinks({ activeHref, orientation, onNavigate, userName,
                 orientation === "horizontal" ? "ml-3" : "justify-between px-4 py-2",
               )}
             >
-              <span className="max-w-40 truncate text-sm font-medium text-ink" title={userName}>
+              <Link
+                href={isAdmin ? "/admin" : "/account"}
+                onClick={onNavigate}
+                aria-current={!isAdmin && activeHref === "/account" ? "page" : undefined}
+                aria-label={isAdmin ? `Panel administración (${userName})` : `Mi cuenta (${userName})`}
+                title={isAdmin ? "Panel administración" : "Mi cuenta"}
+                className="max-w-40 truncate py-2 text-sm font-medium text-ink underline-offset-4 transition-colors duration-200 hover:underline hover:decoration-brass"
+              >
                 {userName}
-              </span>
+              </Link>
               <button
                 type="button"
                 onClick={onLogout}

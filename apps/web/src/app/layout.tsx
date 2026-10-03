@@ -1,7 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Hanken_Grotesk } from "next/font/google";
-import { SiteFooter } from "@/components/layout/site-footer";
-import { SiteHeader } from "@/components/layout/site-header";
 import "./globals.css";
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -28,25 +26,14 @@ export const viewport: Viewport = {
   ],
 };
 
+/** Shared document shell. The public site (`(site)`) and `/admin` each add their own chrome. */
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="es"
       className={`${hankenGrotesk.variable} ${cormorantGaramond.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">
-        <a
-          href="#main-content"
-          className="sr-only rounded-full bg-accent px-5 py-2.5 font-medium text-on-accent focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50"
-        >
-          Saltar al contenido principal
-        </a>
-        <SiteHeader />
-        <main id="main-content" className="flex flex-1 flex-col">
-          {children}
-        </main>
-        <SiteFooter />
-      </body>
+      <body className="min-h-full flex flex-col font-sans">{children}</body>
     </html>
   );
 }

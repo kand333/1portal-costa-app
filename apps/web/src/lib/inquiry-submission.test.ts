@@ -1,6 +1,9 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { submitInquiry } from "./inquiry-submission";
 
+const { mutateMock } = vi.hoisted(() => ({ mutateMock: vi.fn() }));
+vi.mock("swr", () => ({ mutate: mutateMock }));
+
 const data = {
   propertyId: "5eed0000-0000-4000-8000-000000000001",
   name: "María Pérez",
@@ -40,6 +43,8 @@ describe("submitInquiry", () => {
       emailSent: true,
     });
     expect(fetchMock.mock.calls[0][0]).toBe("/api/inquiries");
+    // A logged-in user sees the new inquiry in /account.
+    expect(mutateMock).toHaveBeenCalledWith("/api/account/inquiries");
     expect(requestBody(fetchMock, 0)).toEqual({ ...data, phone: undefined });
     expect(fetchMock.mock.calls[1][0]).toBe("https://api.web3forms.com/submit");
     expect(requestBody(fetchMock, 1)).toMatchObject({

@@ -45,8 +45,9 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  favorites Favorite[]
-  inquiries Inquiry[]
+  favorites       Favorite[]
+  inquiries       Inquiry[]
+  inquiryMessages InquiryMessage[]
 }
 
 model Property {
@@ -74,6 +75,9 @@ model Property {
   // Lowercase, accent-free text (ñ -> n) of title, description, commune, city and region used by
   // the catalog search. Maintained by the "Property_set_search_text" database trigger: never write it.
   searchText    String        @default("")
+  // Soft delete: set when ADMIN deletes it. Deleted properties are hidden everywhere except the
+  // admin "Eliminadas" list; images, features, favorites and inquiries are kept.
+  deletedAt     DateTime?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
 
@@ -99,9 +103,9 @@ model PropertyImage {
 
   property Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
 
-  @@index([propertyId, position])
   // At most one main image per property.
   @@unique([propertyId], where: { isMain: true }, map: "PropertyImage_single_main_per_property_key")
+  @@index([propertyId, position])
 }
 
 model Feature {
@@ -149,12 +153,33 @@ model Inquiry {
   email         String
   phone         String?
   message       String
+  // The user removed it from their account; ADMIN still sees it.
+  hiddenByUser  Boolean  @default(false)
   createdAt     DateTime @default(now())
 
-  property Property? @relation(fields: [propertyId], references: [id], onDelete: SetNull)
-  user     User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+  property Property?        @relation(fields: [propertyId], references: [id], onDelete: SetNull)
+  user     User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  messages InquiryMessage[]
 
   @@index([propertyId])
   @@index([userId])
   @@index([createdAt])
+}
+
+// Conversation after an inquiry: replies from ADMIN and from the user who sent it. The inquiry's
+// own message is the first one of the conversation and stays in Inquiry.message.
+model InquiryMessage {
+  id        String   @id @default(uuid(7)) @db.Uuid
+  inquiryId String   @db.Uuid
+  // Null once the author account is deleted; fromAdmin keeps which side wrote it.
+  authorId  String?  @db.Uuid
+  fromAdmin Boolean
+  body      String
+  createdAt DateTime @default(now())
+
+  inquiry Inquiry @relation(fields: [inquiryId], references: [id], onDelete: Cascade)
+  author  User?   @relation(fields: [authorId], references: [id], onDelete: SetNull)
+
+  @@index([inquiryId, createdAt])
+  @@index([authorId])
 }

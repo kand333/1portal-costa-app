@@ -21,6 +21,8 @@ export function getActiveNavigationHref(
 ): string | null {
   if (pathname === "/") return "/";
   if (pathname === "/login") return "/login";
+  // Reached from the user name shown in place of «Ingresar».
+  if (pathname === "/account" || pathname.startsWith("/account/")) return "/account";
 
   if (pathname === "/properties" || pathname.startsWith("/properties/")) {
     if (pathname === "/properties" && (operation === "SALE" || operation === "RENT")) {

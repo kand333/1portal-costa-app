@@ -8,7 +8,7 @@ import type { AuthUser, LoginData, RegisterData } from "@portal/shared/auth";
 
 const INVALID_CREDENTIALS = "Email o contraseña incorrectos";
 
-const toAuthUser = ({ id, name, email, role, isActive }: UserRecord): AuthUser => ({ id, name, email, role, isActive });
+export const toAuthUser = ({ id, name, email, role, isActive }: UserRecord): AuthUser => ({ id, name, email, role, isActive });
 
 /** Creates a USER account. The email arrives normalized (trimmed, lowercase) from the schema. */
 export async function registerUser(data: RegisterData): Promise<AuthUser> {

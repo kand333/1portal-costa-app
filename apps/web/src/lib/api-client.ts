@@ -18,6 +18,8 @@ async function readJsonResponse<Data>(response: Response, fallbackMessage: strin
         : fallbackMessage;
     throw new ApiClientError(response.status, message);
   }
+  // 204 No Content has no body.
+  if (response.status === 204) return undefined as Data;
   return response.json() as Promise<Data>;
 }
 
@@ -27,12 +29,21 @@ export async function fetchJson<Data>(url: string): Promise<Data> {
   return readJsonResponse<Data>(response, "No fue posible cargar la información");
 }
 
-/** POSTs a JSON body to the REST API and throws ApiClientError on non-2xx responses. */
-export async function postJson<Data>(url: string, body: unknown): Promise<Data> {
+/** Sends a request (with an optional JSON body) to the REST API and throws ApiClientError on non-2xx responses. */
+export async function sendJson<Data>(
+  method: "POST" | "PUT" | "PATCH" | "DELETE",
+  url: string,
+  body?: unknown,
+): Promise<Data> {
   const response = await fetch(url, {
-    method: "POST",
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    method,
+    headers: { Accept: "application/json", ...(body === undefined ? {} : { "Content-Type": "application/json" }) },
+    body: body === undefined ? undefined : JSON.stringify(body),
   });
   return readJsonResponse<Data>(response, "No fue posible enviar la información");
+}
+
+/** POSTs a JSON body to the REST API and throws ApiClientError on non-2xx responses. */
+export function postJson<Data>(url: string, body: unknown): Promise<Data> {
+  return sendJson<Data>("POST", url, body);
 }

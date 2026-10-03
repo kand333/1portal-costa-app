@@ -1,11 +1,13 @@
 import { randomUUID } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
+import { NextRequest } from "next/server";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import type { InquiryCreated } from "@portal/shared/inquiry";
+import type { InquiryCreated, UserInquiry } from "@portal/shared/inquiry";
 
 // Integration test: calls the real Route Handler against the test database.
 loadEnvConfig(process.cwd());
 const hasDatabaseUrl = Boolean(process.env.DATABASE_URL?.trim());
+const hasAuthSecret = (process.env.AUTH_SECRET?.trim().length ?? 0) >= 32;
 
 const testRunId = randomUUID().slice(0, 8);
 const url = "http://localhost:3000/api/inquiries";
@@ -15,12 +17,12 @@ async function getPrisma() {
   return prisma;
 }
 
-async function postInquiry(body: unknown, rawBody?: string) {
+async function postInquiry(body: unknown, rawBody?: string, cookie?: string) {
   const { POST } = await import("@/app/api/inquiries/route");
   const response = await POST(
-    new Request(url, {
+    new NextRequest(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...(cookie ? { cookie } : {}) },
       body: rawBody ?? JSON.stringify(body),
     }),
   );
@@ -63,6 +65,7 @@ describe.skipIf(!hasDatabaseUrl)("inquiries API", () => {
     const prisma = await getPrisma();
     await prisma.inquiry.deleteMany({ where: { name: { contains: testRunId } } });
     await prisma.property.deleteMany({ where: { title: { contains: testRunId } } });
+    await prisma.user.deleteMany({ where: { email: { contains: testRunId } } });
     await prisma.$disconnect();
   });
 
@@ -115,5 +118,115 @@ describe.skipIf(!hasDatabaseUrl)("inquiries API", () => {
     }
     const prisma = await getPrisma();
     expect(await prisma.inquiry.count({ where: { name: `Rechazada ${testRunId}` } })).toBe(0);
+  });
+
+  describe.skipIf(!hasAuthSecret)("with a session", () => {
+    let session: { userId: string; cookie: string };
+
+    beforeAll(async () => {
+      const prisma = await getPrisma();
+      const user = await prisma.user.create({
+        data: { name: "Cliente", email: `cliente-${testRunId}@test.cl`, passwordHash: "scrypt$not-used-here" },
+      });
+      const { createSessionToken } = await import("@/lib/auth/session-token");
+      session = { userId: user.id, cookie: `portal_session=${createSessionToken(user.id)}` };
+    });
+
+    async function listMine(cookie?: string) {
+      const { GET } = await import("@/app/api/account/inquiries/route");
+      const request = new NextRequest(
+        "http://localhost:3000/api/account/inquiries",
+        cookie ? { headers: { cookie } } : undefined,
+      );
+      const response = await GET(request);
+      return { status: response.status, body: await response.json() };
+    }
+
+    it("links the inquiry to the logged-in user and lists it in their account", async () => {
+      const { status, body } = await postInquiry(
+        { ...validInquiry(), name: `Cliente ${testRunId}` },
+        undefined,
+        session.cookie,
+      );
+      expect(status).toBe(201);
+      const created = body as InquiryCreated;
+
+      const prisma = await getPrisma();
+      expect((await prisma.inquiry.findUniqueOrThrow({ where: { id: created.id } })).userId).toBe(session.userId);
+
+      const mine = await listMine(session.cookie);
+      expect(mine.status).toBe(200);
+      const [inquiry] = mine.body as UserInquiry[];
+      expect(inquiry).toMatchObject({
+        id: created.id,
+        propertyId: publishedId,
+        propertyTitle: `Inquiry target ${testRunId}`,
+        message: "Quisiera coordinar una visita esta semana.",
+        property: { id: publishedId, title: `Inquiry target ${testRunId}` },
+      });
+    });
+
+    it("keeps a visitor's inquiry without a user, even with a forged cookie", async () => {
+      const { body } = await postInquiry(validInquiry(), undefined, "portal_session=forged.token");
+      const prisma = await getPrisma();
+      expect((await prisma.inquiry.findUniqueOrThrow({ where: { id: (body as InquiryCreated).id } })).userId).toBeNull();
+    });
+
+    it("requires a session to list the account inquiries, and a USER account", async () => {
+      expect((await listMine()).status).toBe(401);
+      const prisma = await getPrisma();
+      const admin = await prisma.user.create({
+        data: { name: `Admin ${testRunId}`, email: `admin-${testRunId}@test.cl`, passwordHash: "scrypt$not-used-here", role: "ADMIN" },
+      });
+      const { createSessionToken } = await import("@/lib/auth/session-token");
+      const adminCookie = `portal_session=${createSessionToken(admin.id)}`;
+      expect((await listMine(adminCookie)).status).toBe(403);
+      expect(await removeMine(randomUUID(), adminCookie)).toBe(403);
+    });
+
+    async function removeMine(id: string, cookie?: string) {
+      const { DELETE } = await import("@/app/api/account/inquiries/[id]/route");
+      const request = new NextRequest(`http://localhost:3000/api/account/inquiries/${id}`, {
+        method: "DELETE",
+        ...(cookie ? { headers: { cookie } } : {}),
+      });
+      return (await DELETE(request, { params: Promise.resolve({ id }) })).status;
+    }
+
+    it("removes an inquiry from the account only: it stays stored for ADMIN", async () => {
+      const { body } = await postInquiry({ ...validInquiry(), name: `Cliente ${testRunId}` }, undefined, session.cookie);
+      const id = (body as InquiryCreated).id;
+
+      expect(await removeMine(id)).toBe(401);
+      expect(await removeMine(id, session.cookie)).toBe(204);
+      expect(((await listMine(session.cookie)).body as UserInquiry[]).map((inquiry) => inquiry.id)).not.toContain(id);
+
+      const prisma = await getPrisma();
+      expect(await prisma.inquiry.findUniqueOrThrow({ where: { id } })).toMatchObject({ hiddenByUser: true, userId: session.userId });
+
+      // Already removed, unknown, or invalid id.
+      expect(await removeMine(id, session.cookie)).toBe(404);
+      expect(await removeMine(randomUUID(), session.cookie)).toBe(404);
+      expect(await removeMine("not-a-uuid", session.cookie)).toBe(400);
+    });
+
+    it("cannot remove another user's or a visitor's inquiry", async () => {
+      const { body } = await postInquiry(validInquiry());
+      const visitorInquiryId = (body as InquiryCreated).id;
+      expect(await removeMine(visitorInquiryId, session.cookie)).toBe(404);
+      const prisma = await getPrisma();
+      expect((await prisma.inquiry.findUniqueOrThrow({ where: { id: visitorInquiryId } })).hiddenByUser).toBe(false);
+    });
+
+    it("keeps the inquiry, without property data, once the property is unpublished", async () => {
+      const prisma = await getPrisma();
+      await prisma.property.update({ where: { id: publishedId }, data: { isPublished: false } });
+      try {
+        const [inquiry] = (await listMine(session.cookie)).body as UserInquiry[];
+        expect(inquiry).toMatchObject({ propertyTitle: `Inquiry target ${testRunId}`, property: null });
+      } finally {
+        await prisma.property.update({ where: { id: publishedId }, data: { isPublished: true } });
+      }
+    });
   });
 });

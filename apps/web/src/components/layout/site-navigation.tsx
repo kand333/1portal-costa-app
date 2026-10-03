@@ -42,6 +42,7 @@ export function SiteNavigation() {
           activeHref={activeHref}
           orientation="horizontal"
           userName={currentUser?.name}
+          isAdmin={currentUser?.role === "ADMIN"}
           onLogout={handleLogout}
         />
       </nav>
@@ -72,6 +73,7 @@ export function SiteNavigation() {
             orientation="vertical"
             onNavigate={closeMenu}
             userName={currentUser?.name}
+          isAdmin={currentUser?.role === "ADMIN"}
             onLogout={handleLogout}
           />
         </nav>

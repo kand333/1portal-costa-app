@@ -5,9 +5,10 @@ import { escapeLikePattern } from "@/lib/escape-like";
 import type { PropertySort } from "@portal/shared/enums";
 import { prisma } from "@/lib/prisma";
 
-const publishedOnly = { isPublished: true } satisfies Prisma.PropertyWhereInput;
+/** What the public site and the users' lists may show: published and not soft-deleted. */
+export const publishedOnly = { isPublished: true, deletedAt: null } satisfies Prisma.PropertyWhereInput;
 
-const propertySummarySelect = {
+export const propertySummarySelect = {
   id: true,
   title: true,
   operationType: true,
@@ -31,7 +32,7 @@ const propertySummarySelect = {
   },
 } satisfies Prisma.PropertySelect;
 
-const propertyDetailSelect = {
+export const propertyDetailSelect = {
   ...propertySummarySelect,
   description: true,
   parkingSpaces: true,
