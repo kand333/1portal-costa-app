@@ -131,10 +131,12 @@ const propertyTypeOptions = PROPERTY_TYPES.map((value) => ({ value, label: prope
 type PropertyFormProps = {
   /** null: creates a new property. */
   property: AdminPropertyDetail | null;
+  /** Feature catalog (names): offered as checkboxes after the common ones. */
+  catalog?: string[];
 };
 
 /** ADMIN form to create or edit a property. No coordinates: the map is built from the address. */
-export function PropertyForm({ property }: PropertyFormProps) {
+export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
   const router = useRouter();
   const [values, setValues] = useState(() => toPropertyFormValues(property));
   const [errors, setErrors] = useState<PropertyFormErrors>({});
@@ -167,7 +169,7 @@ export function PropertyForm({ property }: PropertyFormProps) {
     step,
   });
 
-  const featureOptions = buildFeatureOptions([...otherFeatures, ...values.features]);
+  const featureOptions = buildFeatureOptions([...catalog, ...otherFeatures, ...values.features]);
   const isFeatureLimitReached = values.features.length >= MAX_FEATURES_PER_PROPERTY;
 
   /** Adds a feature that is not in the list, already checked (or checks it if it is). */
