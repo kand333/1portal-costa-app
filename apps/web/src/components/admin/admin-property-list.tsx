@@ -13,6 +13,7 @@ import {
 import { cn } from "@/lib/cn";
 import { formatLocation, formatPrice, operationLabels, propertyTypeLabels } from "@/lib/property-format";
 import { AdminPropertyFilters } from "./admin-property-filters";
+import { ADMIN_FEATURES_PATH } from "@/lib/admin-features";
 import { DeletePropertyButton } from "./delete-property-button";
 
 const dateFormatter = new Intl.DateTimeFormat("es-CL", { day: "numeric", month: "short", year: "numeric" });
@@ -137,9 +138,17 @@ export function AdminPropertyList({ result, params, cities }: AdminPropertyListP
           <h1 className="font-display text-5xl font-semibold tracking-tight text-ink">Propiedades</h1>
           <p className="mt-2 text-lg text-muted">{statusDescriptions[status]}</p>
         </div>
-        <Link href={`${ADMIN_PROPERTIES_PATH}/new`} className={primaryLinkClassName}>
-          Nueva propiedad
-        </Link>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href={ADMIN_FEATURES_PATH}
+            className="inline-flex h-12 items-center rounded-full border border-line px-6 font-semibold text-ink transition-colors duration-200 hover:border-brass hover:bg-surface"
+          >
+            Características
+          </Link>
+          <Link href={`${ADMIN_PROPERTIES_PATH}/new`} className={primaryLinkClassName}>
+            Nueva propiedad
+          </Link>
+        </div>
       </div>
 
       {/* Filters on the right from xl up; above the list on narrower screens. */}

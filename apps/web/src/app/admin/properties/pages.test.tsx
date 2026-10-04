@@ -2,6 +2,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchWithSession, findWithSession, getAdminUser } from "@/lib/session";
 import EditAdminPropertyPage from "./[id]/edit/page";
+import AdminFeaturesPage from "./features/page";
 import NewAdminPropertyPage from "./new/page";
 import AdminPropertiesPage from "./page";
 
@@ -52,7 +53,12 @@ const renderEdit = async (id: string, searchParams: Record<string, string> = {})
 
 beforeEach(() => {
   vi.mocked(getAdminUser).mockReset().mockResolvedValue(admin);
-  vi.mocked(fetchWithSession).mockReset().mockResolvedValue(emptyList);
+  // The feature catalog is a list; every other admin call here answers a page.
+  vi.mocked(fetchWithSession)
+    .mockReset()
+    .mockImplementation(async (path: string) =>
+      path === "/api/admin/features" ? [{ id: "f1", name: "Sauna", propertyCount: 0 }] : emptyList,
+    );
   vi.mocked(findWithSession).mockReset();
 });
 
@@ -71,6 +77,7 @@ describe("admin property pages", () => {
     vi.mocked(getAdminUser).mockResolvedValue(null);
     expect(await renderList({})).toContain("Acceso restringido");
     expect(renderToStaticMarkup(await NewAdminPropertyPage())).toContain("Acceso restringido");
+    expect(renderToStaticMarkup(await AdminFeaturesPage())).toContain("Acceso restringido");
     expect(await renderEdit(propertyId)).toContain("Acceso restringido");
     expect(fetchWithSession).not.toHaveBeenCalled();
     expect(findWithSession).not.toHaveBeenCalled();
@@ -81,6 +88,8 @@ describe("admin property pages", () => {
     expect(html).toContain("Nueva propiedad");
     expect(html).toContain("Crear propiedad");
     expect(getAdminUser).toHaveBeenCalledWith("/admin/properties/new");
+    // The catalog's features are offered as checkboxes too.
+    expect(html).toMatch(/type="checkbox"[^>]*\/><span[^>]*>Sauna<\/span>/);
   });
 
   it("loads the property to edit, and answers 404 when it does not exist or the id is invalid", async () => {
@@ -98,5 +107,13 @@ describe("admin property pages", () => {
     vi.mocked(findWithSession).mockClear();
     await expect(renderEdit("not-a-uuid")).rejects.toThrow("NEXT_NOT_FOUND");
     expect(findWithSession).not.toHaveBeenCalled();
+  });
+
+  it("shows the feature catalog", async () => {
+    const html = renderToStaticMarkup(await AdminFeaturesPage());
+    expect(html).toContain(">Características</h1>");
+    expect(html).toContain("Sauna");
+    expect(getAdminUser).toHaveBeenCalledWith("/admin/properties/features");
+    expect(fetchWithSession).toHaveBeenCalledWith("/api/admin/features");
   });
 });

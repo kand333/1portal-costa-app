@@ -173,7 +173,7 @@
   - Actualizar.
   - Eliminar.
   - Proteger endpoints.
-  - Hecho: `GET|POST /api/admin/properties` y `GET|PUT|DELETE /api/admin/properties/{id}`, solo ADMIN (401/403). Incluye las no publicadas, búsqueda y paginación; validación compartida sin latitud/longitud; características por nombre (reutiliza existentes sin distinguir mayúsculas). Eliminar aún no borra imágenes en Cloudinary (Paso 27).
+  - Hecho: `GET|POST /api/admin/properties` y `GET|PUT|DELETE /api/admin/properties/{id}`, solo ADMIN (401/403). Incluye las no publicadas, búsqueda y paginación; validación compartida sin latitud/longitud; características por nombre (reutiliza existentes sin distinguir mayúsculas). Eliminar pasó después a ser soft delete y conserva las imágenes (ver Paso 27).
 
 - [x] **Paso 24 — Interfaz de administración**
   - `/admin/properties`.
@@ -194,25 +194,27 @@
   - No agregar latitud/longitud manual.
   - Hecho: un formulario cliente para crear y editar, validado con `propertyInputSchema` antes de enviar (un error por campo, foco en el primero) y de nuevo en la API. Números opcionales en blanco = no aplica (`null`); acepta coma decimal. Precio en USD. Características como lista (Enter o «Agregar», sin repetir ignorando mayúsculas; la API reutiliza las existentes). Crear (`POST`) lleva a la edición con «Propiedad creada»; guardar (`PUT`) actualiza el encabezado.
 
-- [ ] **Paso 26 — Subida a Cloudinary**
+- [x] **Paso 26 — Subida a Cloudinary**
   - Configurar Cloudinary.
   - Crear subida segura mediante REST.
   - Validar tipo y tamaño.
   - Guardar URL y `publicId`.
-  - Implementado (sin marcar): `POST /api/admin/properties/{id}/images` a la carpeta `propiedades-claude` y sección «Imágenes» en la edición; tests en verde con Cloudinary simulado. Falta la subida real: la API key actual responde 403 «missing permissions (create)».
+  - Hecho: `POST /api/admin/properties/{id}/images` (solo ADMIN; ≤ 5 MB; JPG/PNG/WebP detectados por sus bytes) sube a Cloudinary, carpeta `propiedades-claude`, y guarda URL y `publicId`; sección «Imágenes» en la edición. Verificado contra Cloudinary real: subida (201, principal la primera, la segunda en posición 1), imagen servida por `next/image` y destrucción del asset. La API key necesita permisos de crear/borrar (una clave de solo lectura da 503 «revisa la configuración»).
 
-- [ ] **Paso 27 — Administración de imágenes**
+- [x] **Paso 27 — Administración de imágenes**
   - Múltiples imágenes.
   - Eliminar.
   - Seleccionar principal.
   - Ordenar.
   - Mantener sincronizados Cloudinary y PostgreSQL.
   - No destruir en Cloudinary imágenes con `publicId` `seed-placeholder/*` (placeholders del seed, ver `apps/api/prisma/seed/images.ts`).
+  - Hecho: subida múltiple (una por una, con progreso), máximo 20 por propiedad; `DELETE /api/admin/properties/{id}/images/{imageId}` borra primero en Cloudinary (salvo `seed-placeholder/*`) y luego la fila (si Cloudinary falla no cambia nada; si era la principal, pasa a serlo la siguiente; posiciones 0..n-1); `PUT /api/admin/properties/{id}/images` (`{ order, mainImageId }`, debe listar exactamente sus imágenes) define orden y principal en una transacción. UI: galería en el orden público (principal primero) con «Principal», ←/→ y «Eliminar». Verificado contra Cloudinary real (subida, principal, orden y borrado: el asset da 404 en la Admin API). Eliminar una propiedad (soft delete) conserva sus imágenes a propósito.
 
-- [ ] **Paso 28 — Características**
+- [x] **Paso 28 — Características**
   - Múltiples características por propiedad.
   - Modelo flexible.
   - Permitir nuevas características sin modificar columnas de Property.
+  - Hecho: el modelo ya era flexible (`Feature` N:M `Property` vía `PropertyFeature`, sin columnas en `Property`). Se agregó el catálogo para ADMIN: `GET|POST /api/admin/features` y `PUT|DELETE /api/admin/features/{id}` (nombre único sin distinguir mayúsculas → 409; renombrar aplica en todas las propiedades; eliminar solo si ninguna propiedad activa la usa, desvinculando las eliminadas). Página `/admin/properties/features` (enlace «Características» en la lista, sin agregar un menú al sidebar). El formulario de propiedad ofrece como casillas las 12 comunes y luego el resto del catálogo.
 
 - [ ] **Paso 29 — Usuarios**
   - Crear `/admin/users`.

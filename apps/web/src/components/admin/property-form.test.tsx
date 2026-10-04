@@ -93,4 +93,11 @@ describe("PropertyForm", () => {
     expect(html.match(/type="checkbox" disabled=""/g)).toHaveLength(12);
     expect(html).toMatch(/id="property-features"[^>]*disabled=""/);
   });
+
+  it("adds the catalog's features after the common ones, without repeating a name", () => {
+    const html = renderToStaticMarkup(<PropertyForm property={null} catalog={["Sauna", "piscina", "Gimnasio"]} />);
+    // 12 common + Sauna + Gimnasio («piscina» is the common «Piscina»), plus the two publication switches.
+    expect(html.match(/type="checkbox"/g)).toHaveLength(12 + 2 + 2);
+    expect(html.indexOf(">Conserjería</span>")).toBeLessThan(html.indexOf(">Sauna</span>"));
+  });
 });

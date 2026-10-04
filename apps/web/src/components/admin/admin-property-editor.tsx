@@ -8,12 +8,14 @@ import { PropertyImages } from "./property-images";
 type AdminPropertyEditorProps = {
   /** null: a new property. */
   property: AdminPropertyDetail | null;
+  /** Feature catalog (names) for the form's checkboxes. */
+  catalog?: string[];
   /** The property was just created (the form redirects here after creating it). */
   isNew?: boolean;
 };
 
 /** Page to create or edit a property. */
-export function AdminPropertyEditor({ property, isNew = false }: AdminPropertyEditorProps) {
+export function AdminPropertyEditor({ property, catalog = [], isNew = false }: AdminPropertyEditorProps) {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-20 pt-10 sm:px-6">
       <Link
@@ -54,7 +56,7 @@ export function AdminPropertyEditor({ property, isNew = false }: AdminPropertyEd
       )}
 
       {/* Keyed by property: moving to another property's edit page reuses the route, so the form must start over. */}
-      <PropertyForm key={property?.id ?? "new"} property={property} />
+      <PropertyForm key={property?.id ?? "new"} property={property} catalog={catalog} />
 
       {property ? (
         <PropertyImages propertyId={property.id} propertyTitle={property.title} images={property.images} />
