@@ -216,11 +216,13 @@
   - Permitir nuevas características sin modificar columnas de Property.
   - Hecho: el modelo ya era flexible (`Feature` N:M `Property` vía `PropertyFeature`, sin columnas en `Property`). Se agregó el catálogo para ADMIN: `GET|POST /api/admin/features` y `PUT|DELETE /api/admin/features/{id}` (nombre único sin distinguir mayúsculas → 409; renombrar aplica en todas las propiedades; eliminar solo si ninguna propiedad activa la usa, desvinculando las eliminadas). Página `/admin/properties/features` (enlace «Características» en la lista, sin agregar un menú al sidebar). El formulario de propiedad ofrece como casillas las 12 comunes y luego el resto del catálogo.
 
-- [ ] **Paso 29 — Usuarios**
+- [x] **Paso 29 — Usuarios**
   - Crear `/admin/users`.
   - Listar y buscar.
   - Activar/desactivar.
   - Modificar rol cuando corresponda.
+  - Hecho: `GET /api/admin/users` (búsqueda por nombre o email sin distinguir mayúsculas, filtros de rol y estado, paginación; fecha de registro y cuántas consultas y favoritos tiene) y `PATCH /api/admin/users/{id}` (`{ isActive?, role? }`). «Cuando corresponda»: un ADMIN no puede cambiar su propia cuenta (409), así siempre queda un ADMIN activo. Los cambios rigen en la siguiente petición (la sesión se valida contra la BD). Página `/admin/users`, enlazada desde el panel.
+  - Ajuste posterior: menú «Administrar usuarios» en el sidebar (bajo «Administrar propiedades»); ADMIN puede crear (`POST /api/admin/users`, panel colapsable «Nuevo usuario»), editar datos (nombre, email, nueva contraseña, rol, estado en un diálogo) y eliminar definitivamente (`DELETE`; favoritos en cascada, consultas y mensajes se conservan sin usuario). Confirmaciones en ventana modal (`components/ui/confirm-dialog.tsx`, `<dialog>` nativo) al hacer ADMIN, editar, desactivar o eliminar. 10 por página. Su propia cuenta no se toca desde aquí (409; se edita en «Mi cuenta»).
 
 - [ ] **Paso 30 — Consultas**
   - Crear `/admin/inquiries`.

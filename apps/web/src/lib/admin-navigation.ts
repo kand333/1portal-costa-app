@@ -1,4 +1,4 @@
-export type AdminSection = "dashboard" | "properties" | "inquiries" | "account";
+export type AdminSection = "dashboard" | "properties" | "users" | "inquiries" | "account";
 
 export type AdminNavigationItem = { section: AdminSection; label: string; href: string };
 
@@ -6,6 +6,7 @@ export type AdminNavigationItem = { section: AdminSection; label: string; href: 
 export const adminNavigationItems: readonly AdminNavigationItem[] = [
   { section: "dashboard", label: "Panel administración", href: "/admin" },
   { section: "properties", label: "Administrar propiedades", href: "/admin/properties" },
+  { section: "users", label: "Administrar usuarios", href: "/admin/users" },
   { section: "inquiries", label: "Consultas", href: "/admin/inquiries" },
   { section: "account", label: "Mi cuenta", href: "/admin/account" },
 ];

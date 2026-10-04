@@ -145,7 +145,7 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("auth API", () => {
 
   it("logs out by clearing the cookie", async () => {
     const { POST } = await import("@/app/api/auth/logout/route");
-    const response = POST();
+    const response = await POST(new NextRequest(`${baseUrl}/logout`, { method: "POST" }));
     expect(response.status).toBe(204);
     const cookie = sessionCookie(response);
     expect(cookie?.value).toBe("");

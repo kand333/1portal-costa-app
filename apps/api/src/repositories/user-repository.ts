@@ -16,6 +16,31 @@ export function findUserById(id: string): Promise<UserRecord | null> {
   return prisma.user.findUnique({ where: { id }, select: publicUserSelect });
 }
 
+const LAST_SEEN_REFRESH_MS = 60 * 1000;
+
+/**
+ * Records activity, writing at most once a minute per user (the condition skips fresher rows), and
+ * right away after a logout, so logging back in shows as online at once.
+ */
+export async function touchLastSeen(id: string, now = new Date()): Promise<void> {
+  await prisma.user.updateMany({
+    where: {
+      id,
+      OR: [
+        { lastSeenAt: null },
+        { lastSeenAt: { lt: new Date(now.getTime() - LAST_SEEN_REFRESH_MS) } },
+        { loggedOutAt: { gte: prisma.user.fields.lastSeenAt } },
+      ],
+    },
+    data: { lastSeenAt: now },
+  });
+}
+
+/** On logout: the user stops showing as online at once; `lastSeenAt` stays as their last connection. */
+export async function markLoggedOut(id: string, now = new Date()): Promise<void> {
+  await prisma.user.updateMany({ where: { id }, data: { loggedOutAt: now } });
+}
+
 /** Includes the password hash: only for checking credentials. */
 export function findUserCredentialsByEmail(email: string) {
   return prisma.user.findUnique({ where: { email }, select: { ...publicUserSelect, passwordHash: true } });
