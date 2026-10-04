@@ -3,7 +3,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { clearFailedLogins, isLoginBlocked, recordFailedLogin } from "@/lib/auth/login-rate-limit";
 import { hashPassword, verifyPassword, verifyPasswordAgainstDummy } from "@/lib/auth/password";
 import { ApiError } from "@/lib/http/api-error";
-import { findUserById, findUserCredentialsByEmail, insertUser, type UserRecord } from "@/repositories/user-repository";
+import { findUserById, findUserCredentialsByEmail, insertUser, touchLastSeen, type UserRecord } from "@/repositories/user-repository";
 import type { AuthUser, LoginData, RegisterData } from "@portal/shared/auth";
 
 const INVALID_CREDENTIALS = "Email o contraseña incorrectos";
@@ -52,5 +52,7 @@ export async function authenticateUser(data: LoginData, now = Date.now()): Promi
 /** The user of a session, or null when it no longer exists or was deactivated. */
 export async function getActiveUser(userId: string): Promise<AuthUser | null> {
   const user = await findUserById(userId);
-  return user?.isActive ? toAuthUser(user) : null;
+  if (!user?.isActive) return null;
+  await touchLastSeen(user.id);
+  return toAuthUser(user);
 }

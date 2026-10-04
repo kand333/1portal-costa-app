@@ -2,10 +2,11 @@ import { describe, expect, it } from "vitest";
 import { adminNavigationItems, getActiveAdminSection } from "./admin-navigation";
 
 describe("adminNavigationItems", () => {
-  it("lists the four sections in the requested order", () => {
+  it("lists the sections in the requested order, users right after properties", () => {
     expect(adminNavigationItems.map((item) => item.label)).toEqual([
       "Panel administración",
       "Administrar propiedades",
+      "Administrar usuarios",
       "Consultas",
       "Mi cuenta",
     ]);
@@ -15,6 +16,7 @@ describe("adminNavigationItems", () => {
 describe("getActiveAdminSection", () => {
   it.each([
     ["/admin", "dashboard"],
+    ["/admin/users", "users"],
     ["/admin/properties", "properties"],
     ["/admin/properties/new", "properties"],
     ["/admin/properties/11111111-1111-4111-8111-111111111111/edit", "properties"],

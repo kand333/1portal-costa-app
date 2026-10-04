@@ -73,6 +73,7 @@ export function AdminDashboard({ stats }: { stats: AdminDashboardStats }) {
         <IndicatorGroup
           id="activity-indicators-title"
           title="Usuarios y consultas"
+          action={{ label: "Administrar usuarios", href: "/admin/users" }}
           indicators={[
             { label: "Usuarios", value: stats.users },
             { label: "Consultas", value: stats.inquiries },
