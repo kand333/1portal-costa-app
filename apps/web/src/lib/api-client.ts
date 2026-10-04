@@ -47,3 +47,10 @@ export async function sendJson<Data>(
 export function postJson<Data>(url: string, body: unknown): Promise<Data> {
   return sendJson<Data>("POST", url, body);
 }
+
+/** POSTs a multipart form (e.g. a file upload) to the REST API and throws ApiClientError on non-2xx responses. */
+export async function postForm<Data>(url: string, body: FormData): Promise<Data> {
+  // No Content-Type header: the browser sets it with the multipart boundary.
+  const response = await fetch(url, { method: "POST", headers: { Accept: "application/json" }, body });
+  return readJsonResponse<Data>(response, "No fue posible enviar el archivo");
+}

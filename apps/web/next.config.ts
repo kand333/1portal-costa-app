@@ -11,6 +11,8 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       // Placeholder photos used by the development seed (apps/api/prisma/seed/images.ts).
       { protocol: "https", hostname: "images.unsplash.com", pathname: "/**" },
+      // Images uploaded by ADMIN (stored in Cloudinary, step 26).
+      { protocol: "https", hostname: "res.cloudinary.com", pathname: "/**" },
     ],
   },
   // The browser only talks to this origin: /api/** is proxied to the backend,

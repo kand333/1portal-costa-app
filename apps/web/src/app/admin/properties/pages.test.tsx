@@ -34,6 +34,7 @@ const storedProperty = {
   city: "Santiago",
   region: "Región Metropolitana",
   features: [],
+  images: [],
   isPublished: false,
   isFeatured: false,
 };

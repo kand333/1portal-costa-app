@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ADMIN_PROPERTIES_PATH } from "@/lib/admin-properties";
 import { formatLocation } from "@/lib/property-format";
 import { PropertyForm } from "./property-form";
+import { PropertyImages } from "./property-images";
 
 type AdminPropertyEditorProps = {
   /** null: a new property. */
@@ -54,6 +55,12 @@ export function AdminPropertyEditor({ property, isNew = false }: AdminPropertyEd
 
       {/* Keyed by property: moving to another property's edit page reuses the route, so the form must start over. */}
       <PropertyForm key={property?.id ?? "new"} property={property} />
+
+      {property ? (
+        <PropertyImages propertyId={property.id} propertyTitle={property.title} images={property.images} />
+      ) : (
+        <p className="mt-10 text-sm text-muted">Podrás subir imágenes después de crear la propiedad.</p>
+      )}
     </div>
   );
 }

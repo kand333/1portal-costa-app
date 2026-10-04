@@ -1,12 +1,9 @@
 import type { PropertyType } from "../../src/generated/prisma/enums";
+import { SEED_PLACEHOLDER_PUBLIC_ID_PREFIX } from "../../src/lib/seed-placeholder";
 import type { SeedProperty } from "./data";
 
-/**
- * Development placeholder images. They are public Unsplash photos, NOT assets
- * in our Cloudinary account, so their publicId carries this prefix: the
- * Cloudinary sync (task 27) must never try to destroy them remotely.
- */
-export const SEED_PLACEHOLDER_PUBLIC_ID_PREFIX = "seed-placeholder/";
+// Development placeholder images: public Unsplash photos, not in Cloudinary (see the prefix).
+export { SEED_PLACEHOLDER_PUBLIC_ID_PREFIX };
 
 export type SeedImage = {
   url: string;
