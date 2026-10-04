@@ -357,6 +357,13 @@ Validar:
 
 La eliminación debe mantener sincronizados Cloudinary y PostgreSQL.
 
+Implementación (Paso 26):
+
+- `POST /api/admin/properties/{id}/images` (solo ADMIN, multipart, campo `file`). Valida tamaño (≤ 5 MB; también por `Content-Length` antes de leer) y tipo por los primeros bytes (JPEG, PNG o WebP; un archivo renombrado se rechaza): 400 / 413 / 415. Propiedad inexistente o eliminada → 404 sin subir nada.
+- La API sube a Cloudinary con la Upload API REST firmada (SHA-1 de los parámetros ordenados + `CLOUDINARY_API_SECRET`, `apps/api/src/lib/cloudinary.ts`), sin SDK, en la carpeta `propiedades-claude`, y guarda `secure_url` y `public_id` en `PropertyImage` (última posición; principal si no hay otra). La primera imagen propia reemplaza las de ejemplo del seed (`seed-placeholder/*`, solo se borran sus filas). Si falla la BD, se destruye el asset subido.
+- Errores de Cloudinary: credenciales o permisos rechazados (401/403) → 503 «revisa la configuración»; otros → 502. La API key necesita permiso para crear (subir) y destruir assets.
+- Web: sección «Imágenes» en `/admin/properties/{id}/edit` (subir y ver la galería); valida en el navegador con la misma detección (`@portal/shared/property-image`). `next.config.ts` admite `res.cloudinary.com` en `next/image`.
+
 ## 12. Mapa (Leaflet + OpenStreetMap)
 
 Construir la ubicación utilizando:

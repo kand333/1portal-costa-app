@@ -199,6 +199,7 @@
   - Crear subida segura mediante REST.
   - Validar tipo y tamaño.
   - Guardar URL y `publicId`.
+  - Implementado (sin marcar): `POST /api/admin/properties/{id}/images` a la carpeta `propiedades-claude` y sección «Imágenes» en la edición; tests en verde con Cloudinary simulado. Falta la subida real: la API key actual responde 403 «missing permissions (create)».
 
 - [ ] **Paso 27 — Administración de imágenes**
   - Múltiples imágenes.
