@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { PointerGlow } from "@/components/ui/pointer-glow";
+import { FavoriteButton } from "./favorite-button";
 import type { PropertySummary } from "@portal/shared/property";
 import {
   formatLocation,
@@ -46,6 +47,9 @@ export function PropertyCard({ property }: PropertyCardProps) {
         <span className="absolute left-4 top-4 rounded-full border border-white/50 bg-white/75 px-3.5 py-1 text-xs font-semibold text-[#121719] backdrop-blur-md">
           {operationLabels[property.operationType]}
         </span>
+        <div className="absolute right-3 top-3">
+          <FavoriteButton propertyId={property.id} propertyTitle={property.title} variant="overlay" />
+        </div>
       </div>
       <div className="flex flex-1 flex-col gap-1.5 p-6">
         <p className="font-display text-3xl font-semibold leading-none tracking-tight text-ink tabular-nums">

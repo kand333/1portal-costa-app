@@ -39,6 +39,29 @@ export const loginSchema = z.object({
     .max(PASSWORD_MAX_LENGTH, { error: "Email o contraseña incorrectos" }),
 });
 
+/** Body of `PATCH /api/account/profile`. The API requires `currentPassword` only when the email changes. */
+export const updateProfileSchema = z.object({
+  name: registerSchema.shape.name,
+  email: registerSchema.shape.email,
+  currentPassword: z.string().max(PASSWORD_MAX_LENGTH, { error: "La contraseña actual no es correcta" }).optional(),
+});
+
+/** Body of `PUT /api/account/password`. */
+export const changePasswordSchema = z
+  .object({
+    currentPassword: z
+      .string({ error: "Ingresa tu contraseña actual" })
+      .min(1, { error: "Ingresa tu contraseña actual" })
+      .max(PASSWORD_MAX_LENGTH, { error: "La contraseña actual no es correcta" }),
+    newPassword: registerSchema.shape.password,
+  })
+  .refine((data) => data.newPassword !== data.currentPassword, {
+    path: ["newPassword"],
+    error: "La nueva contraseña debe ser distinta de la actual",
+  });
+
+export type UpdateProfileData = z.output<typeof updateProfileSchema>;
+export type ChangePasswordData = z.output<typeof changePasswordSchema>;
 export type RegisterInput = z.input<typeof registerSchema>;
 export type RegisterData = z.output<typeof registerSchema>;
 export type LoginInput = z.input<typeof loginSchema>;

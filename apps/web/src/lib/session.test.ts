@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getAdminUser, getSessionUser, requireSessionUser } from "./session";
+import { fetchWithSession, findWithSession, getAdminUser, requireCustomerUser, getSessionUser, requireSessionUser } from "./session";
 
 const { cookieStore, redirectMock } = vi.hoisted(() => ({
   cookieStore: { value: undefined as string | undefined },
@@ -78,6 +78,25 @@ describe("requireSessionUser", () => {
   });
 });
 
+describe("requireCustomerUser", () => {
+  it("returns a USER", async () => {
+    cookieStore.value = "signed.token";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json(user)));
+    await expect(requireCustomerUser("/account")).resolves.toEqual(user);
+  });
+
+  it("sends an ADMIN to its own area, to /admin unless told otherwise", async () => {
+    cookieStore.value = "signed.token";
+    vi.stubGlobal("fetch", vi.fn().mockImplementation(async () => Response.json({ ...user, role: "ADMIN" })));
+    await expect(requireCustomerUser("/account")).rejects.toThrow("NEXT_REDIRECT /admin");
+    await expect(requireCustomerUser("/account/edit", "/admin/account")).rejects.toThrow("NEXT_REDIRECT /admin/account");
+  });
+
+  it("sends visitors to the login", async () => {
+    await expect(requireCustomerUser("/account")).rejects.toThrow("NEXT_REDIRECT /login?next=%2Faccount");
+  });
+});
+
 describe("getAdminUser", () => {
   it("returns the user when it is an ADMIN", async () => {
     cookieStore.value = "signed.token";
@@ -93,5 +112,42 @@ describe("getAdminUser", () => {
 
   it("sends visitors to the login", async () => {
     await expect(getAdminUser("/admin")).rejects.toThrow("NEXT_REDIRECT /login?next=%2Fadmin");
+  });
+});
+
+describe("fetchWithSession", () => {
+  it("forwards the session cookie to the API and returns the JSON", async () => {
+    cookieStore.value = "signed.token";
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ users: 4 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(fetchWithSession("/api/admin/dashboard")).resolves.toEqual({ users: 4 });
+    expect(fetchMock).toHaveBeenCalledWith(
+      "http://api.test/api/admin/dashboard",
+      expect.objectContaining({ cache: "no-store", headers: expect.objectContaining({ Cookie: "portal_session=signed.token" }) }),
+    );
+  });
+
+  it("throws on an error answer", async () => {
+    cookieStore.value = "signed.token";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ status: 403 }, { status: 403 })));
+    await expect(fetchWithSession("/api/admin/dashboard")).rejects.toThrow("HTTP 403");
+  });
+});
+
+describe("findWithSession", () => {
+  it("returns the JSON, or null when the resource does not exist", async () => {
+    cookieStore.value = "signed.token";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ id: "p1" })));
+    await expect(findWithSession("/api/admin/properties/p1")).resolves.toEqual({ id: "p1" });
+
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ status: 404 }, { status: 404 })));
+    await expect(findWithSession("/api/admin/properties/p2")).resolves.toBeNull();
+  });
+
+  it("throws on any other error answer", async () => {
+    cookieStore.value = "signed.token";
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ status: 500 }, { status: 500 })));
+    await expect(findWithSession("/api/admin/properties/p1")).rejects.toThrow("HTTP 500");
   });
 });

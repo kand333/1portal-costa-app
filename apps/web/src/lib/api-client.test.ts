@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ApiClientError, fetchJson, postJson } from "./api-client";
+import { ApiClientError, fetchJson, postJson, sendJson } from "./api-client";
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -48,5 +48,15 @@ describe("postJson", () => {
       vi.fn().mockResolvedValue(Response.json({ message: "Ingresa tu nombre", status: 400 }, { status: 400 })),
     );
     await expect(postJson("/api/inquiries", {})).rejects.toMatchObject({ status: 400, message: "Ingresa tu nombre" });
+  });
+});
+
+describe("sendJson", () => {
+  it("uses the given method and returns undefined for 204 No Content", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    await expect(sendJson("PUT", "/api/account/password", { newPassword: "x" })).resolves.toBeUndefined();
+    expect(fetchMock.mock.calls[0][1]).toMatchObject({ method: "PUT", body: '{"newPassword":"x"}' });
   });
 });

@@ -21,6 +21,18 @@ export function findUserCredentialsByEmail(email: string) {
   return prisma.user.findUnique({ where: { email }, select: { ...publicUserSelect, passwordHash: true } });
 }
 
+/** Includes the password hash: only for checking the current password. */
+export function findUserCredentialsById(id: string) {
+  return prisma.user.findUnique({ where: { id }, select: { ...publicUserSelect, passwordHash: true } });
+}
+
+export function updateUser(
+  id: string,
+  data: { name?: string; email?: string; passwordHash?: string },
+): Promise<UserRecord> {
+  return prisma.user.update({ where: { id }, data, select: publicUserSelect });
+}
+
 export function insertUser(data: { name: string; email: string; passwordHash: string }): Promise<UserRecord> {
   return prisma.user.create({ data, select: publicUserSelect });
 }

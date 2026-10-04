@@ -39,8 +39,13 @@ describe("getActiveNavigationHref", () => {
     expect(getActiveNavigationHref("/login", null)).toBe("/login");
   });
 
+  it("marks the account (the user name link) on the account pages", () => {
+    expect(getActiveNavigationHref("/account", null)).toBe("/account");
+    expect(getActiveNavigationHref("/account/favorites", null)).toBe("/account");
+  });
+
   it("returns null for routes outside the public navigation", () => {
-    expect(getActiveNavigationHref("/account", null)).toBeNull();
+    expect(getActiveNavigationHref("/admin", null)).toBeNull();
     expect(getActiveNavigationHref("/propertiesx", null)).toBeNull();
   });
 });

@@ -56,7 +56,8 @@ Web3Forms   → contacto
 apps/
 ├── web/                 # @portal/web — frontend Next.js (sin acceso a DB)
 │   └── src/
-│       ├── app/         # páginas: /, /properties, /account, /admin, ...
+│       ├── app/         # (site)/: /, /properties, /account, /login… con header y footer públicos;
+│       │                # admin/: /admin con su propio layout (sidebar). Grupo de rutas: no cambia URLs
 │       ├── components/
 │       ├── hooks/
 │       └── lib/         # cliente REST, formateo, utilidades de UI
@@ -90,6 +91,7 @@ Entidades:
 - Feature
 - Favorite
 - Inquiry
+- InquiryMessage
 
 Relaciones:
 
@@ -97,11 +99,15 @@ Relaciones:
 User 1 --- * Favorite * --- 1 Property
 User 1 --- * Inquiry  * --- 1 Property
 
+Inquiry 1 --- * InquiryMessage * --- 0..1 User (autor)
+
 Property 1 --- * PropertyImage
 Property * --- * Feature
 ```
 
 `Inquiry.userId` puede ser nulo para permitir consultas de visitantes.
+
+`InquiryMessage` guarda la conversación que sigue a una consulta (`fromAdmin`, `body`, autor). El mensaje original sigue en `Inquiry.message` y es el primero de la conversación.
 
 ## 6. Persistencia
 
@@ -148,21 +154,53 @@ POST   /api/favorites/{propertyId}
 DELETE /api/favorites/{propertyId}
 ```
 
+- Requieren sesión (USER o ADMIN). `GET` devuelve `PropertySummary[]` de las propiedades guardadas que siguen publicadas y no eliminadas, la más reciente primero.
+- `POST` (solo propiedades publicadas; si no, 404) y `DELETE` son idempotentes y responden 204. La clave primaria `(userId, propertyId)` impide duplicados.
+- Web: botón de corazón en las tarjetas y en el detalle (`aria-pressed`); un visitante va al login y vuelve. `/account` lista los guardados. La lista se comparte por SWR (`/api/favorites`), una sola petición para todas las tarjetas.
+
 Consultas:
 
 ```text
-POST /api/inquiries
+POST   /api/inquiries
+GET    /api/account/inquiries
+GET    /api/account/inquiries/{id}
+DELETE /api/account/inquiries/{id}
+POST   /api/account/inquiries/{id}/messages
+GET    /api/admin/inquiries
+GET    /api/admin/inquiries/{id}
+POST   /api/admin/inquiries/{id}/messages
 ```
+
+- `POST` es público; con sesión la consulta queda asociada al usuario.
+- `GET /api/account/inquiries` (sesión requerida) lista las consultas del usuario, la más reciente primero: título guardado al enviarla, mensaje, fecha y los datos actuales de la propiedad (`null` si ya no está publicada). Se muestra en «Propiedades consultadas» de `/account` como tabla, con búsqueda por título o mensaje y 6 por página, ambas en el cliente.
+- `DELETE /api/account/inquiries/{id}` (sesión requerida) solo la quita de la cuenta del usuario: marca `Inquiry.hiddenByUser` y el ADMIN la sigue viendo. Responde 204; 404 si no es suya o ya estaba quitada.
+- `/api/account/inquiries/**` y `/api/favorites/**` son solo para cuentas USER (403 a un ADMIN).
+- Conversación (chat en la app, sin correo al usuario: Web3Forms solo escribe a la casilla dueña de la clave):
+  - ADMIN: `GET /api/admin/inquiries` (`page`, `pageSize`, `search` sin distinguir mayúsculas sobre título, nombre, email y mensaje), `GET /api/admin/inquiries/{id}` (contacto, usuario asociado y conversación) y `POST …/messages` (201). Incluye las que el usuario quitó de su cuenta. `awaitingReply`: el último mensaje no es del ADMIN.
+  - USER: `GET /api/account/inquiries/{id}` y `POST …/messages` solo sobre sus consultas no quitadas (404 si no). La lista trae `adminReplyCount`.
+  - Respuesta: `inquiryReplySchema` (1–2000 caracteres). A un visitante sin cuenta el ADMIN le escribe además por `mailto:`; la respuesta queda registrada igual.
+  - Páginas: `/admin/inquiries` (lista) y `/admin/inquiries/{id}` (chat); el usuario, en `/account/inquiries/{id}` (enlace «Conversación» en su tabla). Sin notificaciones ni marcas de leído.
 
 Administración:
 
 ```text
+GET    /api/admin/dashboard
 GET    /api/admin/properties
 POST   /api/admin/properties
 GET    /api/admin/properties/{id}
 PUT    /api/admin/properties/{id}
 DELETE /api/admin/properties/{id}
 ```
+
+- Todos los endpoints `/api/admin/**` empiezan con `requireAdmin` (401 sin sesión, 403 para USER).
+- CRUD de propiedades (`/api/admin/properties`): incluye las no publicadas. `GET` lista con `page`, `pageSize`, `search` (mismo `searchText` que el catálogo) y filtros que se combinan (AND): `status` (`active` por defecto = no eliminadas; `published`, `draft`, o `deleted` = solo eliminadas, de la última eliminada a la primera, con `deletedAt`), `operation`, `type`, `minPrice`/`maxPrice`, `city` (slug, como el catálogo) y `createdFrom`/`createdTo` (días de creación, YYYY-MM-DD, tomados en UTC; no existe una fecha de publicación). Rangos invertidos → 400. En `/admin/properties` son un panel colapsable (a la derecha desde `xl`) que escribe esos mismos parámetros en la URL; la ciudad se elige entre las de propiedades publicadas (`/api/properties/filter-options`) y se oculta si no hay ninguna. `POST` (201) y `PUT` (reemplazo completo) validan con `propertyInputSchema` (`@portal/shared/admin-property`): sin latitud ni longitud; publicada y destacada en `false` por defecto. `DELETE` → 204; inexistente → 404.
+- Características: viajan como lista de nombres. Se quitan vacías y repetidas sin distinguir mayúsculas; si ya existe una con otra capitalización se reutiliza ("piscina" → "Piscina") y si no, se crea. `PUT` reemplaza el conjunto.
+- Eliminar es un soft delete: `Property.deletedAt = now()`. La fila y lo relacionado (imágenes, en PostgreSQL y Cloudinary; características; favoritos; consultas) se conservan. Una eliminada se oculta en todo el portal, en las listas del usuario (favoritos; en sus consultas la propiedad llega `null` y queda el título guardado), en los indicadores del panel y en la lista activa de admin; `GET`/`PUT`/`DELETE` por id responden 404. Solo aparece en `/admin/properties?status=deleted` (filtro Estado: «Eliminadas», solo lectura, con «Eliminada el»). Sin restauración desde la UI; re-ejecutar `db:seed` restaura las propiedades del seed.
+- El filtro público vive en `publishedOnly` (`isPublished: true, deletedAt: null`, `property-repository.ts`): úsalo en toda consulta pública o de usuario.
+- `GET /api/admin/dashboard`: indicadores del panel calculados en PostgreSQL (propiedades totales, publicadas, en venta y en arriendo, incluidas las no publicadas y sin contar las eliminadas; usuarios; consultas). La página `/admin` los pide desde el servidor reenviando la cookie (`fetchWithSession` en `apps/web/src/lib/session.ts`).
+- Área `/admin`: layout propio y corporativo (`components/admin/admin-shell.tsx`), sin header ni footer públicos: sidebar a la izquierda, colapsable a íconos en escritorio y como cajón en móvil, con «Panel administración», «Administrar propiedades», «Consultas» y «Mi cuenta» (`/admin/account`: datos y contraseña del ADMIN), más «Ver sitio» y «Salir». El sitio público vive en el grupo `app/(site)` con su header y footer; el layout raíz solo define `<html>`/`<body>`.
+- Páginas `/admin/properties` (lista), `/admin/properties/new` y `/admin/properties/{id}/edit`: Server Components que piden la API reenviando la cookie (`fetchWithSession`; `findWithSession` devuelve `null` ante 404). La búsqueda y la página viven en la URL (`search`, `page`), con un formulario GET sin JavaScript. Eliminar es un botón cliente (`DELETE` + `router.refresh()`) con confirmación.
+- Formulario (`components/admin/property-form.tsx`, lógica en `lib/property-form.ts`): componente cliente con `useState` que valida con `propertyInputSchema` antes de enviar (la API vuelve a validar). Crear hace `POST` y lleva a `/admin/properties/{id}/edit?created=1`; editar hace `PUT` y vuelve a renderizar la página. Sin latitud ni longitud.
 
 Crear recursos REST adicionales cuando sean necesarios para:
 
@@ -275,12 +313,19 @@ Implementación (sin dependencias nuevas, con `node:crypto`):
 - Registro → 201 e inicio de sesión; email ya registrado → 409. Rol USER por defecto.
 - Web: páginas `/login` y `/register` (vuelven a `?next=` solo si es una ruta del sitio) y el header muestra el nombre con «Salir». El usuario actual se lee con SWR (`/api/auth/me`).
 
+Edición de la cuenta (`/account/edit`, página independiente con el botón «Editar cuenta» en `/account`):
+
+- `PATCH /api/account/profile` actualiza nombre y email; cambiar el email (es el login) exige la contraseña actual. Email ya usado → 409.
+- `PUT /api/account/password` exige la contraseña actual; la nueva cumple las reglas del registro y debe ser distinta. Respuesta 204.
+- Contraseña actual incorrecta → 400. Los fallos cuentan para el mismo límite de intentos que el login (por cuenta) → 429.
+- Límite: cambiar la contraseña no cierra las otras sesiones abiertas (cookie firmada sin registro en el servidor); siguen válidas hasta expirar.
+
 Autorización:
 
 - API: todo Route Handler protegido empieza con `requireUser(request)` o `requireAdmin(request)` (`apps/api/src/lib/auth/authorization.ts`). Leen la cookie y cargan el usuario de la BD en cada petición: 401 sin sesión válida o con cuenta desactivada, 403 sin el rol. Un cambio de rol o una desactivación rige en la siguiente petición.
 - Web, en tres capas:
   1. `proxy.ts` (optimista, solo mira si existe la cookie) redirige `/account/**` y `/admin/**` a `/login?next=…`.
-  2. Los layouts y **cada página** privada validan la sesión con la API desde el servidor (`lib/session.ts`: `requireSessionUser`, `getAdminUser`). En `/admin`, un USER ve «Acceso restringido». El chequeo debe estar también en la página: Next renderiza layout y página en paralelo y, con el chequeo solo en el layout, el contenido de la página viaja igual en la respuesta.
+  2. Los layouts y **cada página** privada validan la sesión con la API desde el servidor (`lib/session.ts`: `requireSessionUser`, `requireCustomerUser`, `getAdminUser`). En `/admin`, un USER ve «Acceso restringido». Las páginas de `/account/**` son solo para USER: un ADMIN se redirige a su equivalente (`/admin`, `/admin/account`, `/admin/inquiries`); su nombre en el header lleva a `/admin` y no ve el botón de favoritos. El chequeo debe estar también en la página: Next renderiza layout y página en paralelo y, con el chequeo solo en el layout, el contenido de la página viaja igual en la respuesta.
   3. La API vuelve a verificar en cada endpoint protegido: es la defensa real.
 
 ## 11. Cloudinary
@@ -349,7 +394,7 @@ Definir un comportamiento claro ante fallos para evitar perder silenciosamente u
 Implementación (híbrida, porque el plan gratuito de Web3Forms solo acepta envíos desde el navegador; desde un servidor exige plan pago y lista blanca de IP):
 
 1. El formulario valida en el navegador con el mismo esquema Zod que la API (`@portal/shared/inquiry`).
-2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` nulo hasta el Paso 21, y responde 201.
+2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` del usuario cuando hay sesión (nulo para visitantes; una cookie inválida cuenta como visitante), y responde 201.
 3. Con la consulta ya guardada, el navegador la envía a Web3Forms con `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (pública por diseño: solo entrega correos a la casilla dueña de la clave). Incluye ID y título de la propiedad e ID de la consulta.
 4. Si el correo falla, el usuario igual ve «Consulta enviada»: la consulta está en PostgreSQL y el ADMIN la verá en su panel. Si falla la API, se muestra el error y no se envía correo.
 5. Anti-spam: campo trampa (honeypot) oculto. Sin limitación de tasa en la API por ahora.

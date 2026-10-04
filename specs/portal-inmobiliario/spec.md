@@ -44,7 +44,7 @@ Puede realizar todas las acciones públicas y además:
 
 ### ADMIN
 
-Puede realizar las acciones anteriores y además:
+Puede realizar las acciones públicas y cerrar sesión; no usa las secciones de USER (cuenta pública, favoritos, consultas propias): administra su cuenta desde el panel. Además puede:
 
 - acceder al panel administrativo;
 - crear propiedades;
@@ -482,6 +482,14 @@ ADMIN puede revisar:
 - fecha.
 
 Debe poder navegar desde la consulta hacia la propiedad correspondiente.
+
+ADMIN puede responder cada consulta. Las respuestas quedan registradas como una conversación (tipo chat) en la consulta:
+
+- el usuario registrado que la envió ve las respuestas en su cuenta y puede seguir la conversación por ese medio;
+- a un visitante sin cuenta se le responde además por email desde el panel;
+- la lista indica qué consultas esperan respuesta.
+
+El área de administración tiene su propio diseño, con un menú lateral: panel, propiedades, consultas y cuenta del administrador. ADMIN no usa las secciones de usuario (cuenta pública, favoritos, consultas propias): si entra por URL, vuelve a su panel.
 
 ---
 

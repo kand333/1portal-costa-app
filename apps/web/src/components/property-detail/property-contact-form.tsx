@@ -7,7 +7,9 @@ import {
   INQUIRY_PHONE_MAX_LENGTH,
   inquiryCreateSchema,
 } from "@portal/shared/inquiry";
+import type { AuthUser } from "@portal/shared/auth";
 import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useCurrentUser } from "@/hooks/use-current-user";
 import { submitInquiry } from "@/lib/inquiry-submission";
 
 type FieldName = "name" | "email" | "phone" | "message";
@@ -17,6 +19,15 @@ type Status = "idle" | "sending" | "sent" | "error";
 
 const FIELD_ORDER: FieldName[] = ["name", "email", "phone", "message"];
 const emptyValues: FormValues = { name: "", email: "", phone: "", message: "" };
+
+/**
+ * Fills name and email with the logged-in user's data, without overwriting what was already typed.
+ * The phone stays as is: accounts do not store one. The message is never prefilled.
+ */
+export function withUserContact(values: FormValues, user: Pick<AuthUser, "name" | "email"> | null | undefined): FormValues {
+  if (!user) return values;
+  return { ...values, name: values.name || user.name, email: values.email || user.email };
+}
 
 // Public by design (see .env.example); inlined at build time.
 const web3FormsAccessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
@@ -33,10 +44,19 @@ type PropertyContactFormProps = {
 
 /** Contact form of a property: the inquiry is stored by the API and emailed through Web3Forms. */
 export function PropertyContactForm({ propertyId, propertyTitle }: PropertyContactFormProps) {
+  const { data: currentUser } = useCurrentUser();
   const [values, setValues] = useState<FormValues>(emptyValues);
+  const [prefilledUserId, setPrefilledUserId] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<Status>("idle");
   const [errorMessage, setErrorMessage] = useState("");
+
+  // The session arrives after the first render: prefill once per user, adjusting state while
+  // rendering (the pattern React recommends instead of an effect). Fields stay editable.
+  if (currentUser && currentUser.id !== prefilledUserId) {
+    setPrefilledUserId(currentUser.id);
+    setValues((previous) => withUserContact(previous, currentUser));
+  }
 
   const fieldId = (name: FieldName) => `contact-${name}`;
   const errorId = (name: FieldName) => `contact-${name}-error`;
@@ -73,7 +93,8 @@ export function PropertyContactForm({ propertyId, propertyTitle }: PropertyConta
     setStatus("sending");
     const result = await submitInquiry(parsed.data, web3FormsAccessKey);
     if (result.status === "sent") {
-      setValues(emptyValues);
+      // Ready for another inquiry: the user's contact data again, empty phone and message.
+      setValues(withUserContact(emptyValues, currentUser));
       setStatus("sent");
     } else {
       setErrorMessage(result.message);

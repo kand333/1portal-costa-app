@@ -14,9 +14,19 @@ describe("NavigationLinks", () => {
       <NavigationLinks activeHref="/" orientation="horizontal" userName="Ana Rojas" onLogout={() => undefined} />,
     );
     expect(html).not.toContain('href="/login"');
-    expect(html).toContain("Ana Rojas");
+    expect(html).toMatch(/<a [^>]*href="\/account"[^>]*>Ana Rojas<\/a>/);
+    expect(html).toContain('aria-label="Mi cuenta (Ana Rojas)"');
     expect(html).toMatch(/<button type="button"[^>]*>Salir<\/button>/);
     // The other links stay.
     expect(html).toContain('href="/properties"');
+  });
+
+  it("leads an ADMIN from its name to «Panel administración»", () => {
+    const html = renderToStaticMarkup(
+      <NavigationLinks activeHref="/" orientation="horizontal" userName="Admin Portal" isAdmin onLogout={() => undefined} />,
+    );
+    expect(html).toMatch(/<a [^>]*href="\/admin"[^>]*>Admin Portal<\/a>/);
+    expect(html).toContain('aria-label="Panel administración (Admin Portal)"');
+    expect(html).not.toContain('href="/account"');
   });
 });

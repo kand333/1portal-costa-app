@@ -1,6 +1,6 @@
-import type { AuthUser, LoginData, RegisterData } from "@portal/shared/auth";
+import type { AuthUser, ChangePasswordData, LoginData, RegisterData, UpdateProfileData } from "@portal/shared/auth";
 import { mutate } from "swr";
-import { ApiClientError, fetchJson, postJson } from "./api-client";
+import { ApiClientError, fetchJson, postJson, sendJson } from "./api-client";
 
 export const CURRENT_USER_KEY = "/api/auth/me";
 
@@ -31,6 +31,17 @@ export async function logOut(): Promise<void> {
   const response = await fetch("/api/auth/logout", { method: "POST" });
   if (!response.ok) throw new ApiClientError(response.status, "No pudimos cerrar la sesión");
   await mutate(CURRENT_USER_KEY, null, { revalidate: false });
+}
+
+/** Saves name and email (the current password is needed only to change the email). */
+export async function updateProfile(data: UpdateProfileData): Promise<AuthUser> {
+  const user = await sendJson<AuthUser>("PATCH", "/api/account/profile", data);
+  await mutate(CURRENT_USER_KEY, user, { revalidate: false });
+  return user;
+}
+
+export function changePassword(data: ChangePasswordData): Promise<void> {
+  return sendJson<void>("PUT", "/api/account/password", data);
 }
 
 /**

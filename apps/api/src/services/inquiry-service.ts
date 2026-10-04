@@ -1,15 +1,17 @@
 import "server-only";
 import { ApiError } from "@/lib/http/api-error";
-import { insertInquiry } from "@/repositories/inquiry-repository";
+import { findUserInquiries, hideUserInquiry, insertInquiry } from "@/repositories/inquiry-repository";
+import { toPropertySummary } from "@/services/property-service";
 import { findPublishedPropertyById } from "@/repositories/property-repository";
-import type { InquiryCreateData, InquiryCreated } from "@portal/shared/inquiry";
+import type { AuthUser } from "@portal/shared/auth";
+import type { InquiryCreateData, InquiryCreated, UserInquiry } from "@portal/shared/inquiry";
 
 /**
  * Stores an inquiry about a published property. It is saved before any email is sent (the browser
  * sends it through Web3Forms afterwards), so an email failure never loses the inquiry.
  * The title is copied so the inquiry keeps it even if the property changes or is deleted.
  */
-export async function createInquiry(data: InquiryCreateData): Promise<InquiryCreated> {
+export async function createInquiry(data: InquiryCreateData, user: AuthUser | null = null): Promise<InquiryCreated> {
   const property = await findPublishedPropertyById(data.propertyId);
   if (!property) {
     throw new ApiError(404, "Propiedad no encontrada");
@@ -18,8 +20,8 @@ export async function createInquiry(data: InquiryCreateData): Promise<InquiryCre
   const inquiry = await insertInquiry({
     propertyId: property.id,
     propertyTitle: property.title,
-    // Visitors only for now: linking the authenticated user is task 21.
-    userId: null,
+    // Linked to the account when there is a session, so the user can see it in /account.
+    userId: user?.id ?? null,
     name: data.name,
     email: data.email,
     phone: data.phone ?? null,
@@ -32,4 +34,29 @@ export async function createInquiry(data: InquiryCreateData): Promise<InquiryCre
     propertyTitle: inquiry.propertyTitle,
     createdAt: inquiry.createdAt.toISOString(),
   };
+}
+
+type UserInquiryRecord = Awaited<ReturnType<typeof findUserInquiries>>[number];
+
+/** The property is null once it is unpublished or deleted. */
+export function toUserInquiry({ property, _count, ...inquiry }: UserInquiryRecord): UserInquiry {
+  return {
+    id: inquiry.id,
+    propertyId: inquiry.propertyId,
+    propertyTitle: inquiry.propertyTitle,
+    message: inquiry.message,
+    createdAt: inquiry.createdAt.toISOString(),
+    property: property?.isPublished && !property.deletedAt ? toPropertySummary(property) : null,
+    adminReplyCount: _count.messages,
+  };
+}
+
+/** Inquiries sent by the user, newest first. */
+export async function listUserInquiries(user: AuthUser): Promise<UserInquiry[]> {
+  return (await findUserInquiries(user.id)).map(toUserInquiry);
+}
+
+/** Removes an inquiry from the user's account; it stays stored for ADMIN. 404 when it is not theirs. */
+export async function removeUserInquiry(user: AuthUser, inquiryId: string): Promise<void> {
+  if (!(await hideUserInquiry(user.id, inquiryId))) throw new ApiError(404, "Consulta no encontrada");
 }

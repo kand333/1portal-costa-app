@@ -23,10 +23,46 @@ export const getSessionUser = cache(async (): Promise<AuthUser | null> => {
   return response.json() as Promise<AuthUser>;
 });
 
+async function getWithSession(path: string): Promise<Response> {
+  const token = (await cookies()).get(SESSION_COOKIE_NAME)?.value;
+  return fetch(`${apiInternalUrl()}${path}`, {
+    headers: { Accept: "application/json", ...(token ? { Cookie: `${SESSION_COOKIE_NAME}=${token}` } : {}) },
+    cache: "no-store",
+  });
+}
+
+/**
+ * GETs a private REST resource from a Server Component, forwarding the session cookie.
+ * Throws on any non-2xx answer (the page has already checked the session and the role).
+ */
+export async function fetchWithSession<Data>(path: string): Promise<Data> {
+  const response = await getWithSession(path);
+  if (!response.ok) throw new Error(`No fue posible cargar la información (HTTP ${response.status})`);
+  return response.json() as Promise<Data>;
+}
+
+/** Like `fetchWithSession`, but a 404 answer means the resource does not exist: returns null. */
+export async function findWithSession<Data>(path: string): Promise<Data | null> {
+  const response = await getWithSession(path);
+  if (response.status === 404) return null;
+  if (!response.ok) throw new Error(`No fue posible cargar la información (HTTP ${response.status})`);
+  return response.json() as Promise<Data>;
+}
+
 /** For pages that need a session: sends visitors to the login, which returns them here afterwards. */
 export async function requireSessionUser(returnPath: string): Promise<AuthUser> {
   const user = await getSessionUser();
   if (!user) redirect(`/login?${new URLSearchParams({ next: returnPath })}`);
+  return user;
+}
+
+/**
+ * For the USER area (/account/**): visitors go to the login and an ADMIN goes to its own area,
+ * since the user sections (saved properties, own inquiries) are not for administrators.
+ */
+export async function requireCustomerUser(returnPath: string, adminDestination = "/admin"): Promise<AuthUser> {
+  const user = await requireSessionUser(returnPath);
+  if (user.role === "ADMIN") redirect(adminDestination);
   return user;
 }
 

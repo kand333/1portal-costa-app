@@ -12,6 +12,12 @@ import type { UserRole } from "@portal/shared/enums";
  * a changed role takes effect immediately.
  */
 
+/** For public endpoints that behave differently with a session: the active user, or null. Never throws 401. */
+export async function getOptionalUser(request: NextRequest): Promise<AuthUser | null> {
+  const userId = readSessionUserId(request);
+  return userId ? getActiveUser(userId) : null;
+}
+
 /** The authenticated, active user; otherwise 401. */
 export async function requireUser(request: NextRequest): Promise<AuthUser> {
   const userId = readSessionUserId(request);

@@ -1,6 +1,15 @@
 import { renderToStaticMarkup } from "react-dom/server";
-import { describe, expect, it } from "vitest";
-import { PropertyContactForm } from "./property-contact-form";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { useCurrentUser } from "@/hooks/use-current-user";
+import { PropertyContactForm, withUserContact } from "./property-contact-form";
+
+vi.mock("@/hooks/use-current-user", () => ({ useCurrentUser: vi.fn() }));
+
+const user = { id: "u1", name: "Ana García", email: "ana@test.com", role: "USER" as const, isActive: true };
+const mockSession = (data: typeof user | null | undefined) =>
+  vi.mocked(useCurrentUser).mockReturnValue({ data } as ReturnType<typeof useCurrentUser>);
+
+beforeEach(() => mockSession(undefined));
 
 const render = () =>
   renderToStaticMarkup(
@@ -45,5 +54,38 @@ describe("PropertyContactForm", () => {
     expect(html).toContain(">Enviar consulta</button>");
     expect(html).not.toContain('role="alert"');
     expect(html).not.toContain(" aria-invalid=");
+  });
+
+  it("prefills name and email for a logged-in user, leaving phone and message empty and every field editable", () => {
+    mockSession(user);
+    const html = render();
+    expect(html).toMatch(/id="contact-name"[^>]*value="Ana García"/);
+    expect(html).toMatch(/id="contact-email"[^>]*value="ana@test.com"/);
+    expect(html).toMatch(/id="contact-phone"[^>]*value=""/);
+    expect(html).toMatch(/<textarea[^>]*id="contact-message"[^>]*><\/textarea>/);
+    expect(html).not.toMatch(/ readOnly="| disabled="/);
+  });
+
+  it("keeps every field empty without a session", () => {
+    for (const session of [undefined, null]) {
+      mockSession(session);
+      const html = render();
+      expect(html).toMatch(/id="contact-name"[^>]*value=""/);
+      expect(html).toMatch(/id="contact-email"[^>]*value=""/);
+    }
+  });
+});
+
+describe("withUserContact", () => {
+  const empty = { name: "", email: "", phone: "", message: "" };
+
+  it("fills only empty name and email, never phone or message", () => {
+    expect(withUserContact(empty, user)).toEqual({ name: "Ana García", email: "ana@test.com", phone: "", message: "" });
+    const typed = { name: "Ana", email: "otra@correo.cl", phone: "+56 9", message: "Hola" };
+    expect(withUserContact(typed, user)).toEqual(typed);
+  });
+
+  it("changes nothing without a user", () => {
+    expect(withUserContact(empty, null)).toBe(empty);
   });
 });
