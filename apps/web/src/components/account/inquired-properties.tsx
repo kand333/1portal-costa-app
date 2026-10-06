@@ -11,6 +11,7 @@ import { filterInquiries, inquiryTitle, paginateInquiries, removeMyInquiry } fro
 import { formatLocation, formatPrice } from "@/lib/property-format";
 
 const dateFormatter = new Intl.DateTimeFormat("es-CL", { dateStyle: "long" });
+const lastEntryFormatter = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short", hourCycle: "h23" });
 const FEEDBACK_DURATION_MS = 4000;
 
 const linkClassName =
@@ -83,6 +84,15 @@ function InquiryRow({ inquiry, onRemove }: { inquiry: UserInquiry; onRemove: (in
           <p className="mt-2 inline-flex rounded-full border border-accent/40 bg-accent/10 px-2.5 py-0.5 text-xs font-semibold text-ink">
             {inquiry.adminReplyCount === 1 ? "1 respuesta del portal" : `${inquiry.adminReplyCount} respuestas del portal`}
           </p>
+        )}
+        {inquiry.lastMessage && (
+          <div className="mt-2 border-l-2 border-brass/60 pl-3 text-sm">
+            <p className="text-xs text-muted">
+              Última entrada · <span className="font-semibold text-ink">{inquiry.lastMessage.fromAdmin ? "Portal" : "Tú"}</span> ·{" "}
+              <time dateTime={inquiry.lastMessage.createdAt}>{lastEntryFormatter.format(new Date(inquiry.lastMessage.createdAt))}</time>
+            </p>
+            <p className="line-clamp-2 whitespace-pre-line break-words text-ink/85">{inquiry.lastMessage.body}</p>
+          </div>
         )}
       </td>
       <td className={cn(cellClassName, "col-start-2 sm:pr-0")}>

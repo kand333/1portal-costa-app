@@ -13,6 +13,8 @@ const inquiry: UserInquiry = {
   message: "Quisiera coordinar una visita esta semana.",
   createdAt: "2026-10-02T15:00:00.000Z",
   adminReplyCount: 0,
+  lastActivityAt: "2026-10-02T15:00:00.000Z",
+  lastMessage: null,
   property: {
     id: "5eed0000-0000-4000-8000-000000000001",
     title: "Casa con piscina",
@@ -109,5 +111,22 @@ describe("InquiredProperties", () => {
     const html = renderToStaticMarkup(<InquiredProperties />);
     expect(html).toContain(`href="/account/inquiries/${inquiry.id}"`);
     expect(html).toContain("2 respuestas del portal");
+  });
+
+  it("shows the last entry of the conversation, saying who wrote it", () => {
+    mockInquiries({
+      data: [
+        { ...inquiry, lastMessage: { fromAdmin: true, body: "Sí, la visita puede ser el sábado.", createdAt: "2026-10-04T21:07:00.000Z" } },
+        { ...inquiry, id: "i2", lastMessage: { fromAdmin: false, body: "¿A qué hora?", createdAt: "2026-10-04T22:00:00.000Z" } },
+      ],
+    });
+    const html = renderToStaticMarkup(<InquiredProperties />);
+    expect(html).toMatch(/Última entrada · <span[^>]*>Portal<\/span>[^]*?Sí, la visita puede ser el sábado\./);
+    expect(html).toMatch(/Última entrada · <span[^>]*>Tú<\/span>[^]*?¿A qué hora\?/);
+  });
+
+  it("shows no last entry while nobody has answered", () => {
+    mockInquiries({ data: [inquiry] });
+    expect(renderToStaticMarkup(<InquiredProperties />)).not.toContain("Última entrada");
   });
 });

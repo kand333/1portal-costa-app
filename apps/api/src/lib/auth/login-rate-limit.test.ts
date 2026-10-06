@@ -4,12 +4,12 @@ import { clearFailedLogins, isLoginBlocked, recordFailedLogin } from "./login-ra
 const minute = 60 * 1000;
 
 describe("login rate limit", () => {
-  it("blocks an email after 10 failed attempts within 15 minutes", () => {
+  it("blocks an email after 5 failed attempts within 15 minutes", () => {
     const email = "blocked@correo.cl";
-    for (let attempt = 0; attempt < 9; attempt += 1) recordFailedLogin(email, attempt * minute);
-    expect(isLoginBlocked(email, 9 * minute)).toBe(false);
-    recordFailedLogin(email, 9 * minute);
-    expect(isLoginBlocked(email, 9 * minute)).toBe(true);
+    for (let attempt = 0; attempt < 4; attempt += 1) recordFailedLogin(email, attempt * minute);
+    expect(isLoginBlocked(email, 4 * minute)).toBe(false);
+    recordFailedLogin(email, 4 * minute);
+    expect(isLoginBlocked(email, 4 * minute)).toBe(true);
   });
 
   it("unblocks when the 15-minute window ends", () => {

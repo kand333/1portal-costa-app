@@ -7,6 +7,7 @@ import { useState, type KeyboardEvent, type ReactNode } from "react";
 import { SkipLink } from "@/components/layout/skip-link";
 import { adminNavigationItems, getActiveAdminSection, type AdminSection } from "@/lib/admin-navigation";
 import { logOut } from "@/lib/auth-client";
+import { flash } from "@/lib/flash";
 import { cn } from "@/lib/cn";
 
 const SIDEBAR_ID = "admin-sidebar";
@@ -58,7 +59,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
   const activeSection = getActiveAdminSection(pathname);
 
   async function handleLogout() {
-    await logOut().catch(() => undefined);
+    await logOut().catch(() => flash("No pudimos cerrar la sesión. Inténtalo de nuevo.", "error"));
     router.push("/");
     router.refresh();
   }

@@ -80,7 +80,9 @@ export async function updateUserByAdmin(admin: AuthUser, userId: string, update:
   if (userId === admin.id) throw new ApiError(409, OWN_ACCOUNT);
   const { password, ...changes } = update;
   const passwordHash = password === undefined ? undefined : await hashPassword(password);
-  return toSummary(await write(() => updateUserAccount(userId, { ...changes, passwordHash })));
+  // A new password also logs the user out of every device.
+  const sessionsValidAfter = passwordHash === undefined ? undefined : new Date();
+  return toSummary(await write(() => updateUserAccount(userId, { ...changes, passwordHash, sessionsValidAfter })));
 }
 
 /** Deletes another user's account for good (their inquiries stay for ADMIN). */

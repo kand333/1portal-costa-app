@@ -57,7 +57,10 @@ export type InquiryCreated = {
   createdAt: string;
 };
 
-/** An inquiry of the logged-in user (`GET /api/account/inquiries`). */
+/** Latest entry of the conversation that follows an inquiry (a preview for the lists). */
+export type InquiryLastMessage = { fromAdmin: boolean; body: string; createdAt: string };
+
+/** An inquiry of the logged-in user (`GET /api/account/inquiries`), latest activity first. */
 export type UserInquiry = {
   id: string;
   /** Null when the property was deleted. */
@@ -70,6 +73,10 @@ export type UserInquiry = {
   property: PropertySummary | null;
   /** Replies from the portal in the conversation. */
   adminReplyCount: number;
+  /** Creation or latest message, from either side. */
+  lastActivityAt: string;
+  /** Null while nobody has answered. */
+  lastMessage: InquiryLastMessage | null;
 };
 
 /** One message of the conversation that follows an inquiry. */
@@ -103,7 +110,7 @@ export const adminInquiryListQuerySchema = z.object({
 });
 export type AdminInquiryListQuery = z.output<typeof adminInquiryListQuerySchema>;
 
-/** A row of `GET /api/admin/inquiries`, newest first. */
+/** A row of `GET /api/admin/inquiries`, latest activity first. */
 export type AdminInquirySummary = {
   id: string;
   propertyId: string | null;
@@ -123,6 +130,8 @@ export type AdminInquirySummary = {
   /** Replies after the inquiry, from either side. */
   messageCount: number;
   lastActivityAt: string;
+  /** Null while nobody has answered. */
+  lastMessage: InquiryLastMessage | null;
   /** The last word is the user's: it is waiting for an answer. */
   awaitingReply: boolean;
 };

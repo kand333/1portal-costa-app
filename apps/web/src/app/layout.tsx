@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Cormorant_Garamond, Hanken_Grotesk } from "next/font/google";
+import { FlashMessages } from "@/components/ui/flash-messages";
 import "./globals.css";
 
 const hankenGrotesk = Hanken_Grotesk({
@@ -15,8 +16,18 @@ const cormorantGaramond = Cormorant_Garamond({
 });
 
 export const metadata: Metadata = {
+  // Base for the relative URLs of the metadata (canonical, Open Graph).
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: "Portal Inmobiliario",
   description: "Propiedades en venta y arriendo en Chile.",
+  // Pages without their own Open Graph share these; a page that sets it replaces the whole object.
+  openGraph: {
+    type: "website",
+    siteName: "Portal Inmobiliario",
+    locale: "es_CL",
+    title: "Portal Inmobiliario",
+    description: "Propiedades en venta y arriendo en Chile.",
+  },
 };
 
 export const viewport: Viewport = {
@@ -33,7 +44,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="es"
       className={`${hankenGrotesk.variable} ${cormorantGaramond.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col font-sans">{children}</body>
+      <body className="min-h-full flex flex-col font-sans">
+        {children}
+        <FlashMessages />
+      </body>
     </html>
   );
 }

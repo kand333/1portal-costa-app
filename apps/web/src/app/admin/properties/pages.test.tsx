@@ -97,8 +97,6 @@ describe("admin property pages", () => {
     const html = await renderEdit(propertyId);
     expect(html).toContain("Editar propiedad");
     expect(html).toContain('value="Casa en Ñuñoa"');
-    expect(html).not.toContain("Propiedad creada");
-    expect(await renderEdit(propertyId, { created: "1" })).toContain("Propiedad creada sin publicar.");
     expect(findWithSession).toHaveBeenCalledWith(`/api/admin/properties/${propertyId}`);
 
     vi.mocked(findWithSession).mockResolvedValue(null);

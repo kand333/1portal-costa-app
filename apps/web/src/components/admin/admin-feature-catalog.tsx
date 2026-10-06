@@ -9,8 +9,9 @@ import { createFeature, deleteFeature, renameFeature } from "@/lib/admin-feature
 import { ADMIN_PROPERTIES_PATH } from "@/lib/admin-properties";
 import { ApiClientError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
+import { flash } from "@/lib/flash";
 
-type Status = { tone: "idle" | "busy" | "success" | "error"; message: string };
+type Status = { tone: "idle" | "busy" | "error"; message: string };
 
 const inputClassName =
   "h-10 w-full min-w-0 rounded-xl border border-line bg-surface px-3 text-ink transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40";
@@ -42,7 +43,9 @@ export function AdminFeatureCatalog({ features }: { features: AdminFeature[] }) 
     try {
       await action();
       onDone?.();
-      setStatus({ tone: "success", message: doneMessage });
+      // Success goes to the flash at the top of the page; this line keeps only progress and errors.
+      setStatus({ tone: "idle", message: "" });
+      flash(doneMessage);
       router.refresh();
     } catch (error) {
       setStatus({ tone: "error", message: errorMessageOf(error) });
@@ -53,7 +56,7 @@ export function AdminFeatureCatalog({ features }: { features: AdminFeature[] }) 
     event.preventDefault();
     const problem = nameProblem(newName);
     if (problem) return setStatus({ tone: "error", message: problem });
-    void run(() => createFeature(newName.trim()), `«${newName.trim()}» agregada.`, () => setNewName(""));
+    void run(() => createFeature(newName.trim()), `Característica «${newName.trim()}» creada.`, () => setNewName(""));
   }
 
   function handleRename(event: FormEvent<HTMLFormElement>) {
@@ -61,12 +64,12 @@ export function AdminFeatureCatalog({ features }: { features: AdminFeature[] }) 
     if (!editing) return;
     const problem = nameProblem(editing.name);
     if (problem) return setStatus({ tone: "error", message: problem });
-    void run(() => renameFeature(editing.id, editing.name.trim()), "Nombre actualizado.", () => setEditing(null));
+    void run(() => renameFeature(editing.id, editing.name.trim()), `Característica renombrada a «${editing.name.trim()}».`, () => setEditing(null));
   }
 
   function handleDelete(feature: AdminFeature) {
     if (!window.confirm(`¿Eliminar «${feature.name}» del catálogo?`)) return;
-    void run(() => deleteFeature(feature.id), `«${feature.name}» eliminada.`);
+    void run(() => deleteFeature(feature.id), `Característica «${feature.name}» eliminada.`);
   }
 
   return (

@@ -125,6 +125,14 @@
   }
 }
 
+/* Flash messages drop in from the top. */
+@keyframes flash-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
 /* The only entrance animation: the hero headline and search bar settle in once on load. */
 @keyframes rise {
   from {

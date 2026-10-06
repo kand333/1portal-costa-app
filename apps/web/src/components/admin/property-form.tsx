@@ -16,6 +16,7 @@ import { AuthFormField } from "@/components/auth/auth-form-field";
 import { ADMIN_PROPERTIES_PATH } from "@/lib/admin-properties";
 import { ApiClientError, sendJson } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
+import { flash } from "@/lib/flash";
 import { operationLabels, propertyTypeLabels } from "@/lib/property-format";
 import {
   buildFeatureOptions,
@@ -28,7 +29,7 @@ import {
   type PropertyFormValues,
 } from "@/lib/property-form";
 
-type Status = "idle" | "saving" | "saved" | "error";
+type Status = "idle" | "saving" | "error";
 
 const fieldId = (name: PropertyFormField) => `property-${name}`;
 
@@ -204,12 +205,14 @@ export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
       if (property) {
         const updated = await sendJson<AdminPropertyDetail>("PUT", `/api/admin/properties/${property.id}`, result.data);
         setValues(toPropertyFormValues(updated));
-        setStatus("saved");
-        // Re-renders the server header (title, publication state) and drops the `?created=1` notice.
-        router.replace(`${ADMIN_PROPERTIES_PATH}/${property.id}/edit`, { scroll: false });
+        setStatus("idle");
+        flash(`Cambios guardados en «${updated.title}».`);
+        // Re-renders the server header (title, publication state).
+        router.refresh();
       } else {
         const created = await sendJson<AdminPropertyDetail>("POST", "/api/admin/properties", result.data);
-        router.push(`${ADMIN_PROPERTIES_PATH}/${created.id}/edit?created=1`);
+        flash(`Propiedad «${created.title}» creada${created.isPublished ? " y publicada" : " sin publicar"}. Ya puedes agregar imágenes.`);
+        router.push(`${ADMIN_PROPERTIES_PATH}/${created.id}/edit`);
       }
     } catch (error) {
       setErrorMessage(
@@ -383,11 +386,6 @@ export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
         >
           Cancelar
         </Link>
-        {status === "saved" && (
-          <p role="status" className="text-sm font-medium text-ink">
-            Cambios guardados.
-          </p>
-        )}
         {status === "error" && (
           <p role="alert" className="basis-full text-sm text-red-700 dark:text-red-400">
             {errorMessage}

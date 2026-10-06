@@ -85,7 +85,8 @@ export default function PropertyMapCanvas({
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={center} icon={redPinIcon} />
+        {/* Only marks the spot (no popup): out of the tab order, so it is not an unnamed "button". */}
+        <Marker position={center} icon={redPinIcon} keyboard={false} interactive={false} />
       </MapContainer>
       {/* Above Leaflet's panes (z-index up to 1000) and click-through, so it never blocks the map. */}
       <p

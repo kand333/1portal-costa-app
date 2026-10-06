@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ApiClientError, sendJson } from "@/lib/api-client";
+import { flash } from "@/lib/flash";
 
 type DeletePropertyButtonProps = {
   propertyId: string;
@@ -22,6 +23,7 @@ export function DeletePropertyButton({ propertyId, propertyTitle }: DeleteProper
     setError(null);
     try {
       await sendJson("DELETE", `/api/admin/properties/${propertyId}`);
+      flash(`Propiedad «${propertyTitle}» eliminada. Puedes verla en el filtro «Eliminadas».`);
       router.refresh();
     } catch (caught) {
       // Already deleted (e.g. from another tab): the list only needs refreshing.

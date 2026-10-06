@@ -2,7 +2,7 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { escapeLikePattern } from "@/lib/escape-like";
 import { prisma } from "@/lib/prisma";
-import { inquiryMessageSelect } from "@/repositories/inquiry-repository";
+import { inquiryMessageSelect, lastMessageSelect } from "@/repositories/inquiry-repository";
 
 const adminInquirySelect = {
   id: true,
@@ -13,17 +13,18 @@ const adminInquirySelect = {
   phone: true,
   message: true,
   createdAt: true,
+  lastActivityAt: true,
   hiddenByUser: true,
   property: { select: { isPublished: true, deletedAt: true } },
   user: { select: { id: true, name: true, email: true } },
   _count: { select: { messages: true } },
-  // The latest message tells whether the inquiry is waiting for an answer.
-  messages: { orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 1, select: { fromAdmin: true, createdAt: true } },
+  // The latest message: the preview, and whether the inquiry is waiting for an answer.
+  messages: lastMessageSelect,
 } satisfies Prisma.InquirySelect;
 
 export type AdminInquiryRecord = Prisma.InquiryGetPayload<{ select: typeof adminInquirySelect }>;
 
-/** Every inquiry (also the ones a user removed from their account), newest first. */
+/** Every inquiry (also the ones a user removed from their account), latest activity first. */
 export async function findAdminInquiries(
   searchTerms: string[],
   pagination: { skip: number; take: number },
@@ -38,7 +39,7 @@ export async function findAdminInquiries(
   const [records, total] = await prisma.$transaction([
     prisma.inquiry.findMany({
       where,
-      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      orderBy: [{ lastActivityAt: "desc" }, { id: "desc" }],
       skip: pagination.skip,
       take: pagination.take,
       select: adminInquirySelect,

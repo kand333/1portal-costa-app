@@ -117,4 +117,26 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("account API", () => {
     await expect(verifyPassword("nueva clave 2", stored.passwordHash)).resolves.toBe(true);
     await expect(verifyPassword(password, stored.passwordHash)).resolves.toBe(false);
   });
+
+  it("logs out the other devices when the password changes, keeping the current session", { timeout: 30_000 }, async () => {
+    const user = await createUser("devices");
+    const { createSessionToken } = await import("@/lib/auth/session-token");
+    const otherDevice = `portal_session=${createSessionToken(user.id, Date.now() - 60_000)}`;
+    const me = async (cookie: string) => {
+      const { GET } = await import("@/app/api/auth/me/route");
+      return (await GET(new NextRequest("http://localhost:3000/api/auth/me", { headers: { cookie } }))).status;
+    };
+    expect(await me(otherDevice)).toBe(200);
+
+    const { PUT } = await import("@/app/api/account/password/route");
+    const response = await PUT(jsonRequest("password", "PUT", { currentPassword: password, newPassword: "nueva clave 3" }, otherDevice));
+    expect(response.status).toBe(204);
+    // The session that made the change gets a fresh cookie and keeps working...
+    const renewed = response.headers.get("set-cookie")?.match(/portal_session=[^;]+/)?.[0];
+    expect(renewed).toBeDefined();
+    expect(await me(renewed ?? "")).toBe(200);
+    // ...while every session issued before the change is rejected.
+    expect(await me(otherDevice)).toBe(401);
+    expect((await patchProfile({ name: "Otro", email: emailFor("devices") }, otherDevice)).status).toBe(401);
+  });
 });

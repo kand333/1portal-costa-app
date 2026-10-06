@@ -1,3 +1,4 @@
+import { createHmac } from "node:crypto";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { createSessionToken, readSessionToken, SESSION_DURATION_SECONDS } from "./session-token";
 
@@ -8,13 +9,20 @@ beforeEach(() => vi.stubEnv("AUTH_SECRET", "a".repeat(40)));
 afterEach(() => vi.unstubAllEnvs());
 
 describe("session token", () => {
-  it("returns the user id of a valid token", () => {
-    expect(readSessionToken(createSessionToken(userId, now), now)).toBe(userId);
+  it("returns the user id and the issue time (seconds) of a valid token", () => {
+    expect(readSessionToken(createSessionToken(userId, now), now)).toEqual({ userId, issuedAt: now / 1000 });
+  });
+
+  it("derives the issue time of older tokens, signed before it was included", () => {
+    const exp = now / 1000 + SESSION_DURATION_SECONDS;
+    const payload = Buffer.from(JSON.stringify({ sub: userId, exp })).toString("base64url");
+    const signature = createHmac("sha256", "a".repeat(40)).update(payload).digest("base64url");
+    expect(readSessionToken(`${payload}.${signature}`, now)).toEqual({ userId, issuedAt: now / 1000 });
   });
 
   it("expires after the session duration", () => {
     const token = createSessionToken(userId, now);
-    expect(readSessionToken(token, now + (SESSION_DURATION_SECONDS - 1) * 1000)).toBe(userId);
+    expect(readSessionToken(token, now + (SESSION_DURATION_SECONDS - 1) * 1000)?.userId).toBe(userId);
     expect(readSessionToken(token, now + SESSION_DURATION_SECONDS * 1000)).toBeNull();
   });
 

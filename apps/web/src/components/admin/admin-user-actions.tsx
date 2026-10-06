@@ -11,6 +11,7 @@ import { useConfirmDialog, type ConfirmOptions } from "@/components/ui/confirm-d
 import { deleteUser, diffUserChanges, updateUser, type UserEditValues } from "@/lib/admin-users";
 import { ApiClientError } from "@/lib/api-client";
 import { cn } from "@/lib/cn";
+import { flash } from "@/lib/flash";
 
 const buttonClassName =
   "inline-flex h-9 w-full items-center justify-center rounded-full border border-line px-2 text-sm max-sm:h-8 max-sm:text-xs font-semibold text-ink transition-colors duration-200 hover:border-brass hover:bg-paper disabled:cursor-not-allowed disabled:opacity-50";
@@ -93,6 +94,7 @@ function EditUserDialog({ user, onClose, confirm }: EditUserDialogProps) {
     setIsSaving(true);
     try {
       await updateUser(user.id, parsed.data);
+      flash(`Cambios guardados en la cuenta de ${parsed.data.name ?? user.name}.`);
       router.refresh();
       onClose();
     } catch (error) {
@@ -213,11 +215,12 @@ export function AdminUserActions({ user, isCurrentAdmin }: AdminUserActionsProps
 
   if (isCurrentAdmin) return <p className="text-sm text-muted max-sm:text-xs xl:text-right">Se edita en «Mi cuenta»</p>;
 
-  async function run(action: () => Promise<unknown>) {
+  async function run(action: () => Promise<unknown>, doneMessage: string) {
     setIsSaving(true);
     setError(null);
     try {
       await action();
+      flash(doneMessage);
       router.refresh();
     } catch (caught) {
       setError(errorMessageOf(caught));
@@ -237,7 +240,12 @@ export function AdminUserActions({ user, isCurrentAdmin }: AdminUserActionsProps
           }
         : { title: `¿Activar a ${user.name}?`, message: "Podrá volver a ingresar con su contraseña.", confirmLabel: "Activar" },
     );
-    if (accepted) await run(() => updateUser(user.id, { isActive: !user.isActive }));
+    if (accepted) {
+      await run(
+        () => updateUser(user.id, { isActive: !user.isActive }),
+        `Cuenta de ${user.name} ${user.isActive ? "desactivada" : "activada"}.`,
+      );
+    }
   }
 
   async function handleDelete() {
@@ -252,7 +260,7 @@ export function AdminUserActions({ user, isCurrentAdmin }: AdminUserActionsProps
       confirmLabel: "Eliminar definitivamente",
       tone: "danger",
     });
-    if (accepted) await run(() => deleteUser(user.id));
+    if (accepted) await run(() => deleteUser(user.id), `Cuenta de ${user.name} eliminada.`);
   }
 
   return (

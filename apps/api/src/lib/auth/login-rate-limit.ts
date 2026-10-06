@@ -1,6 +1,6 @@
 import "server-only";
 
-const MAX_FAILED_ATTEMPTS = 10;
+export const MAX_FAILED_ATTEMPTS = 5;
 const WINDOW_MILLISECONDS = 15 * 60 * 1000;
 
 type Attempts = { count: number; windowStart: number };

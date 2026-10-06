@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   robots: { index: false },
 };
 
-export default async function EditAdminPropertyPage({ params, searchParams }: PageProps<"/admin/properties/[id]/edit">) {
+export default async function EditAdminPropertyPage({ params }: PageProps<"/admin/properties/[id]/edit">) {
   const { id } = await params;
   // Checked here too: the layout check alone does not keep this content out of the response.
   if (!(await getAdminUser(`/admin/properties/${encodeURIComponent(id)}/edit`))) return <AccessDenied />;
@@ -25,12 +25,5 @@ export default async function EditAdminPropertyPage({ params, searchParams }: Pa
     fetchWithSession<AdminFeature[]>("/api/admin/features").catch(() => []),
   ]);
   if (!property) notFound();
-  // `?created=1`: the creation form redirects here.
-  return (
-    <AdminPropertyEditor
-      property={property}
-      catalog={catalog.map((feature) => feature.name)}
-      isNew={(await searchParams).created === "1"}
-    />
-  );
+  return <AdminPropertyEditor property={property} catalog={catalog.map((feature) => feature.name)} />;
 }

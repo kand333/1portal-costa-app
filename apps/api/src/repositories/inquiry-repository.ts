@@ -1,4 +1,5 @@
 import "server-only";
+import type { Prisma } from "@/generated/prisma/client";
 import { prisma } from "@/lib/prisma";
 import { propertySummarySelect } from "@/repositories/property-repository";
 
@@ -38,16 +39,24 @@ const userInquirySelect = {
   propertyTitle: true,
   message: true,
   createdAt: true,
+  lastActivityAt: true,
   property: { select: { ...propertySummarySelect, isPublished: true, deletedAt: true } },
   _count: { select: { messages: { where: { fromAdmin: true } } } },
 } as const;
 
-/** The user's inquiries, except the ones they removed from their account. */
+/** The latest message only: the preview of the conversation in the lists. */
+export const lastMessageSelect = {
+  orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+  take: 1,
+  select: { fromAdmin: true, body: true, createdAt: true },
+} satisfies Prisma.InquiryMessageFindManyArgs;
+
+/** The user's inquiries, latest activity first, except the ones they removed from their account. */
 export function findUserInquiries(userId: string) {
   return prisma.inquiry.findMany({
     where: { userId, hiddenByUser: false },
-    orderBy: { createdAt: "desc" },
-    select: userInquirySelect,
+    orderBy: [{ lastActivityAt: "desc" }, { id: "desc" }],
+    select: { ...userInquirySelect, messages: lastMessageSelect },
   });
 }
 
@@ -59,11 +68,18 @@ export function findUserInquiryWithMessages(userId: string, inquiryId: string) {
   });
 }
 
-/** Adds a reply to the conversation of an inquiry. */
+/**
+ * Adds a reply to the conversation of an inquiry and moves it to the top of both lists. A reply from
+ * ADMIN also brings the inquiry back to a user who had removed it from their account, so they see it.
+ */
 export function insertInquiryMessage(data: { inquiryId: string; authorId: string; fromAdmin: boolean; body: string }) {
   return prisma.inquiry.update({
     where: { id: data.inquiryId },
-    data: { messages: { create: { authorId: data.authorId, fromAdmin: data.fromAdmin, body: data.body } } },
+    data: {
+      lastActivityAt: new Date(),
+      ...(data.fromAdmin ? { hiddenByUser: false } : {}),
+      messages: { create: { authorId: data.authorId, fromAdmin: data.fromAdmin, body: data.body } },
+    },
     select: { messages: { orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 1, select: inquiryMessageSelect } },
   });
 }

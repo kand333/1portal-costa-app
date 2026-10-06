@@ -20,6 +20,7 @@ const summary = (overrides: Partial<AdminInquirySummary> = {}): AdminInquirySumm
   hiddenByUser: false,
   messageCount: 0,
   lastActivityAt: "2026-10-01T12:00:00.000Z",
+  lastMessage: null,
   awaitingReply: true,
   ...overrides,
 });
@@ -36,9 +37,31 @@ describe("AdminInquiryList", () => {
     expect(html).toContain(">Sin responder<");
     expect(html).toContain(">Respondida<");
     expect(html).toContain("2 respuestas");
-    expect(html).toContain("Usuario registrado");
+    expect(html).toContain("Usuario: Ana García");
     expect(html).toContain("Visitante");
+    expect(html).toContain("+56 9 1234 5678");
     expect(html).toContain('href="/admin/inquiries/11111111-1111-4111-8111-111111111111"');
+  });
+
+  it("shows the last entry of each conversation with its author", () => {
+    const html = render([
+      summary({ lastMessage: { fromAdmin: false, body: "agendemos", createdAt: "2026-10-04T21:08:00.000Z" } }),
+      summary({ id: "55555555-5555-4555-8555-555555555555", lastMessage: { fromAdmin: true, body: "Hola Ana", createdAt: "2026-10-04T21:07:00.000Z" } }),
+      summary({ id: "66666666-6666-4666-8666-666666666666" }),
+    ]);
+    expect(html).toMatch(/Última entrada · <span[^>]*>Ana García<\/span>[^]*?agendemos/);
+    expect(html).toMatch(/Última entrada · <span[^>]*>Portal<\/span>[^]*?Hola Ana/);
+    expect(html.match(/Última entrada/g)).toHaveLength(2);
+  });
+
+  it("links the associated property while it is public", () => {
+    const html = render([
+      summary(),
+      summary({ id: "44444444-4444-4444-8444-444444444444", propertyTitle: "Depto retirado", isPropertyPublic: false }),
+    ]);
+    expect(html).toMatch(/<a [^>]*href="\/properties\/22222222-2222-4222-8222-222222222222"[^>]*>Casa en Ñuñoa<\/a>/);
+    expect(html).not.toMatch(/<a [^>]*>Depto retirado<\/a>/);
+    expect(html).toContain("Ya no está publicada");
   });
 
   it("explains an empty list and an empty search", () => {

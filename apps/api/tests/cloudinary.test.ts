@@ -46,8 +46,15 @@ describe("Cloudinary Upload API calls", () => {
     expect(url).toBe("https://api.cloudinary.com/v1_1/demo-cloud/image/upload");
     const body = init.body as FormData;
     expect(body.get("folder")).toBe("propiedades-claude");
+    // Never stores more than 2560 px on the longest side (signed like every other parameter).
+    expect(body.get("transformation")).toBe("c_limit,w_2560,h_2560");
     expect(body.get("api_key")).toBe("123456");
-    expect(body.get("signature")).toBe(signCloudinaryParams({ folder: "propiedades-claude", timestamp: String(body.get("timestamp")) }, "secret"));
+    expect(body.get("signature")).toBe(
+      signCloudinaryParams(
+        { folder: "propiedades-claude", transformation: "c_limit,w_2560,h_2560", timestamp: String(body.get("timestamp")) },
+        "secret",
+      ),
+    );
     expect(body.get("api_secret")).toBeNull();
   });
 

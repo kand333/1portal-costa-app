@@ -5,6 +5,13 @@ import { ApiError } from "@/lib/http/api-error";
 /** Cloudinary folder of the images uploaded by ADMIN. */
 export const PROPERTY_IMAGES_FOLDER = "propiedades-claude";
 
+/**
+ * Incoming transformation applied before storing an upload: at most 2560 px on its longest side
+ * (never upscaled). Big enough for the widest gallery on a high-density screen, while a 6000 px
+ * camera photo is not kept as is. Delivery sizes are then made per request (`next/image` loader).
+ */
+export const UPLOAD_TRANSFORMATION = "c_limit,w_2560,h_2560";
+
 type CloudinaryConfig = { cloudName: string; apiKey: string; apiSecret: string };
 
 function readConfig(): CloudinaryConfig {
@@ -61,7 +68,7 @@ export type UploadedImage = { url: string; publicId: string };
 
 /** Uploads an image (already validated) to the property images folder; returns its HTTPS URL and public_id. */
 export async function uploadPropertyImage(file: Blob): Promise<UploadedImage> {
-  const result = await callUploadApi("upload", { folder: PROPERTY_IMAGES_FOLDER }, file);
+  const result = await callUploadApi("upload", { folder: PROPERTY_IMAGES_FOLDER, transformation: UPLOAD_TRANSFORMATION }, file);
   if (typeof result.secure_url !== "string" || typeof result.public_id !== "string") {
     console.error("Unexpected Cloudinary upload response", result);
     throw new ApiError(502, "No fue posible guardar la imagen en Cloudinary. Inténtalo de nuevo.");

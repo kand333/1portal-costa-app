@@ -4,7 +4,7 @@ import { findUserInquiries, hideUserInquiry, insertInquiry } from "@/repositorie
 import { toPropertySummary } from "@/services/property-service";
 import { findPublishedPropertyById } from "@/repositories/property-repository";
 import type { AuthUser } from "@portal/shared/auth";
-import type { InquiryCreateData, InquiryCreated, UserInquiry } from "@portal/shared/inquiry";
+import type { InquiryCreateData, InquiryCreated, InquiryLastMessage, UserInquiry } from "@portal/shared/inquiry";
 
 /**
  * Stores an inquiry about a published property. It is saved before any email is sent (the browser
@@ -39,7 +39,10 @@ export async function createInquiry(data: InquiryCreateData, user: AuthUser | nu
 type UserInquiryRecord = Awaited<ReturnType<typeof findUserInquiries>>[number];
 
 /** The property is null once it is unpublished or deleted. */
-export function toUserInquiry({ property, _count, ...inquiry }: UserInquiryRecord): UserInquiry {
+export const toLastMessage = (message: { fromAdmin: boolean; body: string; createdAt: Date } | undefined): InquiryLastMessage | null =>
+  message ? { fromAdmin: message.fromAdmin, body: message.body, createdAt: message.createdAt.toISOString() } : null;
+
+export function toUserInquiry({ property, _count, messages, ...inquiry }: UserInquiryRecord): UserInquiry {
   return {
     id: inquiry.id,
     propertyId: inquiry.propertyId,
@@ -48,10 +51,12 @@ export function toUserInquiry({ property, _count, ...inquiry }: UserInquiryRecor
     createdAt: inquiry.createdAt.toISOString(),
     property: property?.isPublished && !property.deletedAt ? toPropertySummary(property) : null,
     adminReplyCount: _count.messages,
+    lastActivityAt: inquiry.lastActivityAt.toISOString(),
+    lastMessage: toLastMessage(messages[0]),
   };
 }
 
-/** Inquiries sent by the user, newest first. */
+/** Inquiries sent by the user, latest activity first. */
 export async function listUserInquiries(user: AuthUser): Promise<UserInquiry[]> {
   return (await findUserInquiries(user.id)).map(toUserInquiry);
 }

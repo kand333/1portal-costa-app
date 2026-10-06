@@ -462,8 +462,13 @@ ADMIN puede:
 - listar;
 - buscar;
 - consultar;
+- crear;
+- editar sus datos (nombre, email, contraseña);
+- eliminar;
 - activar/desactivar;
 - modificar rol cuando corresponda.
+
+Los cambios sensibles (hacer ADMIN, desactivar, eliminar, editar datos) piden confirmación. ADMIN no puede modificar ni eliminar su propia cuenta desde esta sección. La lista distingue a quienes están conectados en ese momento.
 
 La autorización siempre debe comprobarse en backend.
 
@@ -489,7 +494,7 @@ ADMIN puede responder cada consulta. Las respuestas quedan registradas como una 
 - a un visitante sin cuenta se le responde además por email desde el panel;
 - la lista indica qué consultas esperan respuesta.
 
-El área de administración tiene su propio diseño, con un menú lateral: panel, propiedades, consultas y cuenta del administrador. ADMIN no usa las secciones de usuario (cuenta pública, favoritos, consultas propias): si entra por URL, vuelve a su panel.
+El área de administración tiene su propio diseño, con un menú lateral: panel, propiedades, usuarios, consultas y cuenta del administrador. ADMIN no usa las secciones de usuario (cuenta pública, favoritos, consultas propias): si entra por URL, vuelve a su panel.
 
 ---
 

@@ -28,14 +28,38 @@ function InquiryRow({ inquiry }: { inquiry: AdminInquirySummary }) {
       <td className={cn(cellClassName, "text-sm text-muted xl:w-36")}>
         <time dateTime={inquiry.createdAt}>{dateFormatter.format(new Date(inquiry.createdAt))}</time>
       </td>
-      <td className={cn(cellClassName, "font-medium text-ink")}>{inquiry.propertyTitle}</td>
+      <td className={cn(cellClassName, "font-medium text-ink")}>
+        {inquiry.isPropertyPublic && inquiry.propertyId ? (
+          <Link
+            href={`/properties/${inquiry.propertyId}`}
+            className="underline decoration-brass decoration-1 underline-offset-4 transition-colors duration-200 hover:decoration-ink"
+          >
+            {inquiry.propertyTitle}
+          </Link>
+        ) : (
+          <>
+            {inquiry.propertyTitle}
+            <span className="block text-xs font-normal text-muted">Ya no está publicada</span>
+          </>
+        )}
+      </td>
       <td className={cn(cellClassName, "text-sm")}>
         <span className="block font-medium text-ink">{inquiry.name}</span>
         <span className="block break-all text-muted">{inquiry.email}</span>
-        <span className="block text-xs text-muted">{inquiry.user ? "Usuario registrado" : "Visitante"}</span>
+        {inquiry.phone && <span className="block text-muted">{inquiry.phone}</span>}
+        <span className="block text-xs text-muted">{inquiry.user ? `Usuario: ${inquiry.user.name}` : "Visitante"}</span>
       </td>
       <td className={cn(cellClassName, "text-sm text-ink/85")}>
         <p className="line-clamp-2 break-words">{inquiry.message}</p>
+        {inquiry.lastMessage && (
+          <div className="mt-2 border-l-2 border-brass/60 pl-3">
+            <p className="text-xs text-muted">
+              Última entrada · <span className="font-semibold text-ink">{inquiry.lastMessage.fromAdmin ? "Portal" : inquiry.name}</span> ·{" "}
+              <time dateTime={inquiry.lastMessage.createdAt}>{dateFormatter.format(new Date(inquiry.lastMessage.createdAt))}</time>
+            </p>
+            <p className="line-clamp-2 break-words">{inquiry.lastMessage.body}</p>
+          </div>
+        )}
       </td>
       <td className={cn(cellClassName, "xl:w-32")}>
         <StatusBadge inquiry={inquiry} />
@@ -71,7 +95,7 @@ export function AdminInquiryList({ result, params }: AdminInquiryListProps) {
   return (
     <div className="mx-auto w-full max-w-6xl px-4 pb-20 pt-10 sm:px-6 lg:px-8">
       <h1 className="font-display text-5xl font-semibold tracking-tight text-ink">Consultas</h1>
-      <p className="mt-2 text-lg text-muted">Solicitudes de información, de la más reciente a la más antigua.</p>
+      <p className="mt-2 text-lg text-muted">Solicitudes de información, con actividad más reciente primero.</p>
 
       {/* A plain GET form: the search lives in the URL and works without JavaScript. */}
       <form action={ADMIN_INQUIRIES_PATH} method="get" role="search" aria-label="Buscar consultas" className="mt-8 flex flex-wrap gap-3">
