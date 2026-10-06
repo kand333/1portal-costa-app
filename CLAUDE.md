@@ -6,6 +6,8 @@ Portal inmobiliario (Chile). Spec-Driven Development: `specs/portal-inmobiliario
 - `plan.md`: decisiones técnicas vigentes. Si una tarea cambia una decisión, actualiza `plan.md` en la misma tarea.
 - `tasks.md`: progreso. Una tarea a la vez, en orden.
 
+Estado: el SDD inicial está terminado (38/38 tareas). Una funcionalidad nueva empieza actualizando `spec.md` y `plan.md` y agregando su tarea a `tasks.md`; luego sigue el flujo de abajo.
+
 ## Flujo por tarea
 
 1. Lee en `tasks.md` la primera tarea pendiente y, de `spec.md`/`plan.md`, solo las secciones que la afectan.
@@ -20,7 +22,7 @@ Ajustes pedidos fuera de `tasks.md` (UI, bugs): hazlos sin marcar tareas, salvo 
 
 Monorepo npm workspaces:
 
-- `apps/web` (`@portal/web`, :3000): Next.js 16.3.7 + React 19 + Tailwind 4 + SWR. Sin acceso a BD. Depende solo de `@portal/shared`.
+- `apps/web` (`@portal/web`, :3000): Next.js 16.3.7 + React 19 + Tailwind 4 + SWR. Sin acceso a BD. De los paquetes internos, depende solo de `@portal/shared`.
   - El navegador llama a `/api/**`, que `next.config.ts` reenvía a `API_INTERNAL_URL`.
   - Los Server Components llaman al backend directamente por `API_INTERNAL_URL` (patrón: `lib/property-detail-api.ts`).
 - `apps/api` (`@portal/api`, :4000): solo Route Handlers REST → `services/` → `repositories/` → Prisma 7.10.0 (`adapter-pg`) → PostgreSQL 16.
@@ -29,7 +31,7 @@ Monorepo npm workspaces:
 - `packages/shared` (`@portal/shared`): contrato REST, con tipos, enums, límites y esquemas Zod. Los enums deben coincidir con Prisma (hay un test que lo comprueba).
 
 Prohibido: Server Actions; acceder a la BD desde `apps/web`; secretos en variables `NEXT_PUBLIC_*`; imágenes binarias en BD.
-Integraciones previstas en `plan.md`: Cloudinary (imágenes), Leaflet + OpenStreetMap con geocodificación Nominatim (ubicación, sin clave) y Web3Forms (contacto: la API guarda la consulta y el navegador envía el correo con la clave pública `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`). Credenciales siempre por env (`.env.example` en cada app).
+Integraciones (implementadas, detalle en `plan.md`): Cloudinary (imágenes), Leaflet + OpenStreetMap con geocodificación Nominatim (ubicación, sin clave) y Web3Forms (contacto: la API guarda la consulta y el navegador envía el correo con la clave pública `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY`). Credenciales siempre por env (`.env.example` en cada app).
 
 ## Reglas no obvias
 
@@ -45,7 +47,13 @@ Integraciones previstas en `plan.md`: Cloudinary (imágenes), Leaflet + OpenStre
 - El movimiento debe respetar `prefers-reduced-motion`.
 - Código, nombres y commits en inglés; UI y documentación en español. Nombres explícitos, sin abreviaturas. TypeScript estricto, sin `any`.
 - Valida toda entrada en el backend con los esquemas de `@portal/shared`. Protege USER/ADMIN también en el servidor.
-- Autorización: cada Route Handler protegido empieza con `requireUser`/`requireAdmin` (`apps/api/src/lib/auth/authorization.ts`). En la web, cada página privada (no solo su layout) llama a `requireSessionUser`/`getAdminUser` (`apps/web/src/lib/session.ts`): un chequeo solo en el layout deja pasar el contenido de la página en la respuesta.
+- Cada dependencia se declara en el `package.json` del workspace que la usa (el raíz solo tiene herramientas del monorepo).
+- Soft delete de propiedades (`deletedAt`): toda consulta pública o de usuario usa `publishedOnly` (`apps/api/src/repositories/property-repository.ts`).
+- Imágenes: `next/image` usa un loader propio (`apps/web/src/lib/image-loader.ts`, `images.loaderFile`); cada CDN (Cloudinary, Unsplash) redimensiona y `/_next/image` no se usa. Un host nuevo de imágenes necesita su caso en el loader; si no, se sirve el original tal cual.
+- Avisos de éxito: `flash()` de `apps/web/src/lib/flash.ts` (arriba de la página, 5 s). Los errores van junto al campo o formulario.
+- Sesión: token firmado con `iat`; la API lee `readSession` y `getActiveUser(session)`. Todo cambio de contraseña fija `User.sessionsValidAfter` (cierra las otras sesiones).
+- Límites de frecuencia (`apps/api/src/lib/http/rate-limit.ts`, login 5 fallos por email): en memoria. Los tests de integración que llaman mucho a login, registro o consultas reinician con `resetRateLimits()` en `beforeEach`.
+- Autorización: cada Route Handler protegido empieza con `requireUser`/`requireAdmin`/`requireRole` (`apps/api/src/lib/auth/authorization.ts`). En la web, cada página privada (no solo su layout) llama a `requireSessionUser`/`getAdminUser` (`apps/web/src/lib/session.ts`): un chequeo solo en el layout deja pasar el contenido de la página en la respuesta.
 
 ## Comandos (raíz)
 
