@@ -1,0 +1,1366 @@
+{
+  "exportedAt": "2026-10-06T07:07:44.216Z",
+  "features": [
+    {
+      "id": "01a0f17b-331a-705f-8515-017e53896a27",
+      "name": "Piscina",
+      "createdAt": "2026-09-30T08:42:58.203Z"
+    },
+    {
+      "id": "01a0f17b-3339-755b-8d8c-00866c0824ef",
+      "name": "Gimnasio",
+      "createdAt": "2026-09-30T08:42:58.233Z"
+    },
+    {
+      "id": "01a0f17b-3344-7008-9ba5-d037ffa48466",
+      "name": "Quincho",
+      "createdAt": "2026-09-30T08:42:58.245Z"
+    },
+    {
+      "id": "01a0f17b-3352-7369-bb47-aff681270a71",
+      "name": "Lavandería",
+      "createdAt": "2026-09-30T08:42:58.259Z"
+    },
+    {
+      "id": "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+      "name": "Jardín",
+      "createdAt": "2026-09-30T08:42:58.271Z"
+    },
+    {
+      "id": "01a0f17b-336a-748e-a97c-07f66aef29fe",
+      "name": "Terraza",
+      "createdAt": "2026-09-30T08:42:58.282Z"
+    },
+    {
+      "id": "01a0f17b-3374-75e2-aa85-219acc844b7e",
+      "name": "Bodega",
+      "createdAt": "2026-09-30T08:42:58.292Z"
+    },
+    {
+      "id": "01a0f17b-337f-73e0-a099-de6721fe9a94",
+      "name": "Ascensor",
+      "createdAt": "2026-09-30T08:42:58.304Z"
+    },
+    {
+      "id": "01a0f17b-338b-779a-b70a-5905b5b05b38",
+      "name": "Conserjería",
+      "createdAt": "2026-09-30T08:42:58.315Z"
+    },
+    {
+      "id": "01a0f17b-3396-730f-972a-46e59c196f57",
+      "name": "Seguridad",
+      "createdAt": "2026-09-30T08:42:58.326Z"
+    },
+    {
+      "id": "01a0f17b-33a2-726f-bbc8-8ac53396a6ab",
+      "name": "Calefacción",
+      "createdAt": "2026-09-30T08:42:58.338Z"
+    },
+    {
+      "id": "01a0f17b-33ae-700e-800e-24a6a3254fa8",
+      "name": "Aire acondicionado",
+      "createdAt": "2026-09-30T08:42:58.350Z"
+    },
+    {
+      "id": "01a0f17b-33b8-718a-9632-d2cea5440d73",
+      "name": "Pet friendly",
+      "createdAt": "2026-09-30T08:42:58.361Z"
+    },
+    {
+      "id": "01a105bb-01d3-719f-9e87-3a64cd146ebe",
+      "name": "Amoblado",
+      "createdAt": "2026-10-04T07:05:04.162Z"
+    },
+    {
+      "id": "01a105bb-01de-777d-ba86-2f8bfbdd295d",
+      "name": "Vista panoramica naturalesa privilegiada",
+      "createdAt": "2026-10-04T07:05:04.162Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "email": "ana@test.com",
+      "name": "Ana García",
+      "role": "USER",
+      "isActive": true,
+      "createdAt": "2026-10-02T19:23:12.665Z"
+    },
+    {
+      "id": "01a0fe12-1638-7029-ace4-3bb06834f212",
+      "email": "luis@test.com",
+      "name": "Luis Stark",
+      "role": "USER",
+      "isActive": true,
+      "createdAt": "2026-10-02T19:23:13.336Z"
+    },
+    {
+      "id": "01a0fe1b-1a65-77ad-bc93-7589ed4707e7",
+      "email": "admin@test.com",
+      "name": "Admin Portal",
+      "role": "ADMIN",
+      "isActive": true,
+      "createdAt": "2026-10-02T19:33:04.230Z"
+    },
+    {
+      "id": "01a0fe60-e7dc-7760-8639-30beef2da2f2",
+      "email": "marta@test.com",
+      "name": "Marta chic",
+      "role": "USER",
+      "isActive": true,
+      "createdAt": "2026-10-02T20:49:18.812Z"
+    },
+    {
+      "id": "01a0fe6f-db70-7709-a71e-4d1aebe29533",
+      "email": "andres@test.com",
+      "name": "andres",
+      "role": "USER",
+      "isActive": true,
+      "createdAt": "2026-10-02T21:05:38.672Z"
+    }
+  ],
+  "properties": [
+    {
+      "id": "01a105bb-01a1-70ea-8ab5-59787ef4e938",
+      "title": "Casa de Montaña con Vistas Panorámicas a la Cordillera",
+      "description": "Espectacular propiedad de montaña de arquitectura contemporánea alpina, emplazada en un terreno privilegiado con imponentes vistas despejadas a las altas cumbres de la Cordillera de los Andes.\n\nDiseñada para fundirse con la naturaleza mediante el uso de materiales nobles locales como piedra volcánica, vigas a la vista y madera tratada termocontrolada (yakisugi / shou sugi ban).",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "850",
+      "currency": "USD",
+      "usableArea": "340",
+      "totalArea": "3200",
+      "bedrooms": 4,
+      "bathrooms": 2,
+      "parkingSpaces": 4,
+      "ageInYears": 6,
+      "address": "S-69 km 16, Villarrica, Region de la Araucanía",
+      "commune": "Villarrica",
+      "city": "Villarrica",
+      "region": "Araucania",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-10-04T07:05:04.162Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-3344-7008-9ba5-d037ffa48466",
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-3374-75e2-aa85-219acc844b7e",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab",
+        "01a105bb-01d3-719f-9e87-3a64cd146ebe",
+        "01a105bb-01de-777d-ba86-2f8bfbdd295d"
+      ]
+    },
+    {
+      "id": "01a10d2f-1ba5-7029-b32c-fa5123dfd7dd",
+      "title": "Hola",
+      "description": "hola mundo",
+      "operationType": "RENT",
+      "propertyType": "COMMERCIAL",
+      "price": "1000",
+      "currency": "USD",
+      "usableArea": "150",
+      "totalArea": "200",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "parkingSpaces": 2,
+      "ageInYears": 1,
+      "address": "ignacio carrera pinto 405",
+      "commune": "canete",
+      "city": "canete",
+      "region": "Biobío",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": "2026-10-05T17:52:38.134Z",
+      "createdAt": "2026-10-05T17:49:13.510Z",
+      "featureIds": [
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab",
+        "01a105bb-01d3-719f-9e87-3a64cd146ebe"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000001",
+      "title": "Casa mediterránea con piscina en La Dehesa",
+      "description": "Amplia casa de dos pisos en condominio cerrado, con living de doble altura, cocina equipada con isla, sala de estar y dormitorio principal en suite con walk-in closet. Jardín consolidado, piscina temperada y quincho techado.",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "890000",
+      "currency": "USD",
+      "usableArea": "320",
+      "totalArea": "650",
+      "bedrooms": 5,
+      "bathrooms": 4,
+      "parkingSpaces": 3,
+      "ageInYears": 8,
+      "address": "Camino Los Trapenses 4200",
+      "commune": "Lo Barnechea",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-09-20T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-3344-7008-9ba5-d037ffa48466",
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-3396-730f-972a-46e59c196f57",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000002",
+      "title": "Departamento luminoso a pasos del Metro Pedro de Valdivia",
+      "description": "Departamento de dos dormitorios con orientación nororiente, living comedor con salida a terraza y cocina integrada. Edificio con conserjería 24 horas, gimnasio y bodega incluida.",
+      "operationType": "SALE",
+      "propertyType": "APARTMENT",
+      "price": "215000",
+      "currency": "USD",
+      "usableArea": "68",
+      "totalArea": "75",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "parkingSpaces": 1,
+      "ageInYears": 5,
+      "address": "Av. Nueva Providencia 1860",
+      "commune": "Providencia",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-09-18T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3339-755b-8d8c-00866c0824ef",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-3374-75e2-aa85-219acc844b7e",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000003",
+      "title": "Departamento familiar en arriendo frente a Apoquindo",
+      "description": "Tres dormitorios, dos baños y amplia terraza con vista despejada a la cordillera. Cocina independiente con logia, calefacción central y dos estacionamientos subterráneos.",
+      "operationType": "RENT",
+      "propertyType": "APARTMENT",
+      "price": "1450",
+      "currency": "USD",
+      "usableArea": "95",
+      "totalArea": "105",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "parkingSpaces": 2,
+      "ageInYears": 10,
+      "address": "Av. Apoquindo 3000",
+      "commune": "Las Condes",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-09-16T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-3374-75e2-aa85-219acc844b7e",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000004",
+      "title": "Estudio moderno en arriendo cerca de Plaza Ñuñoa",
+      "description": "Departamento de un ambiente con cocina americana y closet empotrado, ideal para estudiantes o profesionales. Edificio nuevo con lavandería, gimnasio y sala cowork. Se aceptan mascotas.",
+      "operationType": "RENT",
+      "propertyType": "APARTMENT",
+      "price": "520",
+      "currency": "USD",
+      "usableArea": "32",
+      "totalArea": "35",
+      "bedrooms": 1,
+      "bathrooms": 1,
+      "parkingSpaces": 0,
+      "ageInYears": 3,
+      "address": "Av. Irarrázaval 3450",
+      "commune": "Ñuñoa",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-14T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3339-755b-8d8c-00866c0824ef",
+        "01a0f17b-3352-7369-bb47-aff681270a71",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-33b8-718a-9632-d2cea5440d73"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000005",
+      "title": "Casa tradicional con amplio jardín en Ñuñoa",
+      "description": "Casa de un piso en barrio residencial, con cuatro dormitorios, tres baños, living y comedor separados y cocina con comedor de diario. Patio con árboles frutales y quincho.",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "385000",
+      "currency": "USD",
+      "usableArea": "140",
+      "totalArea": "280",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "parkingSpaces": 2,
+      "ageInYears": 25,
+      "address": "Dublé Almeyda 2750",
+      "commune": "Ñuñoa",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-12T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3344-7008-9ba5-d037ffa48466",
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000006",
+      "title": "Oficina corporativa en arriendo en barrio El Golf",
+      "description": "Planta libre habilitada con recepción, dos salas de reuniones, privados y kitchenette. Edificio clase A con control de acceso, climatización central y cuatro estacionamientos.",
+      "operationType": "RENT",
+      "propertyType": "OFFICE",
+      "price": "2800",
+      "currency": "USD",
+      "usableArea": "180",
+      "totalArea": "180",
+      "bedrooms": null,
+      "bathrooms": 2,
+      "parkingSpaces": 4,
+      "ageInYears": 12,
+      "address": "Av. Isidora Goyenechea 2900",
+      "commune": "Las Condes",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-10T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38",
+        "01a0f17b-3396-730f-972a-46e59c196f57",
+        "01a0f17b-33ae-700e-800e-24a6a3254fa8"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000007",
+      "title": "Oficina en venta a pasos del Metro Los Leones",
+      "description": "Oficina con tres privados, sala de reuniones y baño interior. Excelente conectividad, locomoción a la puerta y un estacionamiento. Ideal para consulta o estudio profesional.",
+      "operationType": "SALE",
+      "propertyType": "OFFICE",
+      "price": "198000",
+      "currency": "USD",
+      "usableArea": "75",
+      "totalArea": "75",
+      "bedrooms": null,
+      "bathrooms": 1,
+      "parkingSpaces": 1,
+      "ageInYears": 15,
+      "address": "Av. Providencia 2330",
+      "commune": "Providencia",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-08T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38",
+        "01a0f17b-33ae-700e-800e-24a6a3254fa8"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000008",
+      "title": "Terreno plano en condominio de Chicureo",
+      "description": "Sitio de 5.000 m² con factibilidad de agua y luz, en condominio con acceso controlado y urbanización subterránea. Vista despejada a los cerros y cercanía a colegios.",
+      "operationType": "SALE",
+      "propertyType": "LAND",
+      "price": "260000",
+      "currency": "USD",
+      "usableArea": null,
+      "totalArea": "5000",
+      "bedrooms": null,
+      "bathrooms": null,
+      "parkingSpaces": null,
+      "ageInYears": null,
+      "address": "Camino Chicureo km 6",
+      "commune": "Colina",
+      "city": "Colina",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-06T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3396-730f-972a-46e59c196f57"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000009",
+      "title": "Parcela con vista al lago Llanquihue",
+      "description": "Parcela de una hectárea con vista al lago y a los volcanes Osorno y Calbuco. Camino interior estabilizado, rol propio y bosque nativo. A quince minutos del centro de Puerto Varas.",
+      "operationType": "SALE",
+      "propertyType": "LAND",
+      "price": "145000",
+      "currency": "USD",
+      "usableArea": null,
+      "totalArea": "10000",
+      "bedrooms": null,
+      "bathrooms": null,
+      "parkingSpaces": null,
+      "ageInYears": null,
+      "address": "Ruta 225 km 12",
+      "commune": "Puerto Varas",
+      "city": "Puerto Varas",
+      "region": "Región de Los Lagos",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-09-04T12:00:00.000Z",
+      "featureIds": []
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000010",
+      "title": "Casa en arriendo con vista al mar en Reñaca",
+      "description": "Casa de tres niveles con terrazas panorámicas, cuatro dormitorios y sala de estar. Piscina, jardín en desnivel y estacionamiento para dos vehículos. A cinco minutos de la playa.",
+      "operationType": "RENT",
+      "propertyType": "HOUSE",
+      "price": "1900",
+      "currency": "USD",
+      "usableArea": "210",
+      "totalArea": "400",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "parkingSpaces": 2,
+      "ageInYears": 12,
+      "address": "Av. Borgoño 15200",
+      "commune": "Viña del Mar",
+      "city": "Viña del Mar",
+      "region": "Región de Valparaíso",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-09-02T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000011",
+      "title": "Departamento nuevo en primera línea en Concón",
+      "description": "Tres dormitorios, dos baños y terraza corrida con vista frontal al océano. Terminaciones de primer nivel, ventanas termopanel y edificio con piscina y gimnasio.",
+      "operationType": "SALE",
+      "propertyType": "APARTMENT",
+      "price": "310000",
+      "currency": "USD",
+      "usableArea": "110",
+      "totalArea": "135",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "parkingSpaces": 2,
+      "ageInYears": 2,
+      "address": "Av. Borgoño 23500",
+      "commune": "Concón",
+      "city": "Concón",
+      "region": "Región de Valparaíso",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-08-31T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-3339-755b-8d8c-00866c0824ef",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000012",
+      "title": "Departamento patrimonial en arriendo en Cerro Alegre",
+      "description": "Departamento remodelado en casona patrimonial, con techos altos, pisos de madera y terraza con vista a la bahía. Rodeado de cafés, galerías y ascensores históricos.",
+      "operationType": "RENT",
+      "propertyType": "APARTMENT",
+      "price": "680",
+      "currency": "USD",
+      "usableArea": "70",
+      "totalArea": "70",
+      "bedrooms": 2,
+      "bathrooms": 1,
+      "parkingSpaces": 0,
+      "ageInYears": 60,
+      "address": "Lautaro Rosas 540",
+      "commune": "Valparaíso",
+      "city": "Valparaíso",
+      "region": "Región de Valparaíso",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-29T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-33b8-718a-9632-d2cea5440d73"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000013",
+      "title": "Casa en condominio en San Pedro de la Paz",
+      "description": "Casa de dos pisos con cuatro dormitorios, tres baños y sala de estar en segundo piso. Patio amplio con quincho, calefacción a pellet y dos estacionamientos techados.",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "245000",
+      "currency": "USD",
+      "usableArea": "160",
+      "totalArea": "350",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "parkingSpaces": 2,
+      "ageInYears": 7,
+      "address": "Av. Andalué 1850",
+      "commune": "San Pedro de la Paz",
+      "city": "Concepción",
+      "region": "Región del Biobío",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-27T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3344-7008-9ba5-d037ffa48466",
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-3396-730f-972a-46e59c196f57",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000014",
+      "title": "Local comercial en arriendo en pleno centro de Santiago",
+      "description": "Local a la calle con amplia vitrina, altillo para bodega y baño. Alto flujo peatonal, a una cuadra de Plaza de Armas. Apto para retail o servicios.",
+      "operationType": "RENT",
+      "propertyType": "COMMERCIAL",
+      "price": "1600",
+      "currency": "USD",
+      "usableArea": "90",
+      "totalArea": "90",
+      "bedrooms": null,
+      "bathrooms": 1,
+      "parkingSpaces": null,
+      "ageInYears": 20,
+      "address": "Paseo Ahumada 254",
+      "commune": "Santiago",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-25T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-3374-75e2-aa85-219acc844b7e",
+        "01a0f17b-3396-730f-972a-46e59c196f57"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000015",
+      "title": "Departamento cerca de la Avenida del Mar en La Serena",
+      "description": "Dos dormitorios y dos baños, con terraza y vista parcial al mar. Condominio con piscina, lavandería y áreas verdes. Excelente opción para inversión o segunda vivienda.",
+      "operationType": "SALE",
+      "propertyType": "APARTMENT",
+      "price": "128000",
+      "currency": "USD",
+      "usableArea": "58",
+      "totalArea": "66",
+      "bedrooms": 2,
+      "bathrooms": 2,
+      "parkingSpaces": 1,
+      "ageInYears": 4,
+      "address": "Av. Pacífico 2100",
+      "commune": "La Serena",
+      "city": "La Serena",
+      "region": "Región de Coquimbo",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-23T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-3352-7369-bb47-aff681270a71",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000016",
+      "title": "Departamento de categoría en arriendo en Vitacura",
+      "description": "Tres dormitorios en suite, escritorio y amplia terraza con parrilla. Piso alto, climatización por recinto y dos estacionamientos más bodega. Edificio con piscina y seguridad 24/7.",
+      "operationType": "RENT",
+      "propertyType": "APARTMENT",
+      "price": "2300",
+      "currency": "USD",
+      "usableArea": "150",
+      "totalArea": "170",
+      "bedrooms": 3,
+      "bathrooms": 3,
+      "parkingSpaces": 2,
+      "ageInYears": 6,
+      "address": "Av. Vitacura 5250",
+      "commune": "Vitacura",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": true,
+      "deletedAt": null,
+      "createdAt": "2026-08-21T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-331a-705f-8515-017e53896a27",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-3374-75e2-aa85-219acc844b7e",
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-3396-730f-972a-46e59c196f57",
+        "01a0f17b-33ae-700e-800e-24a6a3254fa8"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000017",
+      "title": "Casa pareada cerca del Metro Plaza de Maipú",
+      "description": "Casa de dos pisos con tres dormitorios, dos baños y patio con espacio para ampliación. Barrio consolidado, cerca de colegios, supermercados y estación de Metro.",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "165000",
+      "currency": "USD",
+      "usableArea": "95",
+      "totalArea": "160",
+      "bedrooms": 3,
+      "bathrooms": 2,
+      "parkingSpaces": 1,
+      "ageInYears": 18,
+      "address": "Av. Pajaritos 3100",
+      "commune": "Maipú",
+      "city": "Santiago",
+      "region": "Región Metropolitana",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-19T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000018",
+      "title": "Oficina equipada en arriendo en el centro de Viña del Mar",
+      "description": "Oficina amoblada con dos puestos de trabajo, sala de reuniones compartida y baño. Edificio con conserjería y ascensor, a pasos de Avenida Libertad.",
+      "operationType": "RENT",
+      "propertyType": "OFFICE",
+      "price": "750",
+      "currency": "USD",
+      "usableArea": "45",
+      "totalArea": "45",
+      "bedrooms": null,
+      "bathrooms": 1,
+      "parkingSpaces": 0,
+      "ageInYears": 9,
+      "address": "Av. Libertad 798",
+      "commune": "Viña del Mar",
+      "city": "Viña del Mar",
+      "region": "Región de Valparaíso",
+      "isPublished": true,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-17T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-337f-73e0-a099-de6721fe9a94",
+        "01a0f17b-338b-779a-b70a-5905b5b05b38",
+        "01a0f17b-33ae-700e-800e-24a6a3254fa8"
+      ]
+    },
+    {
+      "id": "5eed0000-0000-4000-8000-000000000019",
+      "title": "Casa de montaña camino al volcán en Pucón (borrador)",
+      "description": "Casa de estilo sureño con estructura de madera nativa, cuatro dormitorios y gran terraza. Publicación en preparación: faltan fotografías y revisión de antecedentes.",
+      "operationType": "SALE",
+      "propertyType": "HOUSE",
+      "price": "420000",
+      "currency": "USD",
+      "usableArea": "190",
+      "totalArea": "2500",
+      "bedrooms": 4,
+      "bathrooms": 3,
+      "parkingSpaces": 3,
+      "ageInYears": 11,
+      "address": "Camino al Volcán km 5",
+      "commune": "Pucón",
+      "city": "Pucón",
+      "region": "Región de La Araucanía",
+      "isPublished": false,
+      "isFeatured": false,
+      "deletedAt": null,
+      "createdAt": "2026-08-15T12:00:00.000Z",
+      "featureIds": [
+        "01a0f17b-335e-77a5-b46c-de06b483fb4c",
+        "01a0f17b-336a-748e-a97c-07f66aef29fe",
+        "01a0f17b-33a2-726f-bbc8-8ac53396a6ab"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "id": "01a0ff63-4cba-76cb-aee5-7ff62eb8644c",
+      "propertyId": "5eed0000-0000-4000-8000-000000000001",
+      "url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/1-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:32.811Z"
+    },
+    {
+      "id": "01a0ff63-4cba-76cb-aee5-80c14ab5a44d",
+      "propertyId": "5eed0000-0000-4000-8000-000000000001",
+      "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/1-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.811Z"
+    },
+    {
+      "id": "01a0ff63-4cba-76cb-aee5-86f63f2fc9a6",
+      "propertyId": "5eed0000-0000-4000-8000-000000000001",
+      "url": "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/1-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.811Z"
+    },
+    {
+      "id": "01a0ff63-4ceb-7773-a4c1-5883e29e14fd",
+      "propertyId": "5eed0000-0000-4000-8000-000000000002",
+      "url": "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/2-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:32.958Z"
+    },
+    {
+      "id": "01a0ff63-4cec-71dc-8da3-9ce4602b5e5a",
+      "propertyId": "5eed0000-0000-4000-8000-000000000002",
+      "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/2-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.958Z"
+    },
+    {
+      "id": "01a0ff63-4cec-71dc-8da3-a25aaac335d6",
+      "propertyId": "5eed0000-0000-4000-8000-000000000002",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/2-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.958Z"
+    },
+    {
+      "id": "01a0ff63-4d11-75a2-a236-814ccda6afee",
+      "propertyId": "5eed0000-0000-4000-8000-000000000003",
+      "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/3-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:32.996Z"
+    },
+    {
+      "id": "01a0ff63-4d11-75a2-a236-8579729e29b2",
+      "propertyId": "5eed0000-0000-4000-8000-000000000003",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/3-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.996Z"
+    },
+    {
+      "id": "01a0ff63-4d11-75a2-a236-8a932751ee08",
+      "propertyId": "5eed0000-0000-4000-8000-000000000003",
+      "url": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/3-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:32.996Z"
+    },
+    {
+      "id": "01a0ff63-4d38-7291-823f-8aebe82a835f",
+      "propertyId": "5eed0000-0000-4000-8000-000000000004",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/4-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.033Z"
+    },
+    {
+      "id": "01a0ff63-4d38-7291-823f-8d9ee99cffdc",
+      "propertyId": "5eed0000-0000-4000-8000-000000000004",
+      "url": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/4-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.033Z"
+    },
+    {
+      "id": "01a0ff63-4d39-7111-9e04-130b323880a2",
+      "propertyId": "5eed0000-0000-4000-8000-000000000004",
+      "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/4-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.033Z"
+    },
+    {
+      "id": "01a0ff63-4d5f-738d-8c20-380bf03945e7",
+      "propertyId": "5eed0000-0000-4000-8000-000000000005",
+      "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/5-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.071Z"
+    },
+    {
+      "id": "01a0ff63-4d5f-738d-8c20-3d80f046b056",
+      "propertyId": "5eed0000-0000-4000-8000-000000000005",
+      "url": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/5-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.071Z"
+    },
+    {
+      "id": "01a0ff63-4d5f-738d-8c20-4100a55017e6",
+      "propertyId": "5eed0000-0000-4000-8000-000000000005",
+      "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/5-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.071Z"
+    },
+    {
+      "id": "01a0ff63-4d86-75fe-80e8-ff9466158797",
+      "propertyId": "5eed0000-0000-4000-8000-000000000006",
+      "url": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/6-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.112Z"
+    },
+    {
+      "id": "01a0ff63-4d86-75fe-80e9-02a77cb6a717",
+      "propertyId": "5eed0000-0000-4000-8000-000000000006",
+      "url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/6-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.112Z"
+    },
+    {
+      "id": "01a0ff63-4d86-75fe-80e9-04127a47c9fe",
+      "propertyId": "5eed0000-0000-4000-8000-000000000006",
+      "url": "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/6-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.112Z"
+    },
+    {
+      "id": "01a0ff63-4daa-70f2-aeb8-29e17184ecc6",
+      "propertyId": "5eed0000-0000-4000-8000-000000000007",
+      "url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/7-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.151Z"
+    },
+    {
+      "id": "01a0ff63-4daa-70f2-aeb8-2eb942db0865",
+      "propertyId": "5eed0000-0000-4000-8000-000000000007",
+      "url": "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/7-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.151Z"
+    },
+    {
+      "id": "01a0ff63-4daa-70f2-aeb8-314e0c8d6c5b",
+      "propertyId": "5eed0000-0000-4000-8000-000000000007",
+      "url": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/7-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.151Z"
+    },
+    {
+      "id": "01a0ff63-4dc9-70ea-a695-9cbd1c6a63a4",
+      "propertyId": "5eed0000-0000-4000-8000-000000000008",
+      "url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/8-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.181Z"
+    },
+    {
+      "id": "01a0ff63-4dca-73e8-855f-54454841ae77",
+      "propertyId": "5eed0000-0000-4000-8000-000000000008",
+      "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/8-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.181Z"
+    },
+    {
+      "id": "01a0ff63-4e08-7647-894d-60187727f829",
+      "propertyId": "5eed0000-0000-4000-8000-000000000010",
+      "url": "https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/10-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.244Z"
+    },
+    {
+      "id": "01a0ff63-4e08-7647-894d-643cb1b2f836",
+      "propertyId": "5eed0000-0000-4000-8000-000000000010",
+      "url": "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/10-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.244Z"
+    },
+    {
+      "id": "01a0ff63-4e08-7647-894d-699a154b6446",
+      "propertyId": "5eed0000-0000-4000-8000-000000000010",
+      "url": "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/10-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.244Z"
+    },
+    {
+      "id": "01a0ff63-4e2a-71c2-96d4-1584525cbecb",
+      "propertyId": "5eed0000-0000-4000-8000-000000000011",
+      "url": "https://images.unsplash.com/photo-1484154218962-a197022b5858?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/11-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.278Z"
+    },
+    {
+      "id": "01a0ff63-4e2a-71c2-96d4-189b32b6f826",
+      "propertyId": "5eed0000-0000-4000-8000-000000000011",
+      "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/11-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.278Z"
+    },
+    {
+      "id": "01a0ff63-4e2a-71c2-96d4-1d38e9a51c6b",
+      "propertyId": "5eed0000-0000-4000-8000-000000000011",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/11-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.278Z"
+    },
+    {
+      "id": "01a0ff63-4e4d-77da-900b-390a83794b88",
+      "propertyId": "5eed0000-0000-4000-8000-000000000012",
+      "url": "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/12-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.312Z"
+    },
+    {
+      "id": "01a0ff63-4e4d-77da-900b-3db179e0a1bd",
+      "propertyId": "5eed0000-0000-4000-8000-000000000012",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/12-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.312Z"
+    },
+    {
+      "id": "01a0ff63-4e4d-77da-900b-421d657204cd",
+      "propertyId": "5eed0000-0000-4000-8000-000000000012",
+      "url": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/12-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.312Z"
+    },
+    {
+      "id": "01a0ff63-4e6f-746a-b533-ca1a002f2581",
+      "propertyId": "5eed0000-0000-4000-8000-000000000013",
+      "url": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/13-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.348Z"
+    },
+    {
+      "id": "01a0ff63-4e6f-746a-b533-ce0522b582cd",
+      "propertyId": "5eed0000-0000-4000-8000-000000000013",
+      "url": "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/13-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.348Z"
+    },
+    {
+      "id": "01a0ff63-4e6f-746a-b533-d30483f00c85",
+      "propertyId": "5eed0000-0000-4000-8000-000000000013",
+      "url": "https://images.unsplash.com/photo-1493809842364-78817add7ffb?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/13-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.348Z"
+    },
+    {
+      "id": "01a0ff63-4e8f-76b4-bb01-1dc997064cf8",
+      "propertyId": "5eed0000-0000-4000-8000-000000000014",
+      "url": "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/14-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.381Z"
+    },
+    {
+      "id": "01a0ff63-4e8f-76b4-bb01-20c7656c2a5d",
+      "propertyId": "5eed0000-0000-4000-8000-000000000014",
+      "url": "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/14-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.381Z"
+    },
+    {
+      "id": "01a0ff63-4eb0-77a6-9c4e-2a5f72e7e701",
+      "propertyId": "5eed0000-0000-4000-8000-000000000015",
+      "url": "https://images.unsplash.com/photo-1505691938895-1758d7feb511?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/15-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.412Z"
+    },
+    {
+      "id": "01a0ff63-4eb0-77a6-9c4e-2e5b97ace66a",
+      "propertyId": "5eed0000-0000-4000-8000-000000000015",
+      "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/15-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.412Z"
+    },
+    {
+      "id": "01a0ff63-4eb0-77a6-9c4e-336d4c8c1fe2",
+      "propertyId": "5eed0000-0000-4000-8000-000000000015",
+      "url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/15-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.412Z"
+    },
+    {
+      "id": "01a0ff63-4ed7-722f-a9fa-97134015595a",
+      "propertyId": "5eed0000-0000-4000-8000-000000000016",
+      "url": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/16-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.447Z"
+    },
+    {
+      "id": "01a0ff63-4ed7-722f-a9fa-9b1342acceb3",
+      "propertyId": "5eed0000-0000-4000-8000-000000000016",
+      "url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/16-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.447Z"
+    },
+    {
+      "id": "01a0ff63-4ed7-722f-a9fa-9c27cf1d3fa6",
+      "propertyId": "5eed0000-0000-4000-8000-000000000016",
+      "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/16-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.447Z"
+    },
+    {
+      "id": "01a0ff63-4ef5-75d6-9371-831cee5f3bf4",
+      "propertyId": "5eed0000-0000-4000-8000-000000000017",
+      "url": "https://images.unsplash.com/photo-1568605114967-8130f3a36994?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/17-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.482Z"
+    },
+    {
+      "id": "01a0ff63-4ef5-75d6-9371-870ab1a7b748",
+      "propertyId": "5eed0000-0000-4000-8000-000000000017",
+      "url": "https://images.unsplash.com/photo-1501183638710-841dd1904471?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/17-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.482Z"
+    },
+    {
+      "id": "01a0ff63-4ef5-75d6-9371-8ab725c46be1",
+      "propertyId": "5eed0000-0000-4000-8000-000000000017",
+      "url": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/17-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.482Z"
+    },
+    {
+      "id": "01a0ff63-4f15-73cc-a5cd-ffdffba9a8a8",
+      "propertyId": "5eed0000-0000-4000-8000-000000000018",
+      "url": "https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/18-0",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-03T01:31:33.513Z"
+    },
+    {
+      "id": "01a0ff63-4f15-73cc-a5ce-007ed604bced",
+      "propertyId": "5eed0000-0000-4000-8000-000000000018",
+      "url": "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/18-1",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.513Z"
+    },
+    {
+      "id": "01a0ff63-4f15-73cc-a5ce-06e3718fd5d0",
+      "propertyId": "5eed0000-0000-4000-8000-000000000018",
+      "url": "https://images.unsplash.com/photo-1497215842964-222b430dc094?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/18-2",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-03T01:31:33.513Z"
+    },
+    {
+      "id": "01a1054c-e826-72eb-b03c-905fc2d3e6a1",
+      "propertyId": "5eed0000-0000-4000-8000-000000000009",
+      "url": "https://res.cloudinary.com/px31xpac/image/upload/v1791090288/propiedades-claude/j7hooaekskqw2ipzqqxi.png",
+      "publicId": "propiedades-claude/j7hooaekskqw2ipzqqxi",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-04T05:04:48.679Z"
+    },
+    {
+      "id": "01a105bb-efd5-736a-8489-4f95fc967375",
+      "propertyId": "01a105bb-01a1-70ea-8ab5-59787ef4e938",
+      "url": "https://res.cloudinary.com/px31xpac/image/upload/v1791097564/propiedades-claude/si30bbycl0b1mugxxaau.jpg",
+      "publicId": "propiedades-claude/si30bbycl0b1mugxxaau",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-04T07:06:05.141Z"
+    },
+    {
+      "id": "01a105bb-f4f8-77d4-9ad2-f8c3be58a59d",
+      "propertyId": "01a105bb-01a1-70ea-8ab5-59787ef4e938",
+      "url": "https://res.cloudinary.com/px31xpac/image/upload/v1791097566/propiedades-claude/yh5mwh8k6spirgpiuujo.png",
+      "publicId": "propiedades-claude/yh5mwh8k6spirgpiuujo",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-04T07:06:06.456Z"
+    },
+    {
+      "id": "01a10d2f-7c2b-776b-83ff-425e8ae713fe",
+      "propertyId": "01a10d2f-1ba5-7029-b32c-fa5123dfd7dd",
+      "url": "https://res.cloudinary.com/px31xpac/image/upload/v1791222576/propiedades-claude/aswbn9ilnhhnggyiiz07.jpg",
+      "publicId": "propiedades-claude/aswbn9ilnhhnggyiiz07",
+      "position": 0,
+      "isMain": true,
+      "createdAt": "2026-10-05T17:49:38.219Z"
+    },
+    {
+      "id": "357fba56-f0b2-4efa-8928-8520c831d75b",
+      "propertyId": "5eed0000-0000-4000-8000-000000000009",
+      "url": "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/9-1",
+      "position": 2,
+      "isMain": false,
+      "createdAt": "2026-10-04T05:11:18.697Z"
+    },
+    {
+      "id": "a35ac13b-49f3-467a-b783-81243abdc33b",
+      "propertyId": "5eed0000-0000-4000-8000-000000000009",
+      "url": "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=1600&q=80",
+      "publicId": "seed-placeholder/9-0",
+      "position": 1,
+      "isMain": false,
+      "createdAt": "2026-10-04T05:11:18.697Z"
+    }
+  ],
+  "favorites": [
+    {
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "propertyId": "5eed0000-0000-4000-8000-000000000009",
+      "createdAt": "2026-10-03T18:23:41.258Z"
+    },
+    {
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "propertyId": "5eed0000-0000-4000-8000-000000000014",
+      "createdAt": "2026-10-03T18:43:12.372Z"
+    },
+    {
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "propertyId": "5eed0000-0000-4000-8000-000000000016",
+      "createdAt": "2026-10-03T18:20:51.011Z"
+    },
+    {
+      "userId": "01a0fe12-1638-7029-ace4-3bb06834f212",
+      "propertyId": "5eed0000-0000-4000-8000-000000000003",
+      "createdAt": "2026-10-03T01:46:53.706Z"
+    },
+    {
+      "userId": "01a0fe12-1638-7029-ace4-3bb06834f212",
+      "propertyId": "5eed0000-0000-4000-8000-000000000018",
+      "createdAt": "2026-10-03T05:23:22.520Z"
+    }
+  ],
+  "inquiries": [
+    {
+      "id": "01a0fde8-fbb0-705c-b496-5c46487307dc",
+      "propertyId": "5eed0000-0000-4000-8000-000000000009",
+      "propertyTitle": "Parcela con vista al lago Llanquihue",
+      "userId": null,
+      "name": "chilo",
+      "email": "gg@gmail.com",
+      "phone": "+56987634887",
+      "message": "quiero comprarla se ve buena.",
+      "hiddenByUser": false,
+      "createdAt": "2026-10-02T18:38:19.569Z",
+      "lastActivityAt": "2026-10-02T18:38:19.569Z"
+    },
+    {
+      "id": "01a102d2-ca81-7669-a4c6-0b95bcf10569",
+      "propertyId": "5eed0000-0000-4000-8000-000000000008",
+      "propertyTitle": "Terreno plano en condominio de Chicureo",
+      "userId": "01a0fe12-1638-7029-ace4-3bb06834f212",
+      "name": "luis",
+      "email": "luis@test.com",
+      "phone": "+56933554477",
+      "message": "hola buenas tardes esta disponible aun la propiedad quiero ir a verla! cuanto antes!\n saludos",
+      "hiddenByUser": false,
+      "createdAt": "2026-10-03T17:32:11.266Z",
+      "lastActivityAt": "2026-10-03T17:32:11.266Z"
+    },
+    {
+      "id": "01a102ff-80cf-74d1-a09a-6a643bf8775a",
+      "propertyId": "5eed0000-0000-4000-8000-000000000016",
+      "propertyTitle": "Departamento de categoría en arriendo en Vitacura",
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "name": "Ana García",
+      "email": "ana@test.com",
+      "phone": null,
+      "message": "quiero ir a verla!",
+      "hiddenByUser": false,
+      "createdAt": "2026-10-03T18:21:01.521Z",
+      "lastActivityAt": "2026-10-04T21:08:52.242Z"
+    },
+    {
+      "id": "01a10301-242a-73b2-a973-ea861932e3f3",
+      "propertyId": "5eed0000-0000-4000-8000-000000000012",
+      "propertyTitle": "Departamento patrimonial en arriendo en Cerro Alegre",
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "name": "Ana García",
+      "email": "ana@test.com",
+      "phone": null,
+      "message": "me interesa tiene descuento?? pago adelantado  de mes garantia?",
+      "hiddenByUser": false,
+      "createdAt": "2026-10-03T18:22:48.874Z",
+      "lastActivityAt": "2026-10-03T18:22:48.874Z"
+    },
+    {
+      "id": "01a10301-ba92-757e-8cc3-6564bfa8269d",
+      "propertyId": "5eed0000-0000-4000-8000-000000000011",
+      "propertyTitle": "Departamento nuevo en primera línea en Concón",
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "name": "Ana García",
+      "email": "ana@test.com",
+      "phone": null,
+      "message": "Estimado esta para arriendo?",
+      "hiddenByUser": true,
+      "createdAt": "2026-10-03T18:23:27.379Z",
+      "lastActivityAt": "2026-10-03T18:23:27.379Z"
+    },
+    {
+      "id": "01a10314-0b2b-7179-959e-60e481797299",
+      "propertyId": "5eed0000-0000-4000-8000-000000000014",
+      "propertyTitle": "Local comercial en arriendo en pleno centro de Santiago",
+      "userId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "name": "Ana García",
+      "email": "ana@test.com",
+      "phone": null,
+      "message": "que eh esto",
+      "hiddenByUser": false,
+      "createdAt": "2026-10-03T18:43:27.660Z",
+      "lastActivityAt": "2026-10-04T21:37:48.299Z"
+    }
+  ],
+  "messages": [
+    {
+      "id": "01a108be-12cf-74f9-bf25-825be09014e6",
+      "inquiryId": "01a10314-0b2b-7179-959e-60e481797299",
+      "authorId": "01a0fe1b-1a65-77ad-bc93-7589ed4707e7",
+      "fromAdmin": true,
+      "body": "Hola, muy buen día, señora Ana:\nLe escribo para informarle que la propiedad está disponible desde el miércoles hasta el sábado. Si le interesa verla, podríamos agendar una breve visita.\nQuedo atento a su respuesta.\nMuy bien, condiciones.",
+      "createdAt": "2026-10-04T21:07:16.816Z"
+    },
+    {
+      "id": "01a108bf-8791-768b-bcf6-898e8e626072",
+      "inquiryId": "01a102ff-80cf-74d1-a09a-6a643bf8775a",
+      "authorId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "fromAdmin": false,
+      "body": "agendemo",
+      "createdAt": "2026-10-04T21:08:52.242Z"
+    },
+    {
+      "id": "01a108d9-0ef1-747a-ab07-b660c77bf2e2",
+      "inquiryId": "01a10314-0b2b-7179-959e-60e481797299",
+      "authorId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "fromAdmin": false,
+      "body": "mmm la quiero",
+      "createdAt": "2026-10-04T21:36:45.298Z"
+    },
+    {
+      "id": "01a108d9-3420-753b-bee5-4f3fe758a215",
+      "inquiryId": "01a10314-0b2b-7179-959e-60e481797299",
+      "authorId": "01a0fe12-1397-707e-8027-c8e503be7b71",
+      "fromAdmin": false,
+      "body": "cuando lo vemos",
+      "createdAt": "2026-10-04T21:36:54.817Z"
+    },
+    {
+      "id": "01a108da-0515-748f-a732-dd56799090d5",
+      "inquiryId": "01a10314-0b2b-7179-959e-60e481797299",
+      "authorId": "01a0fe1b-1a65-77ad-bc93-7589ed4707e7",
+      "fromAdmin": true,
+      "body": "desde el miercoles puedo digame",
+      "createdAt": "2026-10-04T21:37:48.310Z"
+    }
+  ]
+}

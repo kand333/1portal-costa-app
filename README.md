@@ -32,7 +32,7 @@ Monorepo con npm workspaces:
 
 El navegador solo habla con `apps/web`; este reenvía `/api/**` a `apps/api` (variable `API_INTERNAL_URL`, por defecto `http://localhost:4000`). Sin Server Actions: toda la comunicación es REST.
 
-Stack: Next.js 16.3.7, React 19, TypeScript, Tailwind 4, SWR, Prisma 7.10.0, PostgreSQL 16, Zod 4, Vitest.
+Stack: Next.js 16.3.7, React 19, TypeScript, Tailwind 4, SWR, Prisma 7.10.0, PostgreSQL (Supabase; local para tests), Zod 4, Vitest.
 
 ## Documentos
 
@@ -45,7 +45,7 @@ Stack: Next.js 16.3.7, React 19, TypeScript, Tailwind 4, SWR, Prisma 7.10.0, Pos
 
 ## Desarrollo local
 
-Requisitos: Node.js 24 y un contenedor Docker de PostgreSQL 16 llamado `postgres` con el puerto `5432` publicado.
+Requisitos: Node.js 24, un proyecto de Supabase (base principal, ver sección 6) y un contenedor Docker de PostgreSQL 16 llamado `postgres` con el puerto `5432` publicado (tests y creación de migraciones).
 
 ### 1. Dependencias
 
@@ -88,9 +88,19 @@ Next.js ignora `.env.local` cuando `NODE_ENV=test` (Vitest), por eso las pruebas
 
 El mapa (OpenStreetMap + Nominatim) no requiere claves.
 
-### 4. Usuarios de prueba
+### 4. Datos de desarrollo y usuarios de prueba
 
-`npm run db:seed` crea (o restablece) cuatro cuentas, todas con la contraseña definida en `apps/api/prisma/seed/test-users.ts`: `admin@test.com` (ADMIN), `ana@test.com` y `luis@test.com` (USER) e `inactiva@test.com` (desactivada, su login devuelve 403). Solo para desarrollo.
+`npm run db:seed` carga `apps/api/prisma/seed/snapshot.json`, una instantánea de una base real: características, propiedades (incluida una eliminada), imágenes (de ejemplo en Unsplash y reales en Cloudinary), usuarios, favoritos, consultas y conversaciones. Conserva los IDs y se puede re-ejecutar sin duplicar: restaura lo que viene en la instantánea y no toca lo creado aparte.
+
+Usuarios: `admin@test.com` (ADMIN), `ana@test.com`, `luis@test.com`, `marta@test.com` y `andres@test.com` (USER). Todos con la contraseña de `apps/api/prisma/seed/test-users.ts`. Solo para desarrollo.
+
+Para regenerar la instantánea desde una base (sin contraseñas ni sesiones), desde `apps/api`:
+
+```bash
+npx tsx prisma/seed/export-snapshot.ts
+```
+
+Usa `SNAPSHOT_DATABASE_URL` si está definida y si no `DATABASE_URL`.
 
 ### 5. Comandos
 
@@ -107,10 +117,48 @@ Todos se ejecutan desde la raíz.
 | `npm run db:migrate` | Crear/aplicar migraciones en desarrollo |
 | `npm run db:deploy` | Aplicar migraciones existentes (producción) |
 | `npm run db:status` | Estado de migraciones |
-| `npm run db:seed` | Cargar datos de desarrollo y los usuarios de prueba (re-ejecutable, no duplica) |
+| `npm run db:seed` | Cargar la instantánea de desarrollo (re-ejecutable, no duplica) |
 | `npm run db:generate` | Regenerar el cliente Prisma (y reiniciar la API si cambió el esquema) |
 
-### 6. pgAdmin (opcional)
+### 6. Base de datos en Supabase
+
+La base principal está en Supabase. La API se conecta con un usuario propio, `prisma` (con `BYPASSRLS`), al pooler en modo sesión (puerto 5432, IPv4) y verifica el SSL contra la CA de Supabase.
+
+Configuración (una vez por proyecto de Supabase):
+
+1. Crear el usuario `prisma` en el SQL Editor de Supabase. El SQL está en la [guía de Prisma de Supabase](https://supabase.com/docs/guides/database/prisma).
+2. La CA de Supabase (**Project Settings → Database → SSL Configuration → Download certificate**) ya está versionada en `apps/api/certs/prod-ca-2021.crt` (la usa el CLI de Prisma) y, como código, en `apps/api/src/lib/supabase-root-ca.ts` (la usa la API: `src/lib/database-config.ts` verifica todo host de Supabase contra ella, sin importar los parámetros SSL de la URL).
+3. En `apps/api/.env.local`:
+
+   ```text
+   DATABASE_URL=postgresql://prisma.<ref>:<clave>@aws-0-<region>.pooler.supabase.com:5432/postgres?sslmode=verify-full&sslrootcert=certs/prod-ca-2021.crt
+   ```
+
+4. Aplicar las migraciones:
+
+   ```bash
+   npm run db:deploy
+   ```
+
+5. Proteger la tabla interna de Prisma (SQL Editor): `alter table "_prisma_migrations" enable row level security;`.
+6. Cargar datos: `npm run db:seed` (instantánea de desarrollo), o copiar una base existente con `pg_dump --data-only --schema=public --exclude-table=_prisma_migrations` y `psql --single-transaction`.
+
+Notas:
+
+- `npm run db:migrate` (`migrate dev`) necesita una base sombra: créalas siempre contra la base local (con su `DATABASE_URL`) y aplícalas en Supabase con `db:deploy`.
+- Los tests usan siempre la base local `portal_inmobiliario_test` (`.env.test.local`).
+- Para volver a la base local, cambia `DATABASE_URL` en `apps/api/.env.local`.
+
+#### API en Vercel
+
+El proyecto de Vercel de la API (raíz `apps/api`) necesita en **Settings → Environment Variables**:
+
+- `DATABASE_URL`: el pooler en **modo transacción** (puerto `6543`), recomendado por Supabase para serverless: `postgresql://prisma.<ref>:<clave>@aws-0-<region>.pooler.supabase.com:6543/postgres`. No hace falta `sslmode` ni ruta de certificado: la CA va en el código.
+- `AUTH_SECRET` (32 caracteres o más) y `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`.
+
+Las migraciones no se ejecutan en Vercel: se aplican desde local con `npm run db:deploy`.
+
+### 7. pgAdmin (opcional)
 
 Crear `.env.pgadmin` (ignorado por git) con `PGADMIN_DEFAULT_EMAIL` y `PGADMIN_DEFAULT_PASSWORD` (mínimo 6 caracteres; para una clave más corta añadir `PGADMIN_CONFIG_PASSWORD_LENGTH_MIN`), y ejecutar:
 
