@@ -25,7 +25,7 @@ Monorepo npm workspaces:
 - `apps/web` (`@portal/web`, :3000): Next.js 16.3.7 + React 19 + Tailwind 4 + SWR. Sin acceso a BD. De los paquetes internos, depende solo de `@portal/shared`.
   - El navegador llama a `/api/**`, que `next.config.ts` reenvía a `API_INTERNAL_URL`.
   - Los Server Components llaman al backend directamente por `API_INTERNAL_URL` (patrón: `lib/property-detail-api.ts`).
-- `apps/api` (`@portal/api`, :4000): solo Route Handlers REST → `services/` → `repositories/` → Prisma 7.10.0 (`adapter-pg`) → PostgreSQL 16.
+- `apps/api` (`@portal/api`, :4000): solo Route Handlers REST → `services/` → `repositories/` → Prisma 7.10.0 (`adapter-pg`) → PostgreSQL en Supabase (desarrollo y tests en PostgreSQL 16 local).
   - Errores HTTP con forma `{ message, status }` vía `lib/http/api-error.ts`.
   - Cliente Prisma generado en `apps/api/src/generated/prisma`: no se versiona; regenéralo con `npm run db:generate`.
 - `packages/shared` (`@portal/shared`): contrato REST, con tipos, enums, límites y esquemas Zod. Los enums deben coincidir con Prisma (hay un test que lo comprueba).
@@ -41,7 +41,7 @@ Integraciones (implementadas, detalle en `plan.md`): Cloudinary (imágenes), Lea
 - `next.config.ts` lleva `agentRules: false` para que `next dev` no modifique este archivo. No lo quites.
 - Búsqueda: `Property.searchText` lo mantiene un trigger SQL (`search_normalize`). Nunca lo asignes desde código. La normalización JS (`normalizeSearchText`) debe coincidir con la SQL; hay un test que las compara.
 - Estado del catálogo (página, búsqueda, filtros, orden) en la URL, con los mismos nombres de parámetros que la API.
-- Imágenes del seed: `publicId` con prefijo `seed-placeholder/` (Unsplash). La integración con Cloudinary no debe intentar borrarlas.
+- Seed: carga `apps/api/prisma/seed/snapshot.json` (se regenera con `prisma/seed/export-snapshot.ts`; no edites el JSON a mano). Imágenes de ejemplo con `publicId` `seed-placeholder/` (Unsplash): la integración con Cloudinary no debe intentar borrarlas.
 - UI: usa los tokens de `apps/web/src/app/globals.css` (`paper`, `surface`, `ink`, `muted`, `line`, `accent`, `brass`…, con modo oscuro). No uses colores Tailwind sueltos (`zinc-*`, `sky-*`).
 - Tipografía: `font-display` (Cormorant) solo en títulos, precios y marca; `font-sans` (Hanken) para el resto.
 - El movimiento debe respetar `prefers-reduced-motion`.
@@ -65,7 +65,7 @@ Integraciones (implementadas, detalle en `plan.md`): Cloudinary (imágenes), Lea
 | `npm run db:migrate` / `db:seed` / `db:generate` / `db:status` | Prisma, en `apps/api` |
 
 - Tests de API: son de integración contra la BD `portal_inmobiliario_test` (`apps/api/.env.test.local`). `global-setup` se niega a usar una BD cuyo nombre no termine en `_test`; corren sin paralelismo entre archivos.
-- PostgreSQL corre en Docker (contenedor `postgres`); pgAdmin, en :5050. Detalles en `README.md`.
+- `DATABASE_URL` de `apps/api/.env.local` apunta a Supabase (pooler en modo sesión, SSL `verify-full` con `certs/prod-ca-2021.crt`). `db:migrate` (`migrate dev`) se ejecuta contra la base local, nunca contra Supabase; allí se usa `db:deploy`. Los tests usan PostgreSQL local en Docker (contenedor `postgres`; pgAdmin en :5050). Detalles en `README.md`.
 - Servidores para verificar en navegador: `.claude/launch.json` (`web`, `api`) con `preview_start`. Si el API cambia de esquema, regenera Prisma y reinicia `api`.
 
 ## Inspección antes de modificar
