@@ -2,7 +2,7 @@ import "server-only";
 import type { UserRole } from "@/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
-const publicUserSelect = { id: true, name: true, email: true, role: true, isActive: true } as const;
+const publicUserSelect = { id: true, name: true, email: true, role: true, isActive: true, sessionsValidAfter: true } as const;
 
 export type UserRecord = {
   id: string;
@@ -10,6 +10,7 @@ export type UserRecord = {
   email: string;
   role: UserRole;
   isActive: boolean;
+  sessionsValidAfter: Date | null;
 };
 
 export function findUserById(id: string): Promise<UserRecord | null> {
@@ -53,7 +54,7 @@ export function findUserCredentialsById(id: string) {
 
 export function updateUser(
   id: string,
-  data: { name?: string; email?: string; passwordHash?: string },
+  data: { name?: string; email?: string; passwordHash?: string; sessionsValidAfter?: Date },
 ): Promise<UserRecord> {
   return prisma.user.update({ where: { id }, data, select: publicUserSelect });
 }

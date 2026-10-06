@@ -37,7 +37,8 @@ export function PropertyCard({ property }: PropertyCardProps) {
             src={property.mainImageUrl}
             alt={`${propertyTypeLabel} en ${location}: ${property.title}`}
             fill
-            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+            // 3 columns up to the 80rem container (≈ 400px each), 2 from `sm`, 1 below.
+            sizes="(min-width: 1280px) 400px, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
             className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.05] motion-reduce:transition-none motion-reduce:group-hover:scale-100"
           />
         ) : (

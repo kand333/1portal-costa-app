@@ -76,6 +76,7 @@ packages/
 Reglas del monorepo:
 
 - `apps/web` no depende de Prisma ni de `apps/api`; solo de `@portal/shared`.
+- Cada dependencia se declara en el `package.json` del workspace que la usa (p. ej. `leaflet` y `react-leaflet` en `apps/web`); el raíz solo tiene herramientas del monorepo (`concurrently`). Así cada app se instala y despliega sola.
 - El navegador solo conoce el origen del frontend: `apps/web` reenvía `/api/**` a `apps/api` mediante rewrites (`API_INTERNAL_URL`). Mismo origen: cookies de sesión sin CORS.
 - Los Server Components del frontend pueden llamar al backend por `API_INTERNAL_URL`.
 - Los enums compartidos deben coincidir con los de Prisma (verificado por pruebas en `apps/api`).
@@ -154,7 +155,7 @@ POST   /api/favorites/{propertyId}
 DELETE /api/favorites/{propertyId}
 ```
 
-- Requieren sesión (USER o ADMIN). `GET` devuelve `PropertySummary[]` de las propiedades guardadas que siguen publicadas y no eliminadas, la más reciente primero.
+- Solo para cuentas USER (401 sin sesión, 403 a un ADMIN). `GET` devuelve `PropertySummary[]` de las propiedades guardadas que siguen publicadas y no eliminadas, la más reciente primero.
 - `POST` (solo propiedades publicadas; si no, 404) y `DELETE` son idempotentes y responden 204. La clave primaria `(userId, propertyId)` impide duplicados.
 - Web: botón de corazón en las tarjetas y en el detalle (`aria-pressed`); un visitante va al login y vuelve. `/account` lista los guardados. La lista se comparte por SWR (`/api/favorites`), una sola petición para todas las tarjetas.
 
@@ -172,11 +173,11 @@ POST   /api/admin/inquiries/{id}/messages
 ```
 
 - `POST` es público; con sesión la consulta queda asociada al usuario.
-- `GET /api/account/inquiries` (sesión requerida) lista las consultas del usuario, la más reciente primero: título guardado al enviarla, mensaje, fecha y los datos actuales de la propiedad (`null` si ya no está publicada). Se muestra en «Propiedades consultadas» de `/account` como tabla, con búsqueda por título o mensaje y 6 por página, ambas en el cliente.
+- `GET /api/account/inquiries` (sesión requerida) lista las consultas del usuario por actividad más reciente (`Inquiry.lastActivityAt`: creación o último mensaje de cualquiera de los dos lados): título guardado al enviarla, mensaje, fecha, la última entrada de la conversación (`lastMessage`) y los datos actuales de la propiedad (`null` si ya no está publicada). Se muestra en «Propiedades consultadas» de `/account` como tabla, con búsqueda por título o mensaje y 6 por página, ambas en el cliente.
 - `DELETE /api/account/inquiries/{id}` (sesión requerida) solo la quita de la cuenta del usuario: marca `Inquiry.hiddenByUser` y el ADMIN la sigue viendo. Responde 204; 404 si no es suya o ya estaba quitada.
 - `/api/account/inquiries/**` y `/api/favorites/**` son solo para cuentas USER (403 a un ADMIN).
 - Conversación (chat en la app, sin correo al usuario: Web3Forms solo escribe a la casilla dueña de la clave):
-  - ADMIN: `GET /api/admin/inquiries` (`page`, `pageSize`, `search` sin distinguir mayúsculas sobre título, nombre, email y mensaje), `GET /api/admin/inquiries/{id}` (contacto, usuario asociado y conversación) y `POST …/messages` (201). Incluye las que el usuario quitó de su cuenta. `awaitingReply`: el último mensaje no es del ADMIN.
+  - ADMIN: `GET /api/admin/inquiries` (`page`, `pageSize`, `search` sin distinguir mayúsculas sobre título, nombre, email y mensaje), `GET /api/admin/inquiries/{id}` (contacto, usuario asociado y conversación) y `POST …/messages` (201). Incluye las que el usuario quitó de su cuenta. Orden por `lastActivityAt`, con `lastMessage` como vista previa. `awaitingReply`: el último mensaje no es del ADMIN. Una respuesta del ADMIN devuelve la consulta a la cuenta del usuario (`hiddenByUser = false`), para que la vea.
   - USER: `GET /api/account/inquiries/{id}` y `POST …/messages` solo sobre sus consultas no quitadas (404 si no). La lista trae `adminReplyCount`.
   - Respuesta: `inquiryReplySchema` (1–2000 caracteres). A un visitante sin cuenta el ADMIN le escribe además por `mailto:`; la respuesta queda registrada igual.
   - Páginas: `/admin/inquiries` (lista) y `/admin/inquiries/{id}` (chat); el usuario, en `/account/inquiries/{id}` (enlace «Conversación» en su tabla). Sin notificaciones ni marcas de leído.
@@ -198,9 +199,9 @@ DELETE /api/admin/properties/{id}
 - Características: viajan como lista de nombres. Se quitan vacías y repetidas sin distinguir mayúsculas; si ya existe una con otra capitalización se reutiliza ("piscina" → "Piscina") y si no, se crea. `PUT` reemplaza el conjunto.
 - Eliminar es un soft delete: `Property.deletedAt = now()`. La fila y lo relacionado (imágenes, en PostgreSQL y Cloudinary; características; favoritos; consultas) se conservan. Una eliminada se oculta en todo el portal, en las listas del usuario (favoritos; en sus consultas la propiedad llega `null` y queda el título guardado), en los indicadores del panel y en la lista activa de admin; `GET`/`PUT`/`DELETE` por id responden 404. Solo aparece en `/admin/properties?status=deleted` (filtro Estado: «Eliminadas», solo lectura, con «Eliminada el»). Sin restauración desde la UI; re-ejecutar `db:seed` restaura las propiedades del seed.
 - El filtro público vive en `publishedOnly` (`isPublished: true, deletedAt: null`, `property-repository.ts`): úsalo en toda consulta pública o de usuario.
-- Usuarios (Paso 29): `GET /api/admin/users` (`page`, `pageSize`, `search` sobre nombre y email, `role`, `status` = `active`|`inactive`), `POST /api/admin/users` (`adminUserCreateSchema`: reglas del registro + rol; email usado → 409), `PATCH /api/admin/users/{id}` (`adminUserUpdateSchema`: nombre, email, contraseña nueva, `isActive`, `role`) y `DELETE /api/admin/users/{id}` (borrado definitivo: favoritos en cascada; consultas y mensajes quedan sin usuario). El ADMIN no puede cambiar ni eliminar su propia cuenta (409): evita quedarse fuera y garantiza un ADMIN activo. Desactivar, cambiar rol o contraseña aplica en la siguiente petición del usuario; eliminarlo invalida su sesión. Orden: el ADMIN que mira, luego los conectados y luego el resto (ADMIN primero, más recientes). «Conectado» = `User.lastSeenAt` (se actualiza en cada petición autenticada, como máximo una vez por minuto, y se borra al cerrar sesión) dentro de los últimos 5 minutos (`ONLINE_WINDOW_MS`); solo esos usuarios se marcan en verde. Página `/admin/users` (menú «Administrar usuarios»), 10 por página; confirmaciones con `ConfirmDialog` (`<dialog>` nativo con `showModal`).
+- Usuarios (Paso 29): `GET /api/admin/users` (`page`, `pageSize`, `search` sobre nombre y email, `role`, `status` = `active`|`inactive`), `POST /api/admin/users` (`adminUserCreateSchema`: reglas del registro + rol; email usado → 409), `PATCH /api/admin/users/{id}` (`adminUserUpdateSchema`: nombre, email, contraseña nueva, `isActive`, `role`) y `DELETE /api/admin/users/{id}` (borrado definitivo: favoritos en cascada; consultas y mensajes quedan sin usuario). El ADMIN no puede cambiar ni eliminar su propia cuenta (409): evita quedarse fuera y garantiza un ADMIN activo. Desactivar o cambiar el rol aplica en la siguiente petición del usuario; una contraseña nueva cierra sus sesiones abiertas; eliminarlo invalida su sesión. Orden: el ADMIN que mira, luego los conectados y luego el resto (ADMIN primero, más recientes). «Conectado» = `User.lastSeenAt` (se actualiza en cada petición autenticada, como máximo una vez por minuto) dentro de los últimos 5 minutos (`ONLINE_WINDOW_MS`) y sin un cierre de sesión posterior (`User.loggedOutAt`); solo esos usuarios se marcan en verde. Al pasar el cursor por el estado se ve «Conectado ahora» o la última conexión (`lastSeenAt`, que se conserva al cerrar sesión). Página `/admin/users` (menú «Administrar usuarios»), 10 por página; confirmaciones con `ConfirmDialog` (`<dialog>` nativo con `showModal`).
 - `GET /api/admin/dashboard`: indicadores del panel calculados en PostgreSQL (propiedades totales, publicadas, en venta y en arriendo, incluidas las no publicadas y sin contar las eliminadas; usuarios; consultas). La página `/admin` los pide desde el servidor reenviando la cookie (`fetchWithSession` en `apps/web/src/lib/session.ts`).
-- Área `/admin`: layout propio y corporativo (`components/admin/admin-shell.tsx`), sin header ni footer públicos: sidebar a la izquierda, colapsable a íconos en escritorio y como cajón en móvil, con «Panel administración», «Administrar propiedades», «Consultas» y «Mi cuenta» (`/admin/account`: datos y contraseña del ADMIN), más «Ver sitio» y «Salir». El sitio público vive en el grupo `app/(site)` con su header y footer; el layout raíz solo define `<html>`/`<body>`.
+- Área `/admin`: layout propio y corporativo (`components/admin/admin-shell.tsx`), sin header ni footer públicos: sidebar a la izquierda, colapsable a íconos en escritorio y como cajón en móvil, con «Panel administración», «Administrar propiedades», «Administrar usuarios», «Consultas» y «Mi cuenta» (`/admin/account`: datos y contraseña del ADMIN), más «Ver sitio» y «Salir». El sitio público vive en el grupo `app/(site)` con su header y footer; el layout raíz solo define `<html>`/`<body>`.
 - Páginas `/admin/properties` (lista), `/admin/properties/new` y `/admin/properties/{id}/edit`: Server Components que piden la API reenviando la cookie (`fetchWithSession`; `findWithSession` devuelve `null` ante 404). La búsqueda y la página viven en la URL (`search`, `page`), con un formulario GET sin JavaScript. Eliminar es un botón cliente (`DELETE` + `router.refresh()`) con confirmación.
 - Formulario (`components/admin/property-form.tsx`, lógica en `lib/property-form.ts`): componente cliente con `useState` que valida con `propertyInputSchema` antes de enviar (la API vuelve a validar). Crear hace `POST` y lleva a `/admin/properties/{id}/edit?created=1`; editar hace `PUT` y vuelve a renderizar la página. Sin latitud ni longitud.
 
@@ -309,10 +310,11 @@ Requisitos:
 Implementación (sin dependencias nuevas, con `node:crypto`):
 
 - Contraseñas con scrypt (N=2^17, r=8, p=1, sal aleatoria), guardadas como `scrypt$N$r$p$sal$clave` para poder subir el coste más adelante.
-- Sesión: token `payload.firma` (id de usuario y expiración a 7 días, firmado con HMAC-SHA256 y `AUTH_SECRET` de al menos 32 caracteres) en la cookie `portal_session`, con `HttpOnly`, `SameSite=Lax`, `Path=/` y `Secure` en producción. Llega al navegador por el proxy `/api` (mismo origen). No se usa `localStorage`.
+- Sesión: token `payload.firma` (id de usuario, emisión `iat` y expiración a 7 días, firmado con HMAC-SHA256 y `AUTH_SECRET` de al menos 32 caracteres) en la cookie `portal_session`, con `HttpOnly`, `SameSite=Lax`, `Path=/` y `Secure` en producción. Llega al navegador por el proxy `/api` (mismo origen). No se usa `localStorage`.
 - Logout borra la cookie. El token no se revoca en el servidor, pero `GET /api/auth/me` (y toda protección futura) vuelve a leer el usuario: si fue eliminado o desactivado responde 401 y borra la cookie.
-- Login: el mismo mensaje y el mismo tiempo para un email inexistente y una contraseña errónea (401); cuenta desactivada → 403. Tras 10 fallos en 15 minutos para un email → 429 (en memoria, por proceso).
+- Login: el mismo mensaje y el mismo tiempo para un email inexistente y una contraseña errónea (401); cuenta desactivada → 403. Tras 5 fallos en 15 minutos para un email → 429 (en memoria, por proceso).
 - Registro → 201 e inicio de sesión; email ya registrado → 409. Rol USER por defecto.
+- Límite por IP (`apps/api/src/lib/http/rate-limit.ts`, ventana fija en memoria, por proceso) → 429 con `Retry-After`: login 20 cada 15 min, registro 5 por hora, consultas (`POST /api/inquiries`) 10 cada 10 min. La IP es la primera de `x-forwarded-for`, que el proxy de la web pone desde la conexión si la petición no la trae; un cliente puede enviar la suya, así que este límite solo frena el abuso. El de 5 fallos por email no depende de la IP.
 - Web: páginas `/login` y `/register` (vuelven a `?next=` solo si es una ruta del sitio) y el header muestra el nombre con «Salir». El usuario actual se lee con SWR (`/api/auth/me`).
 
 Edición de la cuenta (`/account/edit`, página independiente con el botón «Editar cuenta» en `/account`):
@@ -320,7 +322,7 @@ Edición de la cuenta (`/account/edit`, página independiente con el botón «Ed
 - `PATCH /api/account/profile` actualiza nombre y email; cambiar el email (es el login) exige la contraseña actual. Email ya usado → 409.
 - `PUT /api/account/password` exige la contraseña actual; la nueva cumple las reglas del registro y debe ser distinta. Respuesta 204.
 - Contraseña actual incorrecta → 400. Los fallos cuentan para el mismo límite de intentos que el login (por cuenta) → 429.
-- Límite: cambiar la contraseña no cierra las otras sesiones abiertas (cookie firmada sin registro en el servidor); siguen válidas hasta expirar.
+- Revocación (Paso 34): el token lleva `iat` (hora de emisión). Cambiar la contraseña, el propio usuario o un ADMIN, fija `User.sessionsValidAfter`, y `getActiveUser` rechaza las sesiones emitidas antes (cierra los otros dispositivos). A quien la cambia por sí mismo se le renueva la cookie y sigue conectado. Los tokens anteriores sin `iat` lo derivan de `exp`. Cerrar sesión borra la cookie, pero no invalida en el servidor una copia robada del token (sesión sin estado, 7 días).
 
 Autorización:
 
@@ -329,6 +331,18 @@ Autorización:
   1. `proxy.ts` (optimista, solo mira si existe la cookie) redirige `/account/**` y `/admin/**` a `/login?next=…`.
   2. Los layouts y **cada página** privada validan la sesión con la API desde el servidor (`lib/session.ts`: `requireSessionUser`, `requireCustomerUser`, `getAdminUser`). En `/admin`, un USER ve «Acceso restringido». Las páginas de `/account/**` son solo para USER: un ADMIN se redirige a su equivalente (`/admin`, `/admin/account`, `/admin/inquiries`); su nombre en el header lleva a `/admin` y no ve el botón de favoritos. El chequeo debe estar también en la página: Next renderiza layout y página en paralelo y, con el chequeo solo en el layout, el contenido de la página viaja igual en la respuesta.
   3. La API vuelve a verificar en cada endpoint protegido: es la defensa real.
+- Redirección tras el login (`?next=`): `getSafeRedirectPath` resuelve el valor como lo hará el navegador (sin tabuladores ni saltos de línea; `\` cuenta como `/`) y solo acepta el mismo origen.
+
+Revisión de seguridad (Paso 34):
+
+- Cabeceras: la web envía `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy` sin cámara, micrófono, geolocalización ni pagos, y HSTS en producción. La API envía `nosniff`. Ninguna envía `X-Powered-By`.
+- Comprobado sin cambios: los 27 handlers de la API (todos los privados empiezan con `requireAdmin` o `requireRole`, y validan cuerpo, query e ids con Zod); scrypt con costo OWASP y comparación en tiempo constante; sin SQL crudo ni `dangerouslySetInnerHTML`; subidas con tope de tamaño y tipo detectado por los bytes; Cloudinary firmado y con el secreto solo en la API; los errores 500 no exponen detalles; `.env*` fuera de git y la única variable `NEXT_PUBLIC_*` con valor sensible es la clave de Web3Forms, pública por diseño (se restringe por dominio en su panel).
+- Riesgos aceptados o pendientes:
+  - Sin CSP: los scripts inline de Next necesitarían nonces. Hacerlo antes de producción.
+  - Los límites de frecuencia (login, registro, consultas) son en memoria y por proceso, y la IP sale de `x-forwarded-for`. Con varias instancias o tráfico real, usar un almacén compartido o el limitador del proveedor.
+  - La subida corta por `Content-Length`; un cuerpo `chunked` se lee entero antes de comprobar el tamaño. Solo afecta a ADMIN.
+  - `npm audit --omit=dev`: 4 avisos «high» en `deepmerge-ts` y `mysql2`, del CLI de `prisma` (herramienta de desarrollo; el proyecto no usa MySQL). La corrección pide bajar Prisma a la 6, y la 7.10.0 está fijada. Revisar en la próxima actualización de Prisma.
+  - El primer commit (`9340794`) subió un `.env` en la raíz con `DATABASE_URL` y `JWT_SECRET` de desarrollo (quitado en `3842159`; `JWT_SECRET` ya no se usa). Si el repositorio es público y esa contraseña de BD se reutiliza, cambiarla.
 
 ## 11. Cloudinary
 
@@ -364,7 +378,7 @@ Implementación (Paso 26):
 - `POST /api/admin/properties/{id}/images` (solo ADMIN, multipart, campo `file`). Valida tamaño (≤ 5 MB; también por `Content-Length` antes de leer) y tipo por los primeros bytes (JPEG, PNG o WebP; un archivo renombrado se rechaza): 400 / 413 / 415. Propiedad inexistente o eliminada → 404 sin subir nada.
 - La API sube a Cloudinary con la Upload API REST firmada (SHA-1 de los parámetros ordenados + `CLOUDINARY_API_SECRET`, `apps/api/src/lib/cloudinary.ts`), sin SDK, en la carpeta `propiedades-claude`, y guarda `secure_url` y `public_id` en `PropertyImage` (última posición; principal si no hay otra). La primera imagen propia reemplaza las de ejemplo del seed (`seed-placeholder/*`, solo se borran sus filas). Si falla la BD, se destruye el asset subido.
 - Errores de Cloudinary: credenciales o permisos rechazados (401/403) → 503 «revisa la configuración»; otros → 502. La API key necesita permiso para crear (subir) y destruir assets.
-- Web: sección «Imágenes» en `/admin/properties/{id}/edit`; valida en el navegador con la misma detección (`@portal/shared/property-image`). `next.config.ts` admite `res.cloudinary.com` en `next/image`.
+- Web: sección «Imágenes» en `/admin/properties/{id}/edit`; valida en el navegador con la misma detección (`@portal/shared/property-image`). `next.config.ts` admite `res.cloudinary.com` en `next/image` (desde el Paso 32, con el loader propio).
 
 Administración (Paso 27):
 
@@ -373,6 +387,14 @@ Administración (Paso 27):
 - `PUT /api/admin/properties/{id}/images` con `{ order, mainImageId }` (`propertyImageArrangementSchema`): `order` debe listar exactamente las imágenes de la propiedad (si no, 409); fija `position` según el orden y la principal en una transacción (primero desmarca, por el índice de principal única).
 - UI: la galería del admin usa el orden público (principal primero, luego `position`); «Principal» la lleva al primer lugar, ←/→ mueven entre las demás, «Eliminar» pide confirmación. Subida múltiple secuencial con progreso.
 - El soft delete de una propiedad conserva sus imágenes (en PostgreSQL y Cloudinary).
+
+Optimización (Paso 32):
+
+- Al subir, transformación entrante `c_limit,w_2560,h_2560` (firmada): Cloudinary guarda como máximo 2560 px por lado, sin agrandar.
+- Entrega: `next/image` usa un loader propio (`images.loaderFile` → `apps/web/src/lib/image-loader.ts`). Cada imagen la redimensiona su CDN al ancho que pide `next/image`: Cloudinary con `f_auto,q_auto,c_limit,w_{ancho}` (AVIF/WebP) y Unsplash con `w`, `q` y `auto=format`. El servidor de Next no descarga originales; `/_next/image` ya no se usa. Ejemplo medido: un JPEG de 1 MB llega como WebP de 50 KB en la tarjeta.
+- `sizes` de la tarjeta según la grilla real (400 px con tres columnas en el contenedor de 80rem).
+- Open Graph: `toShareImageUrl` pide al CDN un JPEG de 1200×630 (`c_fill,g_auto`), no el original.
+- Revisado sin cambios: no hay peticiones duplicadas (SWR deduplica `/api/auth/me`; la ficha comparte su petición entre metadata y página con `cache`; la geocodificación se cachea 30 días). Índice de `Inquiry` cambiado de `createdAt` a `lastActivityAt` (orden de ambas listas). La búsqueda usa `ILIKE '%…%'` sobre `searchText` sin índice trigram: suficiente con cientos de propiedades; con miles, `pg_trgm` + índice GIN.
 
 ## 12. Mapa (Leaflet + OpenStreetMap)
 
@@ -414,7 +436,7 @@ Implementación (híbrida, porque el plan gratuito de Web3Forms solo acepta env�
 2. `POST /api/inquiries` valida, exige una propiedad publicada (404 si no), guarda la consulta con una copia del título y `userId` del usuario cuando hay sesión (nulo para visitantes; una cookie inválida cuenta como visitante), y responde 201.
 3. Con la consulta ya guardada, el navegador la envía a Web3Forms con `NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY` (pública por diseño: solo entrega correos a la casilla dueña de la clave). Incluye ID y título de la propiedad e ID de la consulta.
 4. Si el correo falla, el usuario igual ve «Consulta enviada»: la consulta está en PostgreSQL y el ADMIN la verá en su panel. Si falla la API, se muestra el error y no se envía correo.
-5. Anti-spam: campo trampa (honeypot) oculto. Sin limitación de tasa en la API por ahora.
+5. Anti-spam: campo trampa (honeypot) oculto y límite de 10 consultas cada 10 minutos por IP en la API.
 
 ## 14. Errores
 
@@ -427,6 +449,8 @@ Utilizar códigos HTTP apropiados:
 - 409
 - 500
 
+Además, donde corresponde: 413 y 415 (subida de imágenes), 429 (demasiados intentos), 502 y 503 (Cloudinary no disponible o mal configurado).
+
 Formato recomendado:
 
 ```json
@@ -437,6 +461,17 @@ Formato recomendado:
 ```
 
 No exponer stack traces internos.
+
+## 14a. Avisos (mensajes flash)
+
+- `apps/web/src/lib/flash.ts` (`flash(texto, tono)`) y `components/ui/flash-messages.tsx`, montado en el layout raíz: avisos arriba al centro de toda página (sitio y admin), con botón para cerrar y que desaparecen a los 5 s (`FLASH_DURATION_MS`). Región `aria-live="polite"`. Los pendientes se guardan en `sessionStorage`, así sobreviven a una recarga completa (p. ej. tras cerrar sesión).
+- Se usan para éxitos: login, registro y logout (`lib/auth-client.ts`); usuarios (crear, editar, activar/desactivar, eliminar); propiedades (crear, guardar, eliminar); características (crear, renombrar, eliminar). También para un logout fallido. Los errores de validación siguen junto al campo o al formulario.
+
+## 14b. SEO (Paso 31)
+
+- `metadataBase` en el layout raíz desde `NEXT_PUBLIC_SITE_URL`: las URLs relativas (canónica, Open Graph) se vuelven absolutas. En producción debe ser el dominio real.
+- Ficha `/properties/{id}`: `generateMetadata` usa `buildPropertyMetadata` (`apps/web/src/lib/property-metadata.ts`), comparte la petición con la página (`cache`): título «{título} | Portal Inmobiliario», descripción que empieza con tipo, operación, precio y ubicación (máx. 160 caracteres, corte en palabra), canónica, Open Graph y Twitter con la imagen principal (o la primera; sin imagen, tarjeta `summary`). Si no existe, `notFound()` pone `noindex`.
+- Catálogo con canónica `/properties` (filtros y páginas apuntan a la misma). El resto hereda el Open Graph del layout raíz. Next combina la metadata de forma superficial: una página que define `openGraph` reemplaza el objeto completo.
 
 ## 15. Variables de entorno
 

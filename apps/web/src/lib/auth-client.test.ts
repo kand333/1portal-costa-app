@@ -9,14 +9,16 @@ import {
   updateProfile,
 } from "./auth-client";
 
-const { mutateMock } = vi.hoisted(() => ({ mutateMock: vi.fn() }));
+const { mutateMock, flashMock } = vi.hoisted(() => ({ mutateMock: vi.fn(), flashMock: vi.fn() }));
 vi.mock("swr", () => ({ mutate: mutateMock }));
+vi.mock("./flash", () => ({ flash: flashMock }));
 
 const user = { id: "u1", name: "Ana", email: "ana@correo.cl", role: "USER", isActive: true };
 
 afterEach(() => {
   vi.unstubAllGlobals();
   mutateMock.mockReset();
+  flashMock.mockReset();
 });
 
 describe("fetchCurrentUser", () => {
@@ -47,6 +49,7 @@ describe("login, registration and logout", () => {
     await expect(logIn({ email: "ana@correo.cl", password: "clave segura" })).resolves.toEqual(user);
     expect(fetchMock.mock.calls[0][0]).toBe("/api/auth/login");
     expect(mutateMock).toHaveBeenCalledWith("/api/auth/me", user, { revalidate: false });
+    expect(flashMock).toHaveBeenCalledWith("Sesión iniciada. ¡Hola, Ana!");
   });
 
   it("registers and stores the new user in the session cache", async () => {
@@ -56,6 +59,7 @@ describe("login, registration and logout", () => {
     await registerAccount({ name: "Ana", email: "ana@correo.cl", password: "clave segura" });
     expect(fetchMock.mock.calls[0][0]).toBe("/api/auth/register");
     expect(mutateMock).toHaveBeenCalledWith("/api/auth/me", user, { revalidate: false });
+    expect(flashMock).toHaveBeenCalledWith("Cuenta creada. Te damos la bienvenida, Ana.");
   });
 
   it("does not touch the session cache when the login is rejected", async () => {
@@ -67,12 +71,20 @@ describe("login, registration and logout", () => {
       message: "Email o contraseña incorrectos",
     });
     expect(mutateMock).not.toHaveBeenCalled();
+    expect(flashMock).not.toHaveBeenCalled();
   });
 
   it("logs out and clears the session cache", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 204 })));
     await logOut();
     expect(mutateMock).toHaveBeenCalledWith("/api/auth/me", null, { revalidate: false });
+    expect(flashMock).toHaveBeenCalledWith("Sesión cerrada.");
+  });
+
+  it("announces nothing when the logout fails (the caller reports it)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+    await expect(logOut()).rejects.toMatchObject({ message: "No pudimos cerrar la sesión" });
+    expect(flashMock).not.toHaveBeenCalled();
   });
 });
 
@@ -86,6 +98,12 @@ describe("getSafeRedirectPath", () => {
     ["//evil.example", "/"],
     ["/\\evil.example", "/"],
     ["javascript:alert(1)", "/"],
+    // The browser drops tabs and newlines, and reads "\\" as "/": these would become "//evil.example".
+    ["/\t/evil.example", "/"],
+    ["/\n/evil.example", "/"],
+    ["/\\/evil.example", "/"],
+    ["/%2F/evil.example", "/%2F/evil.example"],
+    ["/account#inquiries", "/account#inquiries"],
   ])("%o → %o", (next, expected) => {
     expect(getSafeRedirectPath(next)).toBe(expected);
   });

@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type KeyboardEvent } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { logOut } from "@/lib/auth-client";
+import { flash } from "@/lib/flash";
 import { getActiveNavigationHref } from "./navigation-items";
 import { NavigationLinks } from "./navigation-links";
 
@@ -25,7 +26,7 @@ export function SiteNavigation() {
 
   async function handleLogout() {
     closeMenu();
-    await logOut().catch(() => undefined);
+    await logOut().catch(() => flash("No pudimos cerrar la sesión. Inténtalo de nuevo.", "error"));
     router.refresh();
   }
 

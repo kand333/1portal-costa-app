@@ -204,8 +204,13 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("admin users API", () => {
   it("edits a user's name, email and password", async () => {
     const { body } = await create({ name: "Editable", email: `editable-${testRunId}@test.cl`, password: "clave-original-1" }, admin.cookie);
     const id = (body as AdminUserSummary).id;
+    const { createSessionToken } = await import("@/lib/auth/session-token");
+    const openSession = `portal_session=${createSessionToken(id, Date.now() - 60_000)}`;
+    expect(await me(openSession)).toBe(200);
 
     const edited = await update(id, { name: "Editado", email: `editado-${testRunId}@test.cl`, password: "clave-nueva-123" }, admin.cookie);
+    // A new password logs the user out of the sessions they had open.
+    expect(await me(openSession)).toBe(401);
     expect(edited.body).toMatchObject({ name: "Editado", email: `editado-${testRunId}@test.cl` });
     expect(await login(`editado-${testRunId}@test.cl`, "clave-nueva-123")).toBe(200);
     expect(await login(`editado-${testRunId}@test.cl`, "clave-original-1")).toBe(401);

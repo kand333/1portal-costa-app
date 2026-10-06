@@ -191,5 +191,45 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("inquiry conversation API", (
     expect((await userDetail(customerInquiryId, customer.cookie)).status).toBe(404);
     expect((await userReply(customerInquiryId, { body: "Hola" }, customer.cookie)).status).toBe(404);
     expect((await adminDetail(customerInquiryId, admin.cookie)).body).toMatchObject({ hiddenByUser: true });
+
+    // An answer from ADMIN brings it back to the user's account, so the user does see it.
+    expect((await adminReply(customerInquiryId, { body: "¿Sigue interesada?" }, admin.cookie)).status).toBe(201);
+    expect((await adminDetail(customerInquiryId, admin.cookie)).body).toMatchObject({ hiddenByUser: false });
+    const detail = (await userDetail(customerInquiryId, customer.cookie)).body as UserInquiryDetail;
+    expect(detail.messages.at(-1)?.body).toBe("¿Sigue interesada?");
+  });
+
+  it("sorts both lists by the latest activity and shows the last entry of each conversation", async () => {
+    const prisma = await getPrisma();
+    const older = await prisma.inquiry.create({
+      data: {
+        propertyTitle: `Depto conversación ${testRunId}`,
+        userId: customer.id,
+        name: `Cliente ${testRunId}`,
+        email: "cliente@correo.cl",
+        message: "Consulta antigua",
+        createdAt: new Date("2026-01-01T00:00:00Z"),
+        lastActivityAt: new Date("2026-01-01T00:00:00Z"),
+      },
+    });
+    const { GET } = await import("@/app/api/account/inquiries/route");
+    const mine = async () => (await (await GET(request("/api/account/inquiries", "GET", customer.cookie))).json()) as UserInquiry[];
+    const adminRows = async () => ((await adminList(`?search=${testRunId}`, admin.cookie)).body as PaginatedResponse<AdminInquirySummary>).data;
+
+    // No answers yet: last in both lists, with no last entry.
+    expect((await mine()).at(-1)).toMatchObject({ id: older.id, lastMessage: null });
+    expect((await adminRows()).at(-1)).toMatchObject({ id: older.id, lastMessage: null });
+
+    // A new message from the user moves it to the top of ADMIN's list, with its text as the last entry.
+    expect((await userReply(older.id, { body: "¿Me responden?" }, customer.cookie)).status).toBe(201);
+    expect((await adminRows())[0]).toMatchObject({ id: older.id, awaitingReply: true, lastMessage: { fromAdmin: false, body: "¿Me responden?" } });
+
+    // ADMIN's answer moves it to the top of the user's list.
+    await adminReply(customerInquiryId, { body: "Otra respuesta" }, admin.cookie);
+    expect((await mine())[0]).toMatchObject({ id: customerInquiryId, lastMessage: { fromAdmin: true, body: "Otra respuesta" } });
+    await adminReply(older.id, { body: "Sí, disculpe la demora." }, admin.cookie);
+    const [first] = await mine();
+    expect(first).toMatchObject({ id: older.id, lastMessage: { fromAdmin: true, body: "Sí, disculpe la demora." } });
+    expect(Date.parse(first?.lastActivityAt ?? "")).toBeGreaterThan(Date.parse("2026-01-01T00:00:00Z"));
   });
 });

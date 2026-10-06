@@ -10,12 +10,10 @@ type AdminPropertyEditorProps = {
   property: AdminPropertyDetail | null;
   /** Feature catalog (names) for the form's checkboxes. */
   catalog?: string[];
-  /** The property was just created (the form redirects here after creating it). */
-  isNew?: boolean;
 };
 
 /** Page to create or edit a property. */
-export function AdminPropertyEditor({ property, catalog = [], isNew = false }: AdminPropertyEditorProps) {
+export function AdminPropertyEditor({ property, catalog = [] }: AdminPropertyEditorProps) {
   return (
     <div className="mx-auto w-full max-w-3xl px-4 pb-20 pt-10 sm:px-6">
       <Link
@@ -47,12 +45,6 @@ export function AdminPropertyEditor({ property, catalog = [], isNew = false }: A
         </div>
       ) : (
         <p className="mt-3 text-lg text-muted">Se guardará sin publicar hasta que la marques como publicada.</p>
-      )}
-
-      {isNew && (
-        <p role="status" className="mt-6 rounded-[1.25rem] border border-accent/40 bg-accent/10 px-5 py-3 text-sm font-medium text-ink">
-          Propiedad creada{property?.isPublished ? " y publicada" : " sin publicar"}.
-        </p>
       )}
 
       {/* Keyed by property: moving to another property's edit page reuses the route, so the form must start over. */}

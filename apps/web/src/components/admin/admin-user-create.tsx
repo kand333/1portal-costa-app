@@ -15,6 +15,7 @@ import { AuthFormField } from "@/components/auth/auth-form-field";
 import { useConfirmDialog } from "@/components/ui/confirm-dialog";
 import { createUser } from "@/lib/admin-users";
 import { ApiClientError } from "@/lib/api-client";
+import { flash } from "@/lib/flash";
 
 type Field = "name" | "email" | "password";
 const emptyValues = {
@@ -31,7 +32,7 @@ export function AdminUserCreate() {
   const [values, setValues] = useState(emptyValues);
   const [errors, setErrors] = useState<Partial<Record<Field, string>>>({});
   const [status, setStatus] = useState<{
-    tone: "idle" | "saving" | "success" | "error";
+    tone: "idle" | "saving" | "error";
     message: string;
   }>({ tone: "idle", message: "" });
 
@@ -72,10 +73,8 @@ export function AdminUserCreate() {
     try {
       await createUser(parsed.data);
       setValues(emptyValues);
-      setStatus({
-        tone: "success",
-        message: `Cuenta de ${parsed.data.name} creada.`,
-      });
+      setStatus({ tone: "idle", message: "" });
+      flash(`Cuenta de ${parsed.data.name} creada${parsed.data.role === "ADMIN" ? " como administrador" : ""}.`);
       router.refresh();
     } catch (error) {
       setStatus({

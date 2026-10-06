@@ -7,7 +7,7 @@ import {
   type AdminInquiryRecord,
 } from "@/repositories/admin-inquiry-repository";
 import { findUserInquiryWithMessages, insertInquiryMessage, inquiryMessageSelect } from "@/repositories/inquiry-repository";
-import { toUserInquiry } from "@/services/inquiry-service";
+import { toLastMessage, toUserInquiry } from "@/services/inquiry-service";
 import type { AuthUser } from "@portal/shared/auth";
 import type {
   AdminInquiryDetail,
@@ -47,7 +47,8 @@ function toAdminSummary(record: AdminInquiryRecord): AdminInquirySummary {
     createdAt: record.createdAt.toISOString(),
     hiddenByUser: record.hiddenByUser,
     messageCount: record._count.messages,
-    lastActivityAt: (lastMessage?.createdAt ?? record.createdAt).toISOString(),
+    lastActivityAt: record.lastActivityAt.toISOString(),
+    lastMessage: toLastMessage(lastMessage),
     // The inquiry itself is the user's word: it waits until the latest message is from ADMIN.
     awaitingReply: !lastMessage?.fromAdmin,
   };
@@ -83,7 +84,7 @@ export async function getUserInquiry(user: AuthUser, inquiryId: string): Promise
   const record = await findUserInquiryWithMessages(user.id, inquiryId);
   if (!record) throw new ApiError(404, NOT_FOUND);
   const { messages, ...inquiry } = record;
-  return { ...toUserInquiry(inquiry), messages: messages.map(toInquiryMessage) };
+  return { ...toUserInquiry({ ...inquiry, messages: messages.slice(-1) }), messages: messages.map(toInquiryMessage) };
 }
 
 /** The user answers in the conversation of one of their inquiries. */

@@ -2,10 +2,16 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { PropertyCatalog } from "@/components/properties/property-catalog";
 import { PropertyGridSkeleton } from "@/components/properties/property-grid";
+import { SITE_NAME } from "@/lib/property-metadata";
+
+const title = `Propiedades | ${SITE_NAME}`;
+const description = "Casas, departamentos, oficinas y terrenos en venta y arriendo en Chile.";
 
 export const metadata: Metadata = {
-  title: "Propiedades | Portal Inmobiliario",
-  description: "Casas, departamentos, oficinas y terrenos en venta y arriendo en Chile.",
+  title,
+  description,
+  alternates: { canonical: "/properties" },
+  openGraph: { type: "website", siteName: SITE_NAME, locale: "es_CL", url: "/properties", title, description },
 };
 
 export default function PropertiesPage() {

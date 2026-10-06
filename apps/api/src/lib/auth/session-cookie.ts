@@ -1,6 +1,6 @@
 import "server-only";
 import type { NextRequest, NextResponse } from "next/server";
-import { createSessionToken, readSessionToken, SESSION_DURATION_SECONDS } from "./session-token";
+import { createSessionToken, readSessionToken, SESSION_DURATION_SECONDS, type Session } from "./session-token";
 
 export const SESSION_COOKIE_NAME = "portal_session";
 
@@ -25,7 +25,12 @@ export function clearSessionCookie(response: NextResponse): NextResponse {
   return response;
 }
 
+/** The session of the cookie, or null when there is none or it is invalid or expired. */
+export function readSession(request: NextRequest): Session | null {
+  return readSessionToken(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+}
+
 /** User id of the session cookie, or null when there is none or it is invalid or expired. */
 export function readSessionUserId(request: NextRequest): string | null {
-  return readSessionToken(request.cookies.get(SESSION_COOKIE_NAME)?.value);
+  return readSession(request)?.userId ?? null;
 }

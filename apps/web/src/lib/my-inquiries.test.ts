@@ -10,6 +10,8 @@ const inquiry = (id: string, propertyTitle: string, message: string, currentTitl
   message,
   createdAt: "2026-09-01T12:00:00.000Z",
   adminReplyCount: 0,
+  lastActivityAt: "2026-09-01T12:00:00.000Z",
+  lastMessage: null,
   property: currentTitle ? ({ id: `p-${id}`, title: currentTitle } as PropertySummary) : null,
 });
 

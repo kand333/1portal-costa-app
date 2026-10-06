@@ -1,6 +1,7 @@
 import "server-only";
 import { Prisma } from "@/generated/prisma/client";
 import { clearFailedLogins, isLoginBlocked, recordFailedLogin } from "@/lib/auth/login-rate-limit";
+import type { Session } from "@/lib/auth/session-token";
 import { hashPassword, verifyPassword, verifyPasswordAgainstDummy } from "@/lib/auth/password";
 import { ApiError } from "@/lib/http/api-error";
 import { findUserById, findUserCredentialsByEmail, insertUser, touchLastSeen, type UserRecord } from "@/repositories/user-repository";
@@ -49,10 +50,18 @@ export async function authenticateUser(data: LoginData, now = Date.now()): Promi
   return toAuthUser(user);
 }
 
-/** The user of a session, or null when it no longer exists or was deactivated. */
-export async function getActiveUser(userId: string): Promise<AuthUser | null> {
+/**
+ * A session issued before the last password change is no longer valid. Compared in whole seconds
+ * (the token precision): a session issued in that same second is kept, so the one renewed by the
+ * change itself stays valid.
+ */
+export const isRevoked = (issuedAt: number, sessionsValidAfter: Date | null) =>
+  sessionsValidAfter !== null && issuedAt < Math.floor(sessionsValidAfter.getTime() / 1000);
+
+/** The user of a session, or null when it no longer exists, was deactivated or the session was revoked. */
+export async function getActiveUser({ userId, issuedAt }: Session): Promise<AuthUser | null> {
   const user = await findUserById(userId);
-  if (!user?.isActive) return null;
+  if (!user?.isActive || isRevoked(issuedAt, user.sessionsValidAfter)) return null;
   await touchLastSeen(user.id);
   return toAuthUser(user);
 }

@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
 import { NextRequest } from "next/server";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, beforeEach, describe, expect, it } from "vitest";
 import type { AuthUser } from "@portal/shared/auth";
 
 // Integration test: calls the real Route Handlers against the test database.
@@ -49,6 +49,9 @@ async function me(cookieValue?: string) {
 }
 
 describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("auth API", () => {
+  // Every request here comes from the same "client": start each test with fresh per-IP limits.
+  beforeEach(async () => (await import("@/lib/http/rate-limit")).resetRateLimits());
+
   const password = "clave segura 1";
 
   afterAll(async () => {
@@ -152,13 +155,33 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("auth API", () => {
     expect(cookie?.attributes).toMatch(/Max-Age=0/i);
   });
 
-  // 11 scrypt checks (~0.4 s each, by design) need more than the default 5 s.
-  it("blocks login for a while after 10 failed attempts", { timeout: 30_000 }, async () => {
+  // 6 scrypt checks (~0.4 s each, by design) need more than the default 5 s.
+  it("blocks login for a while after 5 failed attempts", { timeout: 30_000 }, async () => {
     await register({ name: "Bloqueo", email: emailFor("blocked"), password });
-    for (let attempt = 0; attempt < 10; attempt += 1) {
+    for (let attempt = 0; attempt < 5; attempt += 1) {
       await login({ email: emailFor("blocked"), password: "incorrecta" });
     }
     const response = await login({ email: emailFor("blocked"), password });
     expect(response.status).toBe(429);
+  });
+
+  it("limits registrations per client IP (5 per hour), with Retry-After", { timeout: 30_000 }, async () => {
+    const { POST } = await import("@/app/api/auth/register/route");
+    const registerFrom = (ip: string, label: string) =>
+      POST(
+        new Request(`${baseUrl}/register`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "x-forwarded-for": `${ip}, 10.0.0.1` },
+          body: JSON.stringify({ name: "Límite", email: emailFor(label), password }),
+        }),
+      );
+    for (let index = 0; index < 5; index += 1) expect((await registerFrom("203.0.113.7", `ip-${index}`)).status).toBe(201);
+
+    const blocked = await registerFrom("203.0.113.7", "ip-blocked");
+    expect(blocked.status).toBe(429);
+    expect(Number(blocked.headers.get("Retry-After"))).toBeGreaterThan(0);
+    expect(await blocked.json()).toEqual({ message: "Demasiados registros desde esta conexión. Inténtalo más tarde.", status: 429 });
+    // Another client is not affected.
+    expect((await registerFrom("198.51.100.9", "ip-other")).status).toBe(201);
   });
 });

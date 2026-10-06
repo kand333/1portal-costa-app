@@ -41,11 +41,10 @@ export async function updateProfile(user: AuthUser, data: UpdateProfileData): Pr
 }
 
 /**
- * Replaces the password after checking the current one.
- * ponytail: other open sessions stay valid until they expire (stateless signed cookie); add a
- * session version on User if changing the password must log out other devices.
+ * Replaces the password after checking the current one, and revokes every session issued before
+ * (other devices are logged out). The route renews the cookie of the current session.
  */
 export async function changePassword(user: AuthUser, data: ChangePasswordData): Promise<void> {
   await assertCurrentPassword(user.id, data.currentPassword);
-  await updateUser(user.id, { passwordHash: await hashPassword(data.newPassword) });
+  await updateUser(user.id, { passwordHash: await hashPassword(data.newPassword), sessionsValidAfter: new Date() });
 }

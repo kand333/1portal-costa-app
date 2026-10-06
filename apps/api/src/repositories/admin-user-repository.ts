@@ -85,6 +85,7 @@ export type AdminUserChanges = {
   name?: string;
   email?: string;
   passwordHash?: string;
+  sessionsValidAfter?: Date;
   isActive?: boolean;
   role?: UserRole;
 };

@@ -224,32 +224,36 @@
   - Hecho: `GET /api/admin/users` (búsqueda por nombre o email sin distinguir mayúsculas, filtros de rol y estado, paginación; fecha de registro y cuántas consultas y favoritos tiene) y `PATCH /api/admin/users/{id}` (`{ isActive?, role? }`). «Cuando corresponda»: un ADMIN no puede cambiar su propia cuenta (409), así siempre queda un ADMIN activo. Los cambios rigen en la siguiente petición (la sesión se valida contra la BD). Página `/admin/users`, enlazada desde el panel.
   - Ajuste posterior: menú «Administrar usuarios» en el sidebar (bajo «Administrar propiedades»); ADMIN puede crear (`POST /api/admin/users`, panel colapsable «Nuevo usuario»), editar datos (nombre, email, nueva contraseña, rol, estado en un diálogo) y eliminar definitivamente (`DELETE`; favoritos en cascada, consultas y mensajes se conservan sin usuario). Confirmaciones en ventana modal (`components/ui/confirm-dialog.tsx`, `<dialog>` nativo) al hacer ADMIN, editar, desactivar o eliminar. 10 por página. Su propia cuenta no se toca desde aquí (409; se edita en «Mi cuenta»).
 
-- [ ] **Paso 30 — Consultas**
+- [x] **Paso 30 — Consultas**
   - Crear `/admin/inquiries`.
   - Mostrar propiedad, usuario, contacto, mensaje y fecha.
   - Enlazar propiedad asociada.
+  - Nota: la lista y la conversación (`/admin/inquiries/{id}`, respuestas tipo chat) se hicieron junto con el layout de admin. En este paso, la lista enlaza la propiedad mientras está publicada (si no, «Ya no está publicada»), muestra el teléfono y el nombre del usuario registrado («Visitante» si no tiene cuenta). Búsqueda y paginación de 12.
 
 ## Fase 5 — Calidad y finalización
 
-- [ ] **Paso 31 — SEO y metadata**
+- [x] **Paso 31 — SEO y metadata**
   - Metadata dinámica.
   - Título.
   - Descripción.
   - Open Graph.
+  - Nota: `buildPropertyMetadata` (`lib/property-metadata.ts`) para la ficha: título, descripción con los datos clave, canónica, Open Graph y Twitter con la imagen principal. `metadataBase` desde `NEXT_PUBLIC_SITE_URL`. Catálogo con su propio Open Graph y canónica. Sin imagen Open Graph propia del sitio (no hay logo o imagen de marca).
 
-- [ ] **Paso 32 — Optimización**
+- [x] **Paso 32 — Optimización**
   - Optimizar imágenes Next.js/Cloudinary.
   - Evitar imágenes sobredimensionadas.
   - Revisar solicitudes duplicadas.
   - Revisar consultas PostgreSQL.
+  - Nota: loader propio de `next/image` (Cloudinary `f_auto,q_auto,c_limit,w_N`; Unsplash `w`/`q`/`auto=format`). Subidas limitadas a 2560 px (verificado con una subida real a Cloudinary, borrada después). `sizes` de la tarjeta corregido. Imagen Open Graph de 1200×630 en JPEG. Sin peticiones duplicadas. Índice `Inquiry.lastActivityAt` en vez de `createdAt`. Búsqueda sin índice trigram, a propósito (detalle en `plan.md` §11).
 
-- [ ] **Paso 33 — Responsive y accesibilidad**
+- [x] **Paso 33 — Responsive y accesibilidad**
   - Desktop.
   - Tablet.
   - Móvil.
   - Labels, teclado, foco, alt y semántica.
+  - Nota: auditoría automática en el navegador de las 17 páginas (públicas, cuenta de USER y admin) a 1280, 768 y 375 px. Revisa desborde horizontal, `alt`, labels, nombres accesibles, un `h1` y encabezados sin saltos, un `main`, enlace de salto, ids únicos y objetivos de 24 px; además, búsqueda de antipatrones en el código (`outline-none` sin reemplazo, `transition-all`, clics en `div`, zoom bloqueado). Único hallazgo: el marcador del mapa era un «botón» enfocable sin nombre y sin acción; ahora queda fuera del teclado (`keyboard={false}`, `interactive={false}`), con test. Ya cumplían: foco visible global (`:focus-visible`), `prefers-reduced-motion` global, `aria-expanded`/`aria-controls`/`aria-pressed` y cierre con Escape en menús y diálogos. Los enlaces de texto de 20–23 px de alto entran en la excepción de espaciado de WCAG 2.5.8. El foco visible no se pudo medir por script (la pestaña oculta no aplica `:focus-visible`); se verificó por la regla CSS global y la búsqueda en el código.
 
-- [ ] **Paso 34 — Seguridad**
+- [x] **Paso 34 — Seguridad**
   - Autenticación.
   - Autorización.
   - Validación REST.
@@ -258,26 +262,51 @@
   - Cloudinary.
   - Web3Forms.
   - Endpoints ADMIN.
+  - Nota: se corrigieron 3 puntos.
+    1. Cambiar la contraseña ahora cierra las demás sesiones (`User.sessionsValidAfter` + `iat` en el token), con tests.
+    2. Redirección abierta en `?next=` («/», tabulador, «/evil.com» pasaba el filtro), con tests.
+    3. Cabeceras de seguridad y sin `X-Powered-By`.
+    El resto se comprobó sin cambios: auth y Zod en los 27 handlers, scrypt, subidas, Cloudinary, errores, secretos. Riesgos pendientes en `plan.md` §10: CSP, límite de frecuencia en registro y consultas, avisos de `npm audit` en el CLI de Prisma y un `.env` antiguo en el historial de git.
 
-- [ ] **Paso 35 — QA integral**
+- [x] **Paso 35 — QA integral**
   - Flujos visitante.
   - Flujos USER.
   - Flujos ADMIN.
   - Errores y códigos HTTP.
   - Corregir defectos bloqueantes.
+  - Nota: prueba de punta a punta contra el stack en marcha, por el proxy de la web: 89/89 verificaciones (visitante 28, USER 26, ADMIN 34, limpieza 1).
+    - Cubre: catálogo, venta/arriendo, búsqueda (sin tildes), filtros AND, orden, paginación, detalle, consultas; registro, login, favoritos, «Mis consultas» y conversación, perfil y contraseña (con sesión renovada), logout; CRUD de propiedades, características, usuarios e imágenes (subida real a Cloudinary y borrado), respuesta a consultas, soft delete.
+    - Códigos verificados: 200, 201, 204, 307, 400, 401, 403, 404, 409 y 415; también las redirecciones de `/account`.
+    - Interfaz en el navegador: búsqueda y orden en la URL, filtros combinados (también sin JavaScript), galería con botones y teclado, mapa, y validación del contacto sin envío.
+    - Sin defectos bloqueantes. Los datos de prueba se borraron.
+    - No se envió el correo de Web3Forms: la clave real está configurada y el guardado ya se probó en la API.
 
-- [ ] **Paso 36 — Cumplimiento arquitectónico**
+- [x] **Paso 36 — Cumplimiento arquitectónico**
   - Confirmar que no existen Server Actions.
   - Confirmar comunicación REST.
   - Confirmar PostgreSQL.
   - Confirmar que React no accede a DB.
   - Confirmar permisos backend.
   - Confirmar integraciones externas.
+  - Nota (verificado con búsquedas en el código):
+    - Server Actions: ninguna; no hay `"use server"`, y los `action={pathname}` son formularios GET.
+    - REST: la web solo llama a `/api/**` (navegador) o a `API_INTERNAL_URL` (servidor). Salidas externas: Nominatim (servidor, con caché) y Web3Forms (navegador).
+    - PostgreSQL: Prisma `provider = "postgresql"` con `@prisma/adapter-pg`.
+    - React sin acceso a la BD: sin Prisma, `pg` ni `DATABASE_URL` en `apps/web`. `apps/api` solo tiene Route Handlers.
+    - Permisos: los 27 handlers protegidos (ver Paso 34) y las 12 páginas privadas verifican la sesión en la propia página.
+    - Integraciones: Cloudinary solo en la API (en la web, únicamente URLs públicas); Leaflet/OSM y Nominatim sin clave; variables documentadas en los `.env.example`.
+    - Corregido: `leaflet` y `react-leaflet` estaban declaradas en el `package.json` raíz y las usa solo `apps/web`. Se movieron a `apps/web` con las mismas versiones (lockfile: 6 líneas; instaladas 1.9.4 y 5.0.0).
 
-- [ ] **Paso 37 — Convergencia final del SDD**
+- [x] **Paso 37 — Convergencia final del SDD**
   - Releer `spec.md`.
   - Releer `plan.md`.
   - Comparar implementación con requisitos.
   - Corregir faltantes o inconsistencias.
   - Ejecutar build y validaciones finales.
   - Confirmar ausencia de errores bloqueantes.
+  - Nota: todos los requisitos de `spec.md` (§2–§26) están implementados.
+    - Además de los pasos 35 (E2E 89/89) y 36, se comprobó: secciones y navegación de la landing, campos de la ficha y estados «Enviando…», «Consulta enviada» y error del contacto.
+    - Sin faltantes en el código. Se corrigió documentación desactualizada:
+      - `spec.md` §21–22: CRUD de usuarios y menú «Usuarios», pedidos durante el desarrollo.
+      - `plan.md`: favoritos solo USER; orden por `lastActivityAt` y `lastMessage`; la respuesta del ADMIN devuelve la consulta; presencia con `loggedOutAt`; menú con «Administrar usuarios»; `iat` en el token; códigos 413, 415, 429, 502 y 503.
+    - Validaciones finales en verde: test (web 418, api 307, shared 129), lint, typecheck y build.

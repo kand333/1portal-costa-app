@@ -1,11 +1,14 @@
 import type { NextRequest } from "next/server";
 import { getOptionalUser } from "@/lib/auth/authorization";
 import { errorResponse, toErrorResponse } from "@/lib/http/api-error";
+import { RATE_LIMITS, rateLimit } from "@/lib/http/rate-limit";
 import { createInquiry } from "@/services/inquiry-service";
 import { inquiryCreateSchema } from "@portal/shared/inquiry";
 
 /** Creates an inquiry about a published property. Visitors included; with a session it is linked to the user. */
 export async function POST(request: NextRequest) {
+  const limited = rateLimit(request, RATE_LIMITS.inquiry);
+  if (limited) return limited;
   const body: unknown = await request.json().catch(() => undefined);
   if (body === undefined) {
     return errorResponse(400, "El cuerpo de la solicitud debe ser JSON válido");

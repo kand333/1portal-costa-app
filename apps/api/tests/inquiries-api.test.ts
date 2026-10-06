@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { loadEnvConfig } from "@next/env";
 import { NextRequest } from "next/server";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import type { InquiryCreated, UserInquiry } from "@portal/shared/inquiry";
 
 // Integration test: calls the real Route Handler against the test database.
@@ -30,6 +30,9 @@ async function postInquiry(body: unknown, rawBody?: string, cookie?: string) {
 }
 
 describe.skipIf(!hasDatabaseUrl)("inquiries API", () => {
+  // Every request here comes from the same "client": start each test with fresh per-IP limits.
+  beforeEach(async () => (await import("@/lib/http/rate-limit")).resetRateLimits());
+
   let publishedId: string;
   let draftId: string;
 
