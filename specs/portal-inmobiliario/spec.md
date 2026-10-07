@@ -103,7 +103,7 @@ Valores iniciales:
 
 ### Moneda
 
-Debe soportar `USD`
+Debe soportar `CLP` (pesos chilenos). En venta el precio se muestra en millones (ej. «$846 millones»); en arriendo, completo y mensual (ej. «$1.380.000 /mes»).
 
 Algunos campos podrán ser opcionales cuando no correspondan al tipo de propiedad.
 

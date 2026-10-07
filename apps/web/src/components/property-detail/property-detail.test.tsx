@@ -10,8 +10,8 @@ const property: PropertyDetailData = {
   description: "Amplia casa familiar.\nJardín con piscina.",
   operationType: "SALE",
   propertyType: "HOUSE",
-  price: 890000,
-  currency: "USD",
+  price: 846000000,
+  currency: "CLP",
   usableArea: 320,
   totalArea: 650,
   bedrooms: 5,
@@ -39,7 +39,7 @@ describe("PropertyDetail", () => {
   it("shows the title as the page heading, the price and the description", () => {
     const html = render();
     expect(html).toMatch(/<h1[^>]*>Casa mediterránea con piscina<\/h1>/);
-    expect(html).toContain("US$890.000");
+    expect(html).toContain("$846 millones");
     expect(html).toContain("Amplia casa familiar.\nJardín con piscina.");
   });
 

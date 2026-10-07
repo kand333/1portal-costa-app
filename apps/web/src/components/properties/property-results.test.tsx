@@ -9,7 +9,7 @@ const property: PropertySummary = {
   operationType: "SALE",
   propertyType: "HOUSE",
   price: 100000,
-  currency: "USD",
+  currency: "CLP",
   usableArea: 100,
   totalArea: 200,
   bedrooms: 3,

@@ -310,3 +310,11 @@
       - `spec.md` §21–22: CRUD de usuarios y menú «Usuarios», pedidos durante el desarrollo.
       - `plan.md`: favoritos solo USER; orden por `lastActivityAt` y `lastMessage`; la respuesta del ADMIN devuelve la consulta; presencia con `loggedOutAt`; menú con «Administrar usuarios»; `iat` en el token; códigos 413, 415, 429, 502 y 503.
     - Validaciones finales en verde: test (web 418, api 307, shared 129), lint, typecheck y build.
+
+## Cambios posteriores
+
+- [x] **Paso 38 — Precios en pesos chilenos**
+  - Moneda única `CLP` (Prisma, `@portal/shared`) y conversión de los precios existentes.
+  - Venta en millones («$846 millones»); arriendo completo y mensual.
+  - Etiquetas de precio del formulario y de los filtros en CLP.
+  - Nota: migración `20261007120000_prices_in_chilean_pesos` (renombra el valor del enum y convierte a 950 CLP/USD), aplicada en local y en Supabase (`db:deploy`). Snapshot del seed regenerado desde la base local: solo cambian precio y moneda. Validaciones: test (web 426, api 299, shared 129), lint, typecheck y build.

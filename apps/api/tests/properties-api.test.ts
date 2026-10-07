@@ -146,7 +146,7 @@ describe.skipIf(!hasDatabaseUrl)("public properties API", () => {
       expect(property).toMatchObject({
         title: `Published ${testRunId}`,
         price: 215000.5,
-        currency: "USD",
+        currency: "CLP",
         usableArea: 68,
         mainImageUrl: "https://example.com/main.jpg",
       });

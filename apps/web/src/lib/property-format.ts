@@ -14,14 +14,17 @@ export const propertyTypeLabels: Record<PropertyType, string> = {
   OTHER: "Otro",
 };
 
-/** Formats a price for display; rent prices are monthly. */
+const ONE_MILLION = 1_000_000;
+
+const formatAmount = (amount: number, currency: Currency, maximumFractionDigits: number) =>
+  new Intl.NumberFormat("es-CL", { style: "currency", currency, maximumFractionDigits }).format(amount);
+
+/** Formats a price for display: sales in millions of pesos ("$846 millones"), rent prices in full and monthly. */
 export function formatPrice(price: number, currency: Currency, operationType: OperationType): string {
-  const formatted = new Intl.NumberFormat("es-CL", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 0,
-  }).format(price);
-  return operationType === "RENT" ? `${formatted} /mes` : formatted;
+  if (operationType === "RENT") return `${formatAmount(price, currency, 0)} /mes`;
+  if (price < ONE_MILLION) return formatAmount(price, currency, 0);
+  const millions = Math.round((price / ONE_MILLION) * 10) / 10;
+  return `${formatAmount(millions, currency, 1)} ${millions === 1 ? "millón" : "millones"}`;
 }
 
 export function formatLocation(commune: string, city: string): string {

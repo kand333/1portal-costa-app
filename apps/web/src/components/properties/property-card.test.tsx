@@ -8,8 +8,8 @@ const property: PropertySummary = {
   title: "Departamento familiar frente a Apoquindo",
   operationType: "RENT",
   propertyType: "APARTMENT",
-  price: 1450,
-  currency: "USD",
+  price: 1380000,
+  currency: "CLP",
   usableArea: 95,
   totalArea: 105,
   bedrooms: 3,
@@ -26,7 +26,7 @@ describe("PropertyCard", () => {
   it("shows the price, title, type, location and operation, linking to the detail", () => {
     const html = renderToStaticMarkup(<PropertyCard property={property} />);
 
-    expect(html).toContain("US$1.450 /mes");
+    expect(html).toContain("$1.380.000 /mes");
     expect(html).toContain(property.title);
     expect(html).toContain("Departamento");
     expect(html).toContain("Las Condes, Santiago");

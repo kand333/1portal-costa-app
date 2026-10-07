@@ -20,8 +20,8 @@ const inquiry: UserInquiry = {
     title: "Casa con piscina",
     operationType: "SALE",
     propertyType: "HOUSE",
-    price: 890000,
-    currency: "USD",
+    price: 846000000,
+    currency: "CLP",
     usableArea: 320,
     totalArea: 650,
     bedrooms: 5,
@@ -63,7 +63,7 @@ describe("InquiredProperties", () => {
     expect(html).toContain(`href="/properties/${inquiry.property?.id}"`);
     expect(html).toContain('dateTime="2026-10-02T15:00:00.000Z"');
     expect(html).toContain("2 de octubre de 2026");
-    expect(html).toContain("US$890.000");
+    expect(html).toContain("$846 millones");
     expect(html).toContain("Lo Barnechea, Santiago");
     expect(html).toContain("Quisiera coordinar una visita esta semana.");
   });

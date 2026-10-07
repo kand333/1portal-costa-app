@@ -7,8 +7,8 @@ const property: PropertyDetail = {
   title: "Casa con piscina en Lo Barnechea",
   operationType: "SALE",
   propertyType: "HOUSE",
-  price: 890000,
-  currency: "USD",
+  price: 846000000,
+  currency: "CLP",
   usableArea: 320,
   totalArea: 650,
   bedrooms: 5,
@@ -59,7 +59,7 @@ describe("buildPropertyMetadata", () => {
   it("builds the title and a description that leads with the key facts", () => {
     const metadata = buildPropertyMetadata(property);
     expect(metadata.title).toBe("Casa con piscina en Lo Barnechea | Portal Inmobiliario");
-    expect(metadata.description).toMatch(/^Casa en venta · US\$890\.000 · Lo Barnechea, Santiago\. Amplia casa familiar con piscina/);
+    expect(metadata.description).toMatch(/^Casa en venta · \$846 millones · Lo Barnechea, Santiago\. Amplia casa familiar con piscina/);
     expect(metadata.description?.length).toBeLessThanOrEqual(160);
   });
 
@@ -88,6 +88,6 @@ describe("buildPropertyMetadata", () => {
   });
 
   it("shows monthly rent prices", () => {
-    expect(buildPropertyMetadata({ ...property, operationType: "RENT", price: 1200 }).description).toMatch(/^Casa en arriendo · US\$1\.200 \/mes/);
+    expect(buildPropertyMetadata({ ...property, operationType: "RENT", price: 1140000 }).description).toMatch(/^Casa en arriendo · \$1\.140\.000 \/mes/);
   });
 });

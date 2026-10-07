@@ -169,7 +169,7 @@ export function AdminPropertyFilters({ params, cities }: AdminPropertyFiltersPro
         )}
 
         <fieldset>
-          <legend className={labelClassName}>Precio (USD)</legend>
+          <legend className={labelClassName}>Precio (CLP)</legend>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label htmlFor="filter-min-price" className="sr-only">

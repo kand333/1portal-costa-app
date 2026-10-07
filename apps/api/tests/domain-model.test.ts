@@ -62,7 +62,7 @@ describe.skipIf(!hasDatabaseUrl)("domain model", () => {
 
     expect(user.role).toBe("USER");
     expect(user.isActive).toBe(true);
-    expect(property.currency).toBe("USD");
+    expect(property.currency).toBe("CLP");
     expect(property.isPublished).toBe(false);
     expect(property.isFeatured).toBe(false);
     expect(property.price.toString()).toBe("150000");

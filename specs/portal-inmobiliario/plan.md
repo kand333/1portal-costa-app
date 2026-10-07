@@ -286,7 +286,8 @@ El filtrado y ordenamiento debe ejecutarse principalmente en PostgreSQL y no car
 - Parámetro `sort`: `newest` (por defecto, más recientes), `price-asc`, `price-desc`, `area-asc`, `area-desc`. Un valor desconocido o repetido devuelve 400; la URL del catálogo omite el valor por defecto.
 - Todos los órdenes terminan con los mismos desempates (fecha e id), así la paginación no repite ni omite propiedades entre páginas.
 - «Superficie» es la superficie útil; las propiedades sin ella (terrenos) quedan al final, ordenadas por superficie total.
-- El precio ordena en USD sin distinguir operación: con venta y arriendo mezclados, los arriendos (mensuales) quedan al principio de «menor a mayor». Para comparar, filtrar antes por operación.
+- El precio (CLP) ordena sin distinguir operación: con venta y arriendo mezclados, los arriendos (mensuales) quedan al principio de «menor a mayor». Para comparar, filtrar antes por operación.
+- Moneda: solo `CLP`. Los precios pasaron de USD a CLP con la migración `20261007120000_prices_in_chilean_pesos` (950 CLP/USD fijo; venta redondeada al millón y arriendo a $10.000). `formatPrice` (`apps/web/src/lib/property-format.ts`) muestra la venta en millones desde $1.000.000.
 
 ### Estados del catálogo
 

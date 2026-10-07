@@ -267,11 +267,11 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
         </div>
 
         <fieldset>
-          <legend className={labelClassName}>Precio (US$)</legend>
+          <legend className={labelClassName}>Precio (CLP)</legend>
           <div className="grid grid-cols-2 gap-2">
             <div>
               <label htmlFor="filter-minPrice" className="sr-only">
-                Precio mínimo en dólares
+                Precio mínimo en pesos
               </label>
               <input
                 id="filter-minPrice"
@@ -289,7 +289,7 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
             </div>
             <div>
               <label htmlFor="filter-maxPrice" className="sr-only">
-                Precio máximo en dólares
+                Precio máximo en pesos
               </label>
               <input
                 ref={maxPriceRef}
