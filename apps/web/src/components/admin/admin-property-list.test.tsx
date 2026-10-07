@@ -11,7 +11,7 @@ const property = (overrides: Partial<AdminPropertySummary>): AdminPropertySummar
   operationType: "SALE",
   propertyType: "HOUSE",
   price: 250000,
-  currency: "USD",
+  currency: "CLP",
   usableArea: 120,
   totalArea: 200,
   bedrooms: 3,
@@ -76,7 +76,7 @@ describe("AdminPropertyList", () => {
     const html = render([property({})]);
     // Closed by default on narrow screens without filters in use (the server has no viewport).
     expect(html).toMatch(/<details class="group/);
-    for (const label of ["Estado", "Operación", "Tipo de propiedad", "Ciudad", "Precio (USD)", "Fecha de creación"]) {
+    for (const label of ["Estado", "Operación", "Tipo de propiedad", "Ciudad", "Precio (CLP)", "Fecha de creación"]) {
       expect(html, label).toContain(`>${label}</`);
     }
     for (const option of ["Publicadas", "Borradores", "Eliminadas"]) expect(html).toContain(`>${option}</option>`);

@@ -11,16 +11,19 @@ import {
 } from "./property-format";
 
 describe("formatPrice", () => {
-  it("formats sale prices in USD with Chilean separators", () => {
-    expect(formatPrice(890000, "USD", "SALE")).toBe("US$890.000");
+  it("shows sale prices in millions of pesos", () => {
+    expect(formatPrice(846_000_000, "CLP", "SALE")).toBe("$846 millones");
+    expect(formatPrice(1_450_000_000, "CLP", "SALE")).toBe("$1.450 millones");
+    expect(formatPrice(97_540_000, "CLP", "SALE")).toBe("$97,5 millones");
+    expect(formatPrice(1_000_000, "CLP", "SALE")).toBe("$1 millón");
   });
 
-  it("marks rent prices as monthly", () => {
-    expect(formatPrice(1450, "USD", "RENT")).toBe("US$1.450 /mes");
+  it("shows sale prices under a million in full", () => {
+    expect(formatPrice(807_500.4, "CLP", "SALE")).toBe("$807.500");
   });
 
-  it("rounds to whole units", () => {
-    expect(formatPrice(215000.4, "USD", "SALE")).toBe("US$215.000");
+  it("shows rent prices in full and monthly", () => {
+    expect(formatPrice(1_380_000, "CLP", "RENT")).toBe("$1.380.000 /mes");
   });
 });
 

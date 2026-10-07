@@ -62,7 +62,7 @@ describe("validatePropertyForm", () => {
     const result = validatePropertyForm({ ...filled, price: "1450,5", totalArea: "300", bedrooms: "0", ageInYears: " " });
     expect(result).toEqual({
       success: true,
-      data: expect.objectContaining({ price: 1450.5, totalArea: 300, usableArea: null, bedrooms: 0, ageInYears: null, currency: "USD" }),
+      data: expect.objectContaining({ price: 1450.5, totalArea: 300, usableArea: null, bedrooms: 0, ageInYears: null, currency: "CLP" }),
     });
   });
 

@@ -31,7 +31,7 @@ enum PropertyType {
 }
 
 enum Currency {
-  USD
+  CLP
 }
 
 model User {
@@ -63,7 +63,7 @@ model Property {
   operationType OperationType
   propertyType  PropertyType
   price         Decimal       @db.Decimal(14, 2)
-  currency      Currency      @default(USD)
+  currency      Currency      @default(CLP)
   // Optional fields: they do not apply to every property type (e.g. LAND).
   usableArea    Decimal?      @db.Decimal(10, 2)
   totalArea     Decimal?      @db.Decimal(10, 2)

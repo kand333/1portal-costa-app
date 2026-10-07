@@ -5,6 +5,6 @@ describe("shared enums", () => {
   it("define the values required by the specification", () => {
     expect(OPERATION_TYPES).toEqual(["SALE", "RENT"]);
     expect(PROPERTY_TYPES).toEqual(["HOUSE", "APARTMENT", "LAND", "OFFICE", "COMMERCIAL", "OTHER"]);
-    expect(CURRENCIES).toEqual(["USD"]);
+    expect(CURRENCIES).toEqual(["CLP"]);
   });
 });

@@ -23,7 +23,7 @@ describe("propertyInputSchema", () => {
     expect(propertyInputSchema.parse(valid)).toEqual({
       ...valid,
       title: "Casa con piscina",
-      currency: "USD",
+      currency: "CLP",
       usableArea: null,
       totalArea: null,
       bedrooms: null,

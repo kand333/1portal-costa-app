@@ -6,7 +6,7 @@ Portal inmobiliario (Chile). Spec-Driven Development: `specs/portal-inmobiliario
 - `plan.md`: decisiones técnicas vigentes. Si una tarea cambia una decisión, actualiza `plan.md` en la misma tarea.
 - `tasks.md`: progreso. Una tarea a la vez, en orden.
 
-Estado: el SDD inicial está terminado (38/38 tareas). Una funcionalidad nueva empieza actualizando `spec.md` y `plan.md` y agregando su tarea a `tasks.md`; luego sigue el flujo de abajo.
+Estado: el SDD inicial está terminado (39/39 tareas). Una funcionalidad nueva empieza actualizando `spec.md` y `plan.md` y agregando su tarea a `tasks.md`; luego sigue el flujo de abajo.
 
 ## Flujo por tarea
 

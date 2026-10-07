@@ -23,7 +23,7 @@ const storedProperty = {
   operationType: "SALE",
   propertyType: "HOUSE",
   price: 250000,
-  currency: "USD",
+  currency: "CLP",
   usableArea: null,
   totalArea: null,
   bedrooms: 3,

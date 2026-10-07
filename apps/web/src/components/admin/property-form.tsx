@@ -265,9 +265,9 @@ export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
         />
       </FormSection>
 
-      <FormSection title="Precio y superficie" description="Precio en dólares (USD). En arriendo, el valor mensual.">
+      <FormSection title="Precio y superficie" description="Precio en pesos chilenos (CLP). En arriendo, el valor mensual.">
         <div className="sm:col-span-2">
-          <AuthFormField {...numberProps("price", "Precio (USD)", "0.01")} />
+          <AuthFormField {...numberProps("price", "Precio (CLP)", "1")} />
         </div>
         <AuthFormField {...numberProps("usableArea", "Superficie útil (m², opcional)", "0.01")} />
         <AuthFormField {...numberProps("totalArea", "Superficie total (m², opcional)", "0.01")} />

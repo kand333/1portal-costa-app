@@ -7,7 +7,7 @@ export type OperationType = (typeof OPERATION_TYPES)[number];
 export const PROPERTY_TYPES = ["HOUSE", "APARTMENT", "LAND", "OFFICE", "COMMERCIAL", "OTHER"] as const;
 export type PropertyType = (typeof PROPERTY_TYPES)[number];
 
-export const CURRENCIES = ["USD"] as const;
+export const CURRENCIES = ["CLP"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
 export const USER_ROLES = ["USER", "ADMIN"] as const;

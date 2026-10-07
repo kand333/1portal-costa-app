@@ -58,7 +58,7 @@ export const propertyInputSchema = z.object({
     .number({ error: "Ingresa un precio válido" })
     .positive({ error: "El precio debe ser mayor que 0" })
     .max(MAX_FILTER_AMOUNT, { error: "El precio es demasiado alto" }),
-  currency: z.enum(CURRENCIES).default("USD"),
+  currency: z.enum(CURRENCIES).default("CLP"),
   usableArea: optionalArea,
   totalArea: optionalArea,
   bedrooms: optionalCount(MAX_ROOMS),

@@ -2,7 +2,7 @@
 
 Portal inmobiliario full stack para el mercado chileno, construido con **Spec-Driven Development (SDD)** y Claude Code.
 
-**Estado:** SDD terminado. Las 38 tareas de `specs/portal-inmobiliario/tasks.md` están completas y verificadas (tests, lint, typecheck, build y QA de punta a punta).
+**Estado:** SDD terminado. Las 39 tareas de `specs/portal-inmobiliario/tasks.md` están completas y verificadas (tests, lint, typecheck, build y QA de punta a punta).
 
 ## Qué incluye
 
@@ -41,7 +41,7 @@ Stack: Next.js 16.3.7, React 19, TypeScript, Tailwind 4, SWR, Prisma 7.10.0, Pos
 | `CLAUDE.md` | Instrucciones permanentes para Claude Code: arquitectura, reglas no obvias, verificación |
 | `spec.md` | **Qué** hace la aplicación: usuarios, propiedades, catálogo, contacto, administración y criterios de aceptación |
 | `plan.md` | **Cómo** está construida: API REST, modelo de datos, autenticación, integraciones, decisiones y riesgos pendientes (§10) |
-| `tasks.md` | Las 38 tareas en orden, cada una con su nota de verificación |
+| `tasks.md` | Las 39 tareas en orden, cada una con su nota de verificación |
 
 ## Desarrollo local
 
