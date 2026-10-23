@@ -28,7 +28,7 @@ export function HeroSection() {
               style={{ "--delay": "0.1s" } as CSSProperties}
               className="rise font-display text-[clamp(2.75rem,6.5vw,5.25rem)] font-semibold leading-[1.02] tracking-tight"
             >
-              Encuentra tu próxima propiedad en Chile
+              Encuentra tu próxima propiedad en Concepción
             </h1>
             <p
               style={{ "--delay": "0.25s" } as CSSProperties}
