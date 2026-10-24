@@ -8,6 +8,7 @@ describe("navigationItems", () => {
       "Propiedades",
       "Comprar",
       "Arrendar",
+      "Tasar propiedades",
       "Ingresar",
     ]);
   });
@@ -33,6 +34,10 @@ describe("getActiveNavigationHref", () => {
 
   it("marks the catalog on a property detail page", () => {
     expect(getActiveNavigationHref("/properties/abc", "SALE")).toBe("/properties");
+  });
+
+  it("marks the valuation page on its route", () => {
+    expect(getActiveNavigationHref("/tasador-propiedades", null)).toBe("/tasador-propiedades");
   });
 
   it("marks login on the login page", () => {

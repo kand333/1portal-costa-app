@@ -8,6 +8,7 @@ export const navigationItems: readonly NavigationItem[] = [
   { label: "Propiedades", href: "/properties" },
   { label: "Comprar", href: "/properties?operation=SALE" },
   { label: "Arrendar", href: "/properties?operation=RENT" },
+  { label: "Tasar propiedades", href: "/tasador-propiedades" },
   { label: "Ingresar", href: "/login" },
 ];
 
@@ -21,6 +22,7 @@ export function getActiveNavigationHref(
 ): string | null {
   if (pathname === "/") return "/";
   if (pathname === "/login") return "/login";
+  if (pathname === "/tasador-propiedades" || pathname.startsWith("/tasador-propiedades/")) return "/tasador-propiedades";
   // Reached from the user name shown in place of «Ingresar».
   if (pathname === "/account" || pathname.startsWith("/account/")) return "/account";
 
