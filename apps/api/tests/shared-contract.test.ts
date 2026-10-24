@@ -1,6 +1,6 @@
-import { CURRENCIES, OPERATION_TYPES, PROPERTY_TYPES, USER_ROLES } from "@portal/shared/enums";
+import { CURRENCIES, LEAD_KINDS, OPERATION_TYPES, PROPERTY_TYPES, USER_ROLES } from "@portal/shared/enums";
 import { describe, expect, it } from "vitest";
-import { Currency, OperationType, PropertyType, UserRole } from "@/generated/prisma/enums";
+import { Currency, LeadKind, OperationType, PropertyType, UserRole } from "@/generated/prisma/enums";
 
 // The REST contract (@portal/shared) must stay aligned with the database enums.
 describe("shared REST contract", () => {
@@ -8,6 +8,7 @@ describe("shared REST contract", () => {
     expect([...OPERATION_TYPES]).toEqual(Object.values(OperationType));
     expect([...PROPERTY_TYPES]).toEqual(Object.values(PropertyType));
     expect([...CURRENCIES]).toEqual(Object.values(Currency));
+    expect([...LEAD_KINDS]).toEqual(Object.values(LeadKind));
     expect([...USER_ROLES]).toEqual(Object.values(UserRole));
   });
 });
