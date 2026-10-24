@@ -93,6 +93,7 @@ Entidades:
 - Favorite
 - Inquiry
 - InquiryMessage
+- Lead
 
 Relaciones:
 
@@ -109,6 +110,14 @@ Property * --- * Feature
 `Inquiry.userId` puede ser nulo para permitir consultas de visitantes.
 
 `InquiryMessage` guarda la conversación que sigue a una consulta (`fromAdmin`, `body`, autor). El mensaje original sigue en `Inquiry.message` y es el primero de la conversación.
+
+`Lead` guarda los contactos captados en la portada (spec §14.1), sin propiedad: `kind` (`VALUATION` | `SEARCH`), `name`, `email`, `phone?`, `address?`, `commune?`, `operation?`, `propertyType?`, `message?`, `source` (`home-hero` | `home-closing` | `tasador`), `userId?` (`SetNull`), `createdAt`. Contrato en `@portal/shared/lead` (`leadCreateSchema`, con honeypot `website` que debe llegar vacío: si no, la API responde 201 sin guardar). Va aparte de `Inquiry` para no volver opcional `propertyId` ni mezclar bandejas.
+
+El tasador (spec §14.2) no guarda nada: `POST /api/valuations` valida con `valuationRequestSchema` (`@portal/shared/valuation`), busca comparables publicados (`valuation-repository`, mismo `publishedOnly`) y `services/valuation-algorithm.ts` (función pura) calcula la mediana de precio por m² sin atípicos (1,5×IQR) por los m² construidos, con ajustes por dormitorios, baños y estacionamientos acotados a ±15 % en total; rango = percentiles 25–75. Mínimo 3 comparables: comuna, luego todo el portal; si no, `insufficient`. Límite de frecuencia: 30 cada 10 min por IP.
+
+Amenidades y UF del tasador: `amenities` (`pool`, `gym`, `concierge`, `garden`, `heating`, `heatedPool`) suman cada una un ajuste fijo (1,5 %; 2 % la piscina temperada) al factor del algoritmo, dentro del mismo tope de ±15 % que dormitorios, baños y estacionamientos; son constantes declaradas, no datos medidos. El valor de la UF lo obtiene la API de `https://mindicador.cl/api/uf` (público, sin clave) en `apps/api/src/lib/uf-value.ts`, con caché en memoria de 6 h y timeout de 4 s; si falla devuelve `null` y la respuesta no trae montos en UF. Solo las ventas se expresan en UF.
+
+Informe PDF (spec §14.3): `POST /api/valuations/report` valida con `valuationRequestSchema`, recalcula con `estimateValuation` y responde `application/pdf` (límite de frecuencia del tasador). El contenido lo arma `services/valuation-report-data.ts` (puro) y lo dibuja `lib/pdf/valuation-report-pdf.ts` con `pdfkit` (dependencia de `@portal/api`, importado desde `pdfkit/js/pdfkit.standalone.js` para no depender de archivos de `node_modules` en Vercel). La marca (nombre, colores, logotipo vectorial) está en `lib/pdf/report-brand.ts`.
 
 ## 6. Persistencia
 
@@ -172,6 +181,9 @@ Consultas:
 
 ```text
 POST   /api/inquiries
+POST   /api/leads
+POST   /api/valuations
+GET    /api/admin/leads
 GET    /api/account/inquiries
 GET    /api/account/inquiries/{id}
 DELETE /api/account/inquiries/{id}
@@ -324,7 +336,7 @@ Implementación (sin dependencias nuevas, con `node:crypto`):
 - Logout borra la cookie. El token no se revoca en el servidor, pero `GET /api/auth/me` (y toda protección futura) vuelve a leer el usuario: si fue eliminado o desactivado responde 401 y borra la cookie.
 - Login: el mismo mensaje y el mismo tiempo para un email inexistente y una contraseña errónea (401); cuenta desactivada → 403. Tras 5 fallos en 15 minutos para un email → 429 (en memoria, por proceso).
 - Registro → 201 e inicio de sesión; email ya registrado → 409. Rol USER por defecto.
-- Límite por IP (`apps/api/src/lib/http/rate-limit.ts`, ventana fija en memoria, por proceso) → 429 con `Retry-After`: login 20 cada 15 min, registro 5 por hora, consultas (`POST /api/inquiries`) 10 cada 10 min. La IP es la primera de `x-forwarded-for`, que el proxy de la web pone desde la conexión si la petición no la trae; un cliente puede enviar la suya, así que este límite solo frena el abuso. El de 5 fallos por email no depende de la IP.
+- Límite por IP (`apps/api/src/lib/http/rate-limit.ts`, ventana fija en memoria, por proceso) → 429 con `Retry-After`: login 20 cada 15 min, registro 5 por hora, consultas (`POST /api/inquiries`) 10 cada 10 min, leads (`POST /api/leads`) 10 cada 10 min, tasador (`POST /api/valuations`) 30 cada 10 min. La IP es la primera de `x-forwarded-for`, que el proxy de la web pone desde la conexión si la petición no la trae; un cliente puede enviar la suya, así que este límite solo frena el abuso. El de 5 fallos por email no depende de la IP.
 - Web: páginas `/login` y `/register` (vuelven a `?next=` solo si es una ruta del sitio) y el header muestra el nombre con «Salir». El usuario actual se lee con SWR (`/api/auth/me`).
 
 Edición de la cuenta (`/account/edit`, página independiente con el botón «Editar cuenta» en `/account`):
