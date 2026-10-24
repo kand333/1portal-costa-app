@@ -16,6 +16,8 @@ export const RATE_LIMITS = {
   login: { name: "login", limit: 20, windowMs: 15 * 60 * 1000, message: "Demasiados intentos de ingreso. Espera unos minutos e inténtalo de nuevo." },
   register: { name: "register", limit: 5, windowMs: 60 * 60 * 1000, message: "Demasiados registros desde esta conexión. Inténtalo más tarde." },
   inquiry: { name: "inquiry", limit: 10, windowMs: 10 * 60 * 1000, message: "Enviaste muchas consultas seguidas. Espera unos minutos e inténtalo de nuevo." },
+  lead: { name: "lead", limit: 10, windowMs: 10 * 60 * 1000, message: "Enviaste muchas solicitudes seguidas. Espera unos minutos e inténtalo de nuevo." },
+  valuation: { name: "valuation", limit: 30, windowMs: 10 * 60 * 1000, message: "Hiciste muchas estimaciones seguidas. Espera unos minutos e inténtalo de nuevo." },
 } satisfies Record<string, RateLimitRule>;
 
 type Window = { count: number; start: number };

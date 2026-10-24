@@ -8,6 +8,7 @@ describe("adminNavigationItems", () => {
       "Administrar propiedades",
       "Administrar usuarios",
       "Consultas",
+      "Leads",
       "Mi cuenta",
     ]);
   });
@@ -22,6 +23,7 @@ describe("getActiveAdminSection", () => {
     ["/admin/properties/11111111-1111-4111-8111-111111111111/edit", "properties"],
     ["/admin/inquiries", "inquiries"],
     ["/admin/inquiries/11111111-1111-4111-8111-111111111111", "inquiries"],
+    ["/admin/leads", "leads"],
     ["/admin/account", "account"],
   ])("%s → %s", (pathname, section) => {
     expect(getActiveAdminSection(pathname)).toBe(section);

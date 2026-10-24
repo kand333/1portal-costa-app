@@ -30,6 +30,11 @@ enum PropertyType {
   OTHER
 }
 
+enum LeadKind {
+  VALUATION
+  SEARCH
+}
+
 enum Currency {
   CLP
 }
@@ -53,6 +58,7 @@ model User {
 
   favorites       Favorite[]
   inquiries       Inquiry[]
+  leads           Lead[]
   inquiryMessages InquiryMessage[]
 }
 
@@ -191,4 +197,28 @@ model InquiryMessage {
 
   @@index([inquiryId, createdAt])
   @@index([authorId])
+}
+
+// Contact captured on the home page (valuation or search request). It has no property, unlike Inquiry.
+model Lead {
+  id           String         @id @default(uuid(7)) @db.Uuid
+  kind         LeadKind
+  // Null for visitors who are not authenticated.
+  userId       String?        @db.Uuid
+  name         String
+  email        String
+  phone        String?
+  address      String?
+  commune      String?
+  operation    OperationType?
+  propertyType PropertyType?
+  message      String?
+  // Form that sent it: "home-hero" or "home-closing".
+  source       String
+  createdAt    DateTime       @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([createdAt])
 }

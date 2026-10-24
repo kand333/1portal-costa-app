@@ -349,6 +349,41 @@ Si existe un usuario autenticado, relacionar la solicitud con él.
 
 Los visitantes no autenticados también pueden realizar consultas.
 
+### 14.1 Captación de leads desde la portada
+
+La portada prioriza captar contactos de personas de Concepción y comunas vecinas (San Pedro de la Paz, Chiguayante, Hualpén, Talcahuano, Penco, Hualqui, Coronel…).
+
+- Oferta principal: «tasación gratis» (`VALUATION`): dirección o sector, comuna, nombre y email o teléfono. Ruta secundaria para compradores (`SEARCH`): el buscador actual y un formulario con operación, tipo y comuna.
+- Un `Lead` no tiene propiedad asociada. Se persiste en PostgreSQL, se relaciona con el usuario si hay sesión y también se envía por Web3Forms (el fallo del correo no invalida el lead).
+- Mismo formulario en el hero y en el cierre de la portada; `source` indica cuál. Protección anti-spam: campo honeypot y límite de frecuencia.
+- Solo cifras reales en la portada (sin estadísticas inventadas). Movimiento de scroll sujeto a `prefers-reduced-motion`.
+- ADMIN ve los leads en `/admin/leads` (listado simple).
+- Página independiente `/tasador-propiedades` («Tasar propiedades» en el menú superior): tasador de precio (§14.2).
+
+### 14.2 Tasador de precio
+
+Página `/tasador-propiedades`: estimación gratuita e inmediata del precio de una casa o departamento, con la estructura de un tasador en línea típico (introducción, formulario, resultado, preguntas frecuentes).
+
+- Datos: dirección, comuna, tipo (casa o departamento), precio a estimar (venta o arriendo mensual), m² totales, m² construidos, dormitorios (1 a 6+), baños (1 a 6+) y estacionamientos (0 a 5+).
+- Flujo en cuatro pasos dentro de la misma página: (1) datos, (2) amenidades opcionales (piscina, gimnasio, conserjería, jardín, calefacción, piscina temperada) para afinar el precio, (3) aviso emergente que ofrece contacto con un corredor («Quiero que me contacten» abre el formulario de contacto; «No, solo quiero saber el precio» lo omite), (4) resumen con el mapa de la propiedad y el precio. Las ventas se expresan en UF (con el equivalente en CLP); los arriendos, en CLP mensuales. Si no se puede obtener el valor de la UF, se muestra solo CLP.
+- Cálculo en el servidor con comparables reales: propiedades publicadas de la misma comuna, tipo y operación. Mediana del precio por m² (sin atípicos) por los m² construidos, con ajustes acotados por dormitorios, baños y estacionamientos. Rango entre los percentiles 25 y 75.
+- Con menos de 3 comparables en la comuna usa todo el portal (mismo tipo y operación); con menos de 3 en total responde que no hay datos suficientes y no inventa una cifra.
+- El resultado indica el rango, el precio por m², el número de comparables y que es una estimación, no una tasación bancaria. Desde el resultado la persona puede dejar sus datos (un `Lead` `VALUATION`, `source` `tasador`).
+- La estimación no se guarda. Límite de frecuencia por IP.
+
+### 14.3 Informe PDF de valoración
+
+Desde el resumen del tasador, el botón «Generar Informe PDF» descarga un informe en tamaño carta (portada, resumen ejecutivo, ficha de la propiedad, mercado, conclusión y limitaciones).
+
+- Se genera en el servidor, al pedirlo (`POST /api/valuations/report`): recalcula la estimación con el algoritmo del tasador a partir de los datos del formulario; no se guarda.
+- Solo datos reales: todo dato del inmueble figura como «informado por el propietario» y lo que no se conoce, como «sin antecedentes». No hay entorno, planta ni precios de cierre: esas secciones se omiten y los comparables se rotulan como precios publicados.
+- Venta en UF con su equivalente en CLP al valor de la UF de la fecha de emisión; sin UF fiable, solo CLP con aviso. Arriendo en CLP mensual.
+- Cada página lleva el aviso de que es una estimación referencial, no una tasación profesional presencial ni garantía de venta.
+
+---
+
+---
+
 ---
 
 ## 15. Autenticación

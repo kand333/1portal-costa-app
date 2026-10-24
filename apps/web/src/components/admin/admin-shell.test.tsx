@@ -19,7 +19,7 @@ describe("AdminShell", () => {
   it("shows the sections in order, the content and the main landmark", () => {
     const html = render("/admin");
     const labels = [...html.matchAll(/<span class="truncate">([^<]+)<\/span>/g)].map((match) => match[1]);
-    expect(labels.slice(0, 5)).toEqual(["Panel administración", "Administrar propiedades", "Administrar usuarios", "Consultas", "Mi cuenta"]);
+    expect(labels.slice(0, 6)).toEqual(["Panel administración", "Administrar propiedades", "Administrar usuarios", "Consultas", "Leads", "Mi cuenta"]);
     expect(html).toContain('<main id="main-content"');
     expect(html).toContain("<p>Contenido</p>");
     expect(html).toContain("Saltar al contenido principal");

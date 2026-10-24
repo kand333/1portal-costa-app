@@ -10,6 +10,9 @@ export type PropertyType = (typeof PROPERTY_TYPES)[number];
 export const CURRENCIES = ["CLP"] as const;
 export type Currency = (typeof CURRENCIES)[number];
 
+export const LEAD_KINDS = ["VALUATION", "SEARCH"] as const;
+export type LeadKind = (typeof LEAD_KINDS)[number];
+
 export const USER_ROLES = ["USER", "ADMIN"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 

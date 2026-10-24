@@ -19,6 +19,7 @@ describe("NavigationLinks", () => {
     expect(html).toMatch(/<button type="button"[^>]*>Salir<\/button>/);
     // The other links stay.
     expect(html).toContain('href="/properties"');
+    expect(html).toContain('href="/tasador-propiedades"');
   });
 
   it("leads an ADMIN from its name to «Panel administración»", () => {
