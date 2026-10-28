@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
-const requiredVariableNames = ["NEXT_PUBLIC_SITE_URL", "API_INTERNAL_URL", "NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY"];
+const requiredVariableNames = ["NEXT_PUBLIC_SITE_URL", "API_INTERNAL_URL", "NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY", "NEXT_PUBLIC_WHATSAPP_NUMBER"];
 
 // Backend-only variables that must never reach the frontend app.
 const backendVariableNames = [
