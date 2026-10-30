@@ -5,7 +5,7 @@ import { InquiryConversation } from "@/components/account/inquiry-conversation";
 import { findWithSession, requireCustomerUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Tu consulta | Portal Inmobiliario",
+  title: "Tu consulta | PropiZoom",
   robots: { index: false },
 };
 

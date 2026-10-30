@@ -1,8 +1,8 @@
 const questions = [
   { question: "¿La tasación es gratis?", answer: "Sí. Dejas tus datos, un corredor revisa tu propiedad y te contacta sin costo ni compromiso." },
-  { question: "¿Qué propiedades puedo tasar?", answer: "Casas, departamentos, oficinas, locales y terrenos de Concepción y comunas cercanas." },
-  { question: "¿Cómo se calcula el valor?", answer: "Se compara con propiedades similares de la zona y se considera el estado, la superficie y la ubicación." },
-  { question: "¿Reemplaza una tasación bancaria?", answer: "No. Es una referencia comercial para decidir cuánto pedir o pagar; los bancos exigen su propia tasación." },
+  { question: "¿Qué es el corretaje tradicional?", answer: "Es vender o arrendar tu propiedad con un corredor que la promociona, atiende a los interesados y te acompaña hasta la firma." },
+  { question: "¿Trabajan con inmobiliarias?", answer: "Sí. Representamos proyectos nuevos del Gran Concepción: los difundimos y atendemos a los compradores. Escríbenos por WhatsApp." },
+  { question: "¿Cómo compro un departamento nuevo?", answer: "Cuéntanos qué buscas, te mostramos proyectos, te acompañamos en la reserva, el financiamiento y la escritura." },
   { question: "¿Necesito una cuenta?", answer: "No. Puedes enviar la solicitud como visitante; con una cuenta además ves tus consultas en un solo lugar." },
 ];
 

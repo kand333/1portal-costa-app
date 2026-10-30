@@ -23,7 +23,9 @@ describe("home lead capture", () => {
   });
 
   it("keeps the chapters readable in the server HTML", () => {
-    expect(renderToStaticMarkup(<LeadSteps />)).toContain("Un precio pedido no es un precio pagado");
+    const steps = renderToStaticMarkup(<LeadSteps />);
+    expect(steps.replace(/<[^>]+>/g, "")).toContain("Compra o vende con un corredor que conoce tu comuna");
+    for (const title of ["Cuéntanos qué buscas", "Te mostramos proyectos", "Te acompañamos hasta la escritura"]) expect(steps).toContain(title);
     const faq = renderToStaticMarkup(<FaqSection />);
     expect(faq).toContain("¿La tasación es gratis?");
     expect(faq).toContain("no reemplaza una tasación bancaria");

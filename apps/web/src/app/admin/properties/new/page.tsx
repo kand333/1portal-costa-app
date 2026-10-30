@@ -5,7 +5,7 @@ import { AccessDenied } from "@/components/auth/access-denied";
 import { fetchWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Nueva propiedad | Administración | Portal Inmobiliario",
+  title: "Nueva propiedad | Administración | PropiZoom",
   robots: { index: false },
 };
 

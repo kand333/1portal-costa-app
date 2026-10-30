@@ -7,7 +7,7 @@ export function MobileCtaBar() {
   const [isFormVisible, setIsFormVisible] = useState(true);
 
   useEffect(() => {
-    const forms = ["tasar", "cierre"].flatMap((id) => document.getElementById(id) ?? []);
+    const forms = ["cierre"].flatMap((id) => document.getElementById(id) ?? []);
     const visible = new Set<Element>();
     const observer = new IntersectionObserver((entries) => {
       for (const entry of entries) {
@@ -23,16 +23,16 @@ export function MobileCtaBar() {
   return (
     <div
       aria-hidden={isFormVisible}
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 p-3 backdrop-blur transition-transform duration-300 lg:hidden ${
+      className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-300 lg:hidden ${
         isFormVisible ? "translate-y-full" : "translate-y-0"
       }`}
     >
       <a
-        href="#tasar"
+        href="#cierre"
         tabIndex={isFormVisible ? -1 : undefined}
         className="flex h-12 items-center justify-center rounded-full bg-accent font-semibold text-on-accent"
       >
-        ¿Cuánto vale tu propiedad? Tasar gratis
+        Cuéntanos qué necesitas
       </a>
     </div>
   );

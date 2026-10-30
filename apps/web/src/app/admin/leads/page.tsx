@@ -7,7 +7,7 @@ import { parsePageParam } from "@/lib/pagination";
 import { fetchWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Leads | Administración | Portal Inmobiliario",
+  title: "Leads | Administración | PropiZoom",
   robots: { index: false },
 };
 

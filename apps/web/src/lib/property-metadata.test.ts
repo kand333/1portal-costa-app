@@ -58,7 +58,7 @@ describe("toShareImageUrl", () => {
 describe("buildPropertyMetadata", () => {
   it("builds the title and a description that leads with the key facts", () => {
     const metadata = buildPropertyMetadata(property);
-    expect(metadata.title).toBe("Casa con piscina en Lo Barnechea | Portal Inmobiliario");
+    expect(metadata.title).toBe("Casa con piscina en Lo Barnechea | PropiZoom");
     expect(metadata.description).toMatch(/^Casa en venta · \$846 millones · Lo Barnechea, Santiago\. Amplia casa familiar con piscina/);
     expect(metadata.description?.length).toBeLessThanOrEqual(160);
   });
@@ -68,7 +68,7 @@ describe("buildPropertyMetadata", () => {
     expect(metadata.alternates?.canonical).toBe(`/properties/${property.id}`);
     expect(metadata.openGraph).toMatchObject({
       type: "website",
-      siteName: "Portal Inmobiliario",
+      siteName: "PropiZoom",
       locale: "es_CL",
       url: `/properties/${property.id}`,
       title: metadata.title,

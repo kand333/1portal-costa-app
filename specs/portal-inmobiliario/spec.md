@@ -606,3 +606,7 @@ El producto está funcionalmente terminado cuando:
 - la autorización se aplica en backend;
 - la aplicación es responsive;
 - no existen errores bloqueantes conocidos.
+
+## 27. Identidad visual
+
+La portada se rediseña con la identidad PropiZoom (paleta del logo, solo tema claro) y una experiencia animada por scroll, con una composición móvil propia y movimiento reducido respetado. Detalle técnico en `plan.md` §18.

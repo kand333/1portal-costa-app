@@ -6,7 +6,7 @@ import { AccessDenied } from "@/components/auth/access-denied";
 import { findWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Consulta | Administración | Portal Inmobiliario",
+  title: "Consulta | Administración | PropiZoom",
   robots: { index: false },
 };
 

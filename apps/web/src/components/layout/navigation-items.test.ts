@@ -5,10 +5,9 @@ describe("navigationItems", () => {
   it("exposes the public navigation in the specified order", () => {
     expect(navigationItems.map((item) => item.label)).toEqual([
       "Inicio",
-      "Propiedades",
-      "Comprar",
-      "Arrendar",
-      "Tasar propiedades",
+      "Proyectos nuevos",
+      "Tasación",
+      "Corretaje",
       "Ingresar",
     ]);
   });

@@ -7,7 +7,7 @@ import { buildAdminPropertiesApiPath, parseAdminPropertyListParams } from "@/lib
 import { fetchWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Propiedades | Administración | Portal Inmobiliario",
+  title: "Propiedades | Administración | PropiZoom",
   robots: { index: false },
 };
 

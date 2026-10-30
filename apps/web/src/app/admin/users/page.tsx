@@ -7,7 +7,7 @@ import { buildAdminUsersApiPath, parseAdminUserListParams } from "@/lib/admin-us
 import { fetchWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Usuarios | Administración | Portal Inmobiliario",
+  title: "Usuarios | Administración | PropiZoom",
   robots: { index: false },
 };
 

@@ -5,10 +5,9 @@ export type NavigationItem = {
 
 export const navigationItems: readonly NavigationItem[] = [
   { label: "Inicio", href: "/" },
-  { label: "Propiedades", href: "/properties" },
-  { label: "Comprar", href: "/properties?operation=SALE" },
-  { label: "Arrendar", href: "/properties?operation=RENT" },
-  { label: "Tasar propiedades", href: "/tasador-propiedades" },
+  { label: "Proyectos nuevos", href: "/properties?operation=SALE" },
+  { label: "Tasación", href: "/tasador-propiedades" },
+  { label: "Corretaje", href: "/#cierre" },
   { label: "Ingresar", href: "/login" },
 ];
 

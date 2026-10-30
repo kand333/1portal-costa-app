@@ -437,6 +437,8 @@ Implementación (sin claves):
 - La dirección (en azul, sobre el mapa) y el enlace «Abrir en Google Maps» (debajo del mapa) abren Google Maps con la dirección, sin clave. Si la geocodificación falla, se ve solo el enlace.
 - Con tráfico real, guardar las coordenadas en la BD desde la API al guardar la propiedad (transparente para ADMIN).
 
+Portada: «Conocemos tu comuna» usa el mismo Leaflet con tiles de OSM (constante `TILE_URL` en `commune-map-canvas.tsx`, filtro cálido por CSS), con pines en las coordenadas de `lib/communes.ts`; el mapa se monta solo al acercarse al viewport y no es arrastrable.
+
 Si posteriormente se requiere geocodificación interna, debe ser transparente para ADMIN y no modificar los campos obligatorios del formulario.
 
 ## 13. Web3Forms
@@ -534,3 +536,13 @@ Una tarea está terminada cuando:
 - las validaciones correspondientes pasan;
 - no quedan errores bloqueantes;
 - su checkbox se actualiza en `tasks.md`.
+
+## 18. Identidad visual (rediseño de la portada)
+
+- Marca PropiZoom, con la paleta y tipografía del video de referencia (no la del logo): `paper` crema `#fef7e5`, `sand` arena `#eae3c9`, `ink` marrón casi negro `#231a14`, `night` gris-verde `#263031` (clase `.night` para escenas oscuras), `accent`/`brass` naranja `#f56908` (degradado `--ember` hasta `#ea2403`; texto `ink` sobre naranja por contraste) y `brand-blue` `#0e4a87` solo en el logo y un bloque. Los nombres de tokens se conservan.
+- Tipografía: Newsreader (`font-display`, peso 400, tracking -0.02em), Hanken Grotesk (`font-sans`) y Geist Mono (`font-mono`, etiquetas en mayúsculas).
+- Header: píldora blanca flotante (`SiteHeader`), el hero sube bajo ella con margen negativo. Solo tema claro.
+- Logo: `apps/web/public/logo-mark.png` (isotipo con fondo transparente); el nombre va como texto.
+- Animación nativa (CSS + IntersectionObserver + rAF), sin librerías nuevas; todo respeta `prefers-reduced-motion`.
+- Identidad: corredora de proyectos nuevos del Gran Concepción (también tasación y corretaje tradicional; capta inmobiliarias). El hero (`HeroSection`) tiene fondo tipo video (`HeroBackdrop`, mp4 opcional con `videoSrc`) y buscador por comuna y tipo (`HeroSearch`).
+- Secuencia de la portada: hero en capas, cifras, pasos fijos con ilustración isométrica, escena oscura, «Conocemos tu comuna» inmersivo, propiedades, cierre split y pie naranja con ondas.

@@ -51,7 +51,7 @@ describe("account pages", () => {
     });
     const html = await renderInquiry(inquiryId);
     expect(html).toContain("Sí, sigue disponible.");
-    expect(html).toContain(">Portal Inmobiliario<");
+    expect(html).toContain(">PropiZoom<");
     expect(html).toContain("Escribe un mensaje");
     expect(findWithSession).toHaveBeenCalledWith(`/api/account/inquiries/${inquiryId}`);
   });

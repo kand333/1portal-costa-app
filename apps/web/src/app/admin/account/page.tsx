@@ -4,7 +4,7 @@ import { AccessDenied } from "@/components/auth/access-denied";
 import { getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Mi cuenta | Administración | Portal Inmobiliario",
+  title: "Mi cuenta | Administración | PropiZoom",
   robots: { index: false },
 };
 

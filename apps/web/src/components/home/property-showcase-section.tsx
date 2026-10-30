@@ -35,7 +35,7 @@ export function PropertyShowcaseSection({
         </div>
         <Link
           href={viewAllHref}
-          className="w-fit border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+          className="inline-flex min-h-11 w-fit items-center border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
         >
           {viewAllLabel}
         </Link>

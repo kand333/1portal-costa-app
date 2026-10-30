@@ -18,7 +18,7 @@ describe("NavigationLinks", () => {
     expect(html).toContain('aria-label="Mi cuenta (Ana Rojas)"');
     expect(html).toMatch(/<button type="button"[^>]*>Salir<\/button>/);
     // The other links stay.
-    expect(html).toContain('href="/properties"');
+    expect(html).toContain('href="/properties?operation=SALE"');
     expect(html).toContain('href="/tasador-propiedades"');
   });
 

@@ -27,7 +27,7 @@ export async function sendInquiryEmail(
       body: JSON.stringify({
         access_key: accessKey,
         subject: `Consulta por «${inquiry.propertyTitle}»`,
-        from_name: "Portal Inmobiliario",
+        from_name: "PropiZoom",
         // Reply goes straight to the visitor.
         replyto: data.email,
         name: data.name,
