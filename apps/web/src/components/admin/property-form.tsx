@@ -9,6 +9,7 @@ import {
   type AdminPropertyDetail,
 } from "@portal/shared/admin-property";
 import { OPERATION_TYPES, PROPERTY_TYPES } from "@portal/shared/enums";
+import { centerSectorOf, citiesOfRegion, REGION_FIELD_LABEL, REGIONS, sectorsOfCity, toLocationSlug } from "@portal/shared/locations";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent, type KeyboardEvent, type ReactNode } from "react";
@@ -59,7 +60,7 @@ function FormSection({ title, description, children }: { title: string; descript
 }
 
 type SelectFieldProps = {
-  name: "operationType" | "propertyType";
+  name: "operationType" | "propertyType" | "region" | "city" | "commune";
   label: string;
   value: string;
   options: readonly { value: string; label: string }[];
@@ -92,6 +93,12 @@ function SelectField({ name, label, value, options, error, onChange }: SelectFie
       <FieldError name={name} error={error} />
     </div>
   );
+}
+
+/** Options from names; an existing value that is not in the list stays selectable (old data). */
+function withCurrentOption(names: string[], current: string): { value: string; label: string }[] {
+  const all = current !== "" && !names.includes(current) ? [...names, current] : names;
+  return all.map((name) => ({ value: name, label: name }));
 }
 
 type CheckboxFieldProps = {
@@ -152,6 +159,32 @@ export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
     setErrors((previous) => ({ ...previous, [name]: undefined }));
     if (status !== "saving") setStatus("idle");
   }
+
+  /** Region, city and sector are chained: changing one clears what no longer belongs to it. */
+  function setLocation(patch: Partial<Pick<PropertyFormValues, "region" | "city" | "commune">>) {
+    setValues((previous) => ({ ...previous, ...patch }));
+    setErrors((previous) => ({ ...previous, region: undefined, city: undefined, commune: undefined }));
+    if (status !== "saving") setStatus("idle");
+  }
+
+  function handleRegionChange(region: string) {
+    const keepsCity = citiesOfRegion(toLocationSlug(region)).some((city) => city.name === values.city);
+    setLocation(keepsCity ? { region } : { region, city: "", commune: "" });
+  }
+
+  function handleCityChange(city: string) {
+    // Only Concepción has a sector list; the other cities use «Centro de <ciudad>».
+    const hasSectors = sectorsOfCity(toLocationSlug(city)).length > 0;
+    setLocation({ city, commune: city === "" || hasSectors ? "" : centerSectorOf(city) });
+  }
+
+  // The stored value is the region name; visitors read its label (Gran Concepción, Provincia de Arauco).
+  const regionOptions = REGIONS.map((region) => ({ value: region.name, label: region.label }));
+  if (values.region !== "" && !REGIONS.some((region) => region.name === values.region)) regionOptions.push({ value: values.region, label: values.region });
+  const citySlug = toLocationSlug(values.city);
+  const cityNames = citiesOfRegion(toLocationSlug(values.region)).map((city) => city.name);
+  const sectorNames = sectorsOfCity(citySlug).map((sector) => sector.name);
+  if (values.city !== "" && sectorNames.length === 0) sectorNames.push(centerSectorOf(values.city));
 
   /** Props shared by the text and number inputs. */
   const inputProps = (name: PropertyFormField, label: string) => ({
@@ -284,10 +317,31 @@ export function PropertyForm({ property, catalog = [] }: PropertyFormProps) {
         <div className="sm:col-span-2">
           <AuthFormField {...inputProps("address", "Dirección")} type="text" maxLength={PROPERTY_LOCATION_MAX_LENGTH} />
         </div>
-        <AuthFormField {...inputProps("commune", "Comuna")} type="text" maxLength={PROPERTY_LOCATION_MAX_LENGTH} />
-        <AuthFormField {...inputProps("city", "Ciudad")} type="text" maxLength={PROPERTY_LOCATION_MAX_LENGTH} />
+        <SelectField
+          name="region"
+          label={REGION_FIELD_LABEL}
+          value={values.region}
+          options={regionOptions}
+          error={errors.region}
+          onChange={handleRegionChange}
+        />
+        <SelectField
+          name="city"
+          label="Comuna"
+          value={values.city}
+          options={withCurrentOption(cityNames, values.city)}
+          error={errors.city}
+          onChange={handleCityChange}
+        />
         <div className="sm:col-span-2">
-          <AuthFormField {...inputProps("region", "Región")} type="text" maxLength={PROPERTY_LOCATION_MAX_LENGTH} />
+          <SelectField
+            name="commune"
+            label="Sector"
+            value={values.commune}
+            options={withCurrentOption(sectorNames, values.commune)}
+            error={errors.commune}
+            onChange={(commune) => setLocation({ commune })}
+          />
         </div>
       </FormSection>
 

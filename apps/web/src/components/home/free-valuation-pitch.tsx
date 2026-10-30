@@ -8,7 +8,7 @@ const BACKGROUND = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?au
 
 // Credentials shown to visitors; real figures of the business, kept here so they are easy to update.
 const CREDENTIALS = [
-  { value: 14, label: "años de experiencia" },
+  { value: 5, label: "años de experiencia" },
   { value: 500, label: "negocios realizados" },
   { value: 1000, label: "tasaciones" },
 ] as const;

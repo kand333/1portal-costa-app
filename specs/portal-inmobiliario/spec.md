@@ -266,8 +266,10 @@ Permitir combinar:
 - baños;
 - superficie útil mínima;
 - comuna;
-- ciudad;
+- sector;
 - región.
+
+En el catálogo la ubicación va justo debajo de la operación, en este orden: **comuna** (las diez comunas del Gran Concepción: Concepción, San Pedro de la Paz, Chiguayante, Hualpén, Talcahuano, Penco, Tomé, Hualqui, Coronel y Lota), **sector** (reemplaza a «comuna»; solo Concepción tiene lista: Centro de Concepción, Barrio Universitario, Barrio Norte, Santa Sabina, Collao, Nonguén, Lorenzo Arenas, Laguna Redonda, Pedro de Valdivia, Lomas de San Andrés, Lomas de San Sebastián, Torreones, Lomas de Bellavista, Valle Noble y Valle Andalién; en las demás comunas el selector queda desactivado con «Próximamente») y **Región del Bío-Bío**, con dos opciones: «Gran Concepción» (por defecto, con las diez comunas) y «Provincia de Arauco» (con las comunas Arauco, Cañete, Contulmo, Curanilahue, Lebu, Los Álamos y Tirúa).
 
 Los filtros deben representarse en la URL.
 

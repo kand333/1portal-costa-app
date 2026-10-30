@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useProperties } from "@/hooks/use-properties";
-import { countActiveFilters, parseCatalogFilters } from "@/lib/catalog-filters";
+import { countActiveFilters, parseCatalogFilters, withDefaultRegion } from "@/lib/catalog-filters";
 import { parseSortParam } from "@/lib/catalog-sort";
 import { parsePageParam } from "@/lib/pagination";
 import { parseSearchParam } from "@/lib/property-search";
@@ -32,7 +32,7 @@ export function PropertyCatalog() {
   const areFiltersOpen = filtersOpenChoice ?? isLargeScreen;
 
   const { data, error, isLoading, isValidating, mutate } = useProperties({
-    ...filters,
+    ...withDefaultRegion(filters),
     page: requestedPage,
     pageSize: DEFAULT_PAGE_SIZE,
     search,

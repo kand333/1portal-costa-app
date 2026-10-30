@@ -58,7 +58,7 @@ describe("PropertyCatalog", () => {
   it("requests the first page with 12 items by default", () => {
     mockResult({ isLoading: true });
     renderToStaticMarkup(<PropertyCatalog />);
-    expect(useProperties).toHaveBeenCalledWith({ page: 1, pageSize: 12, search: undefined, sort: undefined });
+    expect(useProperties).toHaveBeenCalledWith({ region: ["region-del-biobio"], page: 1, pageSize: 12, search: undefined, sort: undefined });
   });
 
   it.each([
@@ -70,7 +70,7 @@ describe("PropertyCatalog", () => {
     currentSearch = search;
     mockResult({ isLoading: true });
     renderToStaticMarkup(<PropertyCatalog />);
-    expect(useProperties).toHaveBeenCalledWith({ page: expectedPage, pageSize: 12, search: undefined, sort: undefined });
+    expect(useProperties).toHaveBeenCalledWith({ region: ["region-del-biobio"], page: expectedPage, pageSize: 12, search: undefined, sort: undefined });
   });
 
   it("shows the loading skeleton", () => {
@@ -129,7 +129,7 @@ describe("PropertyCatalog", () => {
       currentSearch = "search=%20Las%20Condes%20&page=2";
       mockResult({ isLoading: true });
       renderToStaticMarkup(<PropertyCatalog />);
-      expect(useProperties).toHaveBeenCalledWith({ page: 2, pageSize: 12, search: "Las Condes", sort: undefined });
+      expect(useProperties).toHaveBeenCalledWith({ region: ["region-del-biobio"], page: 2, pageSize: 12, search: "Las Condes", sort: undefined });
     });
 
     it("shows a labelled search field with the active search and a way to clear it", () => {
@@ -187,6 +187,7 @@ describe("PropertyCatalog", () => {
       renderToStaticMarkup(<PropertyCatalog />);
 
       expect(useProperties).toHaveBeenCalledWith({
+        region: ["region-del-biobio"],
         operation: "SALE",
         type: "HOUSE",
         minPrice: 100000,
@@ -229,7 +230,14 @@ describe("PropertyCatalog", () => {
       currentSearch = "operation=BUY&minPrice=-1&commune=las condes";
       mockResult({ isLoading: true });
       renderToStaticMarkup(<PropertyCatalog />);
-      expect(useProperties).toHaveBeenCalledWith({ page: 1, pageSize: 12, search: undefined, sort: undefined });
+      expect(useProperties).toHaveBeenCalledWith({ region: ["region-del-biobio"], page: 1, pageSize: 12, search: undefined, sort: undefined });
+    });
+
+    it("sends the chosen region instead of the default one", () => {
+      currentSearch = "region=provincia-arauco";
+      mockResult({ isLoading: true });
+      renderToStaticMarkup(<PropertyCatalog />);
+      expect(useProperties).toHaveBeenCalledWith(expect.objectContaining({ region: ["provincia-arauco"] }));
     });
 
     it("renders the filters panel next to the results", () => {

@@ -1,3 +1,4 @@
+import { DEFAULT_REGION } from "@portal/shared/locations";
 import { propertyInputSchema, type AdminPropertyDetail, type PropertyInputData } from "@portal/shared/admin-property";
 import type { OperationType, PropertyType } from "@portal/shared/enums";
 
@@ -45,7 +46,7 @@ export function toPropertyFormValues(property: AdminPropertyDetail | null): Prop
     address: property?.address ?? "",
     commune: property?.commune ?? "",
     city: property?.city ?? "",
-    region: property?.region ?? "",
+    region: property?.region ?? DEFAULT_REGION.name,
     features: property?.features ?? [],
     isPublished: property?.isPublished ?? false,
     isFeatured: property?.isFeatured ?? false,

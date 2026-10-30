@@ -53,7 +53,7 @@ export function HeroSection({ resultCount }: HeroSectionProps) {
           style={{ "--delay": "0.1s" } as CSSProperties}
           className="rise mt-3 max-w-3xl text-[clamp(2.1rem,5.4vw,4.5rem)] font-bold uppercase leading-[1.06] tracking-tight text-white"
         >
-          Encuentra tu depto nuevo en el Gran Concepción
+          Encuentra tu hogar ideal en el Gran Concepción
         </h1>
         <div style={{ "--delay": "0.25s" } as CSSProperties} className="rise">
           <HeroSearch resultCount={resultCount} />
