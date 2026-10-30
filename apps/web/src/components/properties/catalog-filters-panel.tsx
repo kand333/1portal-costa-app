@@ -1,11 +1,11 @@
 "use client";
 
 import { OPERATION_TYPES, PROPERTY_TYPES } from "@portal/shared/enums";
+import { citiesOfRegion, DEFAULT_REGION_SLUG, REGION_FIELD_LABEL, REGIONS, sectorsOfCity } from "@portal/shared/locations";
 import type { LocationOption } from "@portal/shared/property";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
-import { useFilterOptions } from "@/hooks/use-filter-options";
 import {
   buildCatalogFiltersHref,
   countActiveFilters,
@@ -39,7 +39,7 @@ function toFormValues(filters: CatalogFilters): FormValues {
     bedrooms: toText(filters.bedrooms),
     bathrooms: toText(filters.bathrooms),
     minUsableArea: toText(filters.minUsableArea),
-    region: filters.region ?? [],
+    region: filters.region ?? [DEFAULT_REGION_SLUG],
     city: filters.city ?? [],
     commune: filters.commune ?? [],
   };
@@ -55,10 +55,10 @@ function toSearchParams(values: FormValues): URLSearchParams {
   return searchParams;
 }
 
-/** Keeps selected slugs visible even if they are not among the loaded options (old link, typo). */
-function withSelectedOptions(options: LocationOption[], selectedSlugs: string[]): LocationOption[] {
-  const missing = selectedSlugs.filter((slug) => !options.some((option) => option.slug === slug));
-  return [...options, ...missing.map((slug) => ({ slug, name: slug }))];
+/** Keeps the selected slug visible even if it is not among the options (old link, typo). */
+function withSelectedOption(options: readonly LocationOption[], selectedSlug: string): readonly LocationOption[] {
+  if (selectedSlug === "" || options.some((option) => option.slug === selectedSlug)) return options;
+  return [...options, { slug: selectedSlug, name: selectedSlug }];
 }
 
 type CatalogFiltersPanelProps = {
@@ -74,7 +74,6 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { data: options, error: optionsError, isLoading: optionsLoading } = useFilterOptions();
   const toggleButtonRef = useRef<HTMLButtonElement>(null);
   const maxPriceRef = useRef<HTMLInputElement>(null);
 
@@ -126,75 +125,29 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
     }
   }
 
-  // Single choice: the API accepts several values, but the form offers one region and one city.
-  const locationSelect = (filterName: "region" | "city", label: string, list: LocationOption[] = []) => {
-    const selected = values[filterName][0] ?? "";
-    return (
-      <div>
-        <label htmlFor={`filter-${filterName}`} className={labelClassName}>
-          {label}
-        </label>
-        <select
-          id={`filter-${filterName}`}
-          name={filterName}
-          value={selected}
-          onChange={(event) =>
-            setValues((previous) => ({ ...previous, [filterName]: event.target.value ? [event.target.value] : [] }))
-          }
-          disabled={optionsLoading && !selected}
-          className={fieldClassName}
-        >
-          <option value="">{optionsLoading ? "Cargando…" : "Todas"}</option>
-          {withSelectedOptions(list, selected ? [selected] : []).map((option) => (
-            <option key={option.slug} value={option.slug}>
-              {option.name}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  };
+  // Region, city and sector are chained: the region sets the cities and the city sets the sectors.
+  const regionSlug = values.region[0] ?? DEFAULT_REGION_SLUG;
+  const citySlug = values.city[0] ?? "";
+  const communeSlug = values.commune[0] ?? "";
+  const cityOptions = withSelectedOption(citiesOfRegion(regionSlug), citySlug);
+  const sectorOptions = withSelectedOption(sectorsOfCity(citySlug), communeSlug);
 
-  const locationCheckboxes = (filterName: LocationFilterName, legend: string, list: LocationOption[] = []) => {
-    const selected = values[filterName];
-    const items = withSelectedOptions(list, selected);
-    return (
-      <fieldset>
-        <legend className={labelClassName}>
-          {legend}
-          {selected.length > 0 && (
-            <span className="font-normal text-muted"> ({selected.length} seleccionadas)</span>
-          )}
-        </legend>
-        {optionsLoading && items.length === 0 ? (
-          <p className="text-sm text-muted">Cargando…</p>
-        ) : (
-          // Scrolls when the list is long so the panel keeps a reasonable height.
-          <ul className="max-h-48 space-y-1.5 overflow-y-auto rounded-xl border border-line p-3">
-            {items.map((option) => {
-              const checkboxId = `filter-${filterName}-${option.slug}`;
-              return (
-                <li key={option.slug} className="flex items-center gap-2">
-                  <input
-                    id={checkboxId}
-                    type="checkbox"
-                    name={filterName}
-                    value={option.slug}
-                    checked={selected.includes(option.slug)}
-                    onChange={handleCheckboxChange}
-                    className="size-4 rounded accent-[var(--accent)]"
-                  />
-                  <label htmlFor={checkboxId} className="text-sm text-ink">
-                    {option.name}
-                  </label>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </fieldset>
-    );
-  };
+  function changeRegion(slug: string) {
+    setValues((previous) => {
+      const keepsCity = citiesOfRegion(slug).some((city) => city.slug === previous.city[0]);
+      return { ...previous, region: [slug], city: keepsCity ? previous.city : [], commune: keepsCity ? previous.commune : [] };
+    });
+  }
+
+  function changeCity(slug: string) {
+    setValues((previous) => ({ ...previous, city: slug ? [slug] : [], commune: [] }));
+  }
+
+  function changeSector(slug: string) {
+    setValues((previous) => ({ ...previous, commune: slug ? [slug] : [] }));
+  }
+
+  const sectorPlaceholder = citySlug === "" ? "Elige una comuna" : sectorOptions.length === 0 ? "Próximamente" : "Todos";
 
   return (
     <div>
@@ -251,6 +204,54 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
             ))}
           </div>
         </fieldset>
+
+        <div>
+          <label htmlFor="filter-city" className={labelClassName}>
+            Comuna
+          </label>
+          <select id="filter-city" name="city" value={citySlug} onChange={(event) => changeCity(event.target.value)} className={fieldClassName}>
+            <option value="">Todas</option>
+            {cityOptions.map((option) => (
+              <option key={option.slug} value={option.slug}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="filter-commune" className={labelClassName}>
+            Sector
+          </label>
+          <select
+            id="filter-commune"
+            name="commune"
+            value={communeSlug}
+            onChange={(event) => changeSector(event.target.value)}
+            disabled={sectorOptions.length === 0}
+            className={`${fieldClassName} disabled:cursor-not-allowed disabled:opacity-50`}
+          >
+            <option value="">{sectorPlaceholder}</option>
+            {sectorOptions.map((option) => (
+              <option key={option.slug} value={option.slug}>
+                {option.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="filter-region" className={labelClassName}>
+            {REGION_FIELD_LABEL}
+          </label>
+          <select id="filter-region" name="region" value={regionSlug} onChange={(event) => changeRegion(event.target.value)} className={fieldClassName}>
+            {REGIONS.map((option) => (
+              <option key={option.slug} value={option.slug}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <div>
           <label htmlFor="filter-type" className={labelClassName}>
@@ -358,13 +359,6 @@ export function CatalogFiltersPanel({ filters, isOpen, onToggle, closeAfterApply
             className={fieldClassName}
           />
         </div>
-
-        {locationCheckboxes("commune", "Comuna", options?.communes)}
-        {locationSelect("city", "Ciudad", options?.cities)}
-        {locationSelect("region", "Región", options?.regions)}
-        {optionsError && (
-          <p className="text-sm text-muted">No pudimos cargar las ubicaciones disponibles.</p>
-        )}
 
         <div className="flex flex-wrap items-center gap-3 pt-2">
           <button

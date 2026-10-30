@@ -4,6 +4,7 @@ import {
   type OperationType,
   type PropertyType,
 } from "@portal/shared/enums";
+import { DEFAULT_REGION_SLUG } from "@portal/shared/locations";
 import {
   LOCATION_SLUG_PATTERN,
   MAX_FILTER_AMOUNT,
@@ -96,11 +97,19 @@ export function parseCatalogFilters(searchParams: URLSearchParams): CatalogFilte
   return Object.fromEntries(Object.entries(filters).filter(([, value]) => value !== undefined)) as CatalogFilters;
 }
 
-/** Number of active choices: each selected location counts (2 communes = 2). */
+/** True when the region is just the default one (Región del Biobío): it is shown, but it is not a choice. */
+const isDefaultRegion = (region: string[] | undefined) => region?.length === 1 && region[0] === DEFAULT_REGION_SLUG;
+
+/** Filters sent to the API: without a region in the URL the catalog shows the default region. */
+export function withDefaultRegion(filters: CatalogFilters): CatalogFilters {
+  return filters.region === undefined ? { ...filters, region: [DEFAULT_REGION_SLUG] } : filters;
+}
+
+/** Number of active choices: each selected location counts (2 sectors = 2); the default region does not. */
 export function countActiveFilters(filters: CatalogFilters): number {
   return CATALOG_FILTER_NAMES.reduce((count, filterName) => {
     const value = filters[filterName];
-    if (value === undefined) return count;
+    if (value === undefined || (filterName === "region" && isDefaultRegion(value as string[]))) return count;
     return count + (Array.isArray(value) ? value.length : 1);
   }, 0);
 }
@@ -115,6 +124,8 @@ export function buildCatalogFiltersHref(pathname: string, searchParams: URLSearc
   for (const filterName of CATALOG_FILTER_NAMES) {
     nextSearchParams.delete(filterName);
     const value = filters[filterName];
+    // The default region is implied: keep the URL clean.
+    if (filterName === "region" && isDefaultRegion(value as string[] | undefined)) continue;
     for (const item of value === undefined ? [] : [value].flat()) {
       nextSearchParams.append(filterName, String(item));
     }

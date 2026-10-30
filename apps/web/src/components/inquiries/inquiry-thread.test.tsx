@@ -27,10 +27,10 @@ describe("InquiryThread", () => {
     expect(forUser.match(/justify-end/g)).toHaveLength(2);
   });
 
-  it("shows the administrator's name to ADMIN and «Portal Inmobiliario» to the user", () => {
+  it("shows the administrator's name to ADMIN and «PropiZoom» to the user", () => {
     expect(renderToStaticMarkup(<InquiryThread viewer="admin" inquiry={inquiry} messages={messages} />)).toContain(">Admin Portal<");
     const forUser = renderToStaticMarkup(<InquiryThread viewer="user" inquiry={inquiry} messages={messages} />);
-    expect(forUser).toContain(">Portal Inmobiliario<");
+    expect(forUser).toContain(">PropiZoom<");
     expect(forUser).not.toContain("Admin Portal");
   });
 });

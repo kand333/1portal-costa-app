@@ -7,7 +7,7 @@ import { buildAdminInquiriesApiPath, parseAdminInquiryListParams } from "@/lib/a
 import { fetchWithSession, getAdminUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Consultas | Administración | Portal Inmobiliario",
+  title: "Consultas | Administración | PropiZoom",
   robots: { index: false },
 };
 

@@ -266,8 +266,10 @@ Permitir combinar:
 - baños;
 - superficie útil mínima;
 - comuna;
-- ciudad;
+- sector;
 - región.
+
+En el catálogo la ubicación va justo debajo de la operación, en este orden: **comuna** (las diez comunas del Gran Concepción: Concepción, San Pedro de la Paz, Chiguayante, Hualpén, Talcahuano, Penco, Tomé, Hualqui, Coronel y Lota), **sector** (reemplaza a «comuna»; solo Concepción tiene lista: Centro de Concepción, Barrio Universitario, Barrio Norte, Santa Sabina, Collao, Nonguén, Lorenzo Arenas, Laguna Redonda, Pedro de Valdivia, Lomas de San Andrés, Lomas de San Sebastián, Torreones, Lomas de Bellavista, Valle Noble y Valle Andalién; en las demás comunas el selector queda desactivado con «Próximamente») y **Región del Bío-Bío**, con dos opciones: «Gran Concepción» (por defecto, con las diez comunas) y «Provincia de Arauco» (con las comunas Arauco, Cañete, Contulmo, Curanilahue, Lebu, Los Álamos y Tirúa).
 
 Los filtros deben representarse en la URL.
 
@@ -606,3 +608,7 @@ El producto está funcionalmente terminado cuando:
 - la autorización se aplica en backend;
 - la aplicación es responsive;
 - no existen errores bloqueantes conocidos.
+
+## 27. Identidad visual
+
+La portada se rediseña con la identidad PropiZoom (paleta del logo, solo tema claro) y una experiencia animada por scroll, con una composición móvil propia y movimiento reducido respetado. Detalle técnico en `plan.md` §18.

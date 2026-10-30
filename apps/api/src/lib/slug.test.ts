@@ -1,4 +1,5 @@
 import { LOCATION_SLUG_PATTERN } from "@portal/shared/limits";
+import { citiesOfRegion, REGIONS, sectorsOfCity, toLocationSlug } from "@portal/shared/locations";
 import { describe, expect, it } from "vitest";
 import { toSlug } from "./slug";
 
@@ -25,5 +26,15 @@ describe("toSlug", () => {
   it("gives the same slug to names that only differ in accents or case", () => {
     expect(toSlug("Ñuñoa")).toBe(toSlug("NUNOA"));
     expect(toSlug("Concón")).toBe(toSlug("concon"));
+  });
+});
+
+describe("locations of @portal/shared", () => {
+  it("uses the same slugs as the API for every region, city and sector", () => {
+    const names = REGIONS.flatMap((region) => [region.name, ...citiesOfRegion(region.slug).flatMap((city) => [city.name, ...sectorsOfCity(city.slug).map((sector) => sector.name)])]);
+    for (const name of names) {
+      expect(toLocationSlug(name), name).toBe(toSlug(name));
+      expect(toSlug(name), name).toMatch(LOCATION_SLUG_PATTERN);
+    }
   });
 });

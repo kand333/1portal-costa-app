@@ -4,7 +4,7 @@ import { PasswordForm, ProfileForm } from "@/components/account/account-edit-for
 import { requireCustomerUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Editar cuenta | Portal Inmobiliario",
+  title: "Editar cuenta | PropiZoom",
   robots: { index: false },
 };
 

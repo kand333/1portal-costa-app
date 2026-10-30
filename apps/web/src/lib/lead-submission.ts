@@ -16,7 +16,7 @@ export async function sendLeadEmail(accessKey: string, lead: LeadCreated, data: 
       body: JSON.stringify({
         access_key: accessKey,
         subject: data.kind === "VALUATION" ? "Solicitud de tasación" : "Búsqueda de propiedad",
-        from_name: "Portal Inmobiliario",
+        from_name: "PropiZoom",
         replyto: data.email,
         name: data.name,
         email: data.email,

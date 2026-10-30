@@ -3,7 +3,7 @@ import { AccountOverview } from "@/components/account/account-overview";
 import { requireCustomerUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "Mi cuenta | Portal Inmobiliario",
+  title: "Mi cuenta | PropiZoom",
   robots: { index: false },
 };
 

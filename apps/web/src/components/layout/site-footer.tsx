@@ -1,37 +1,56 @@
+import Image from "next/image";
 import Link from "next/link";
 import { navigationItems } from "./navigation-items";
 
-// The footer is always dark: it closes the page with a quiet, weighty band in both color schemes.
+// An orange band with slow waves closes the page, like the reference. Dark text keeps the small links readable on orange.
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0e1213] text-[#ecebe7]">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 md:grid-cols-2 lg:px-8">
-        <div>
-          <p translate="no" className="font-display text-3xl font-semibold tracking-tight">
-            Portal Inmobiliario
+    <footer className="relative isolate overflow-hidden bg-[image:var(--ember)] text-ink">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 1440 400"
+        preserveAspectRatio="none"
+        className="footer-waves absolute inset-y-0 -left-[10%] -z-10 h-full w-[120%] opacity-30"
+      >
+        {[0, 1, 2, 3, 4].map((index) => (
+          <path
+            key={index}
+            d={`M0 ${60 + index * 70} C 240 ${index * 70} 480 ${150 + index * 70} 720 ${70 + index * 70} S 1200 ${index * 70} 1440 ${80 + index * 70}`}
+            fill="none"
+            stroke="#fff"
+            strokeWidth={26}
+            strokeLinecap="round"
+          />
+        ))}
+      </svg>
+      <div className="mx-auto flex min-h-[28rem] max-w-7xl flex-col justify-between gap-12 px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto_1fr]">
+          <p translate="no" className="flex items-center gap-3 text-4xl font-bold tracking-tight text-white">
+            <span className="flex size-14 items-center justify-center rounded-full bg-white">
+              <Image src="/logo-mark.png" alt="" width={40} height={38} className="h-10 w-auto" />
+            </span>
+            PropiZoom
           </p>
-          <p className="mt-3 max-w-sm text-[#a3a9ab]">Propiedades en venta y arriendo en Chile.</p>
+          <nav aria-label="Pie de página">
+            <ul className="flex flex-col gap-3 lg:items-center">
+              {navigationItems.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="inline-flex min-h-11 items-center rounded-sm font-mono text-xs font-medium uppercase tracking-[0.2em] transition-opacity duration-200 hover:opacity-70 focus-visible:outline-white"
+                  >
+                    [ {item.label} ]
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <p className="font-display text-4xl leading-tight text-white lg:text-right">Tu corredora en el Gran Concepción.</p>
         </div>
-        <nav aria-label="Pie de página" className="md:justify-self-end">
-          <ul className="grid grid-cols-2 gap-x-10 gap-y-3 text-sm sm:grid-cols-3">
-            {navigationItems.map((item) => (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  className="rounded-sm text-[#a3a9ab] transition-colors duration-200 hover:text-white focus-visible:outline-[#c2a574]"
-                >
-                  {item.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </div>
-      <div className="border-t border-white/10">
-        <p className="mx-auto max-w-7xl px-4 py-5 text-xs text-[#7d8588] sm:px-6 lg:px-8">
-          © {currentYear} Portal Inmobiliario. Todos los derechos reservados.
+        <p className="font-mono text-xs uppercase tracking-[0.18em]">
+          © {currentYear} PropiZoom · Corredora de propiedades en el Gran Concepción
         </p>
       </div>
     </footer>

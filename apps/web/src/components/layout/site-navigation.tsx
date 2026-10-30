@@ -66,7 +66,7 @@ export function SiteNavigation() {
         <nav
           id={mobileNavigationId}
           aria-label="Principal"
-          className="absolute inset-x-0 top-full border-b border-line/60 bg-paper/95 px-4 py-3 shadow-soft backdrop-blur-xl md:hidden"
+          className="absolute inset-x-0 top-full mt-2 rounded-3xl border border-line bg-surface px-4 py-3 shadow-lift md:hidden"
           onKeyDown={handleMobileNavigationKeyDown}
         >
           <NavigationLinks

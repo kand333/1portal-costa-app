@@ -26,7 +26,7 @@ export function InquiryThread({ viewer, inquiry, messages }: InquiryThreadProps)
       author: message.fromAdmin
         ? viewer === "admin"
           ? (message.authorName ?? "Administrador")
-          : "Portal Inmobiliario"
+          : "PropiZoom"
         : (message.authorName ?? inquiry.name),
       body: message.body,
       createdAt: message.createdAt,

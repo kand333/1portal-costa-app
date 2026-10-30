@@ -165,7 +165,7 @@ export function AdminPropertyList({ result, params, cities }: AdminPropertyListP
             ))}
             <div className="min-w-0 flex-1 basis-64">
               <label htmlFor="admin-property-search" className="sr-only">
-                Buscar por título, comuna, ciudad, región o descripción
+                Buscar por título, sector, ciudad, región o descripción
               </label>
               <input
                 id="admin-property-search"
@@ -173,7 +173,7 @@ export function AdminPropertyList({ result, params, cities }: AdminPropertyListP
                 type="search"
                 defaultValue={search}
                 maxLength={MAX_SEARCH_LENGTH}
-                placeholder="Busca por título, comuna o ciudad"
+                placeholder="Busca por título, sector o ciudad"
                 className="h-12 w-full rounded-full border border-line bg-surface px-5 text-ink shadow-soft transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
               />
             </div>

@@ -47,3 +47,7 @@ next-env.d.ts
 
 # prisma generated client
 /apps/api/src/generated/
+
+# Higgsfield skill outputs (generated media and run checkpoints)
+projects/higgsfield-api-generations/
+projects/db-backups/

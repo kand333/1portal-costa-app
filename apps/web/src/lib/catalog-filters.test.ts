@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildCatalogFiltersHref, countActiveFilters, parseCatalogFilters } from "./catalog-filters";
+import { buildCatalogFiltersHref, countActiveFilters, parseCatalogFilters, withDefaultRegion } from "./catalog-filters";
 
 const parse = (query: string) => parseCatalogFilters(new URLSearchParams(query));
 
@@ -108,5 +108,27 @@ describe("location filters with several values", () => {
     const filters = { commune: ["las-condes", "providencia"], operation: "SALE" as const };
     const href = buildCatalogFiltersHref("/properties", new URLSearchParams(), filters);
     expect(parse(href.split("?")[1])).toEqual(filters);
+  });
+});
+
+describe("default region", () => {
+  it("applies Región del Biobío when the URL has no region", () => {
+    expect(withDefaultRegion({})).toEqual({ region: ["region-del-biobio"] });
+    expect(withDefaultRegion({ city: ["concepcion"] })).toEqual({ city: ["concepcion"], region: ["region-del-biobio"] });
+  });
+
+  it("keeps an explicit region", () => {
+    expect(withDefaultRegion({ region: ["provincia-arauco"] })).toEqual({ region: ["provincia-arauco"] });
+  });
+
+  it("does not count the default region as an active filter, but counts Provincia Arauco", () => {
+    expect(countActiveFilters({ region: ["region-del-biobio"] })).toBe(0);
+    expect(countActiveFilters({ region: ["provincia-arauco"] })).toBe(1);
+    expect(countActiveFilters({ region: ["region-del-biobio"], city: ["concepcion"], commune: ["collao"] })).toBe(2);
+  });
+
+  it("keeps the URL clean when the region is the default one", () => {
+    expect(buildCatalogFiltersHref("/properties", new URLSearchParams(), { region: ["region-del-biobio"], city: ["lota"] })).toBe("/properties?city=lota");
+    expect(buildCatalogFiltersHref("/properties", new URLSearchParams(), { region: ["provincia-arauco"] })).toBe("/properties?region=provincia-arauco");
   });
 });

@@ -290,7 +290,8 @@ El filtrado y ordenamiento debe ejecutarse principalmente en PostgreSQL y no car
 - `commune`, `city` y `region` usan slugs (`las-condes`, `nunoa`, `region-metropolitana`), insensibles a mayúsculas y acentos. La API los traduce a los nombres guardados; un slug desconocido devuelve 0 resultados.
 - Las ubicaciones admiten varios valores repitiendo el parámetro (`?commune=las-condes&commune=providencia`, máx. 20 por campo): coincide cualquiera de ellos. Repetir un parámetro de valor único (p. ej. `type`) devuelve 400.
 - En el catálogo la barra de filtros va a la izquierda y es plegable en todas las pantallas (abierta por defecto en escritorio, plegada en móvil); las ubicaciones se eligen con casillas.
-- `GET /api/properties/filter-options` entrega las regiones, ciudades y comunas con propiedades publicadas (`{ slug, name }`) para el formulario.
+- Las opciones de ubicación del catálogo y del formulario del administrador salen de `@portal/shared/locations` (regiones, ciudades por región y sectores por ciudad, con los mismos slugs que la API; un test los compara con `lib/slug.ts`), no de la base. La propiedad guarda `region`, `city` y `commune` (= sector) como texto; fuera de Concepción el sector es «Centro de <ciudad>». El campo se titula «Región del Bío-Bío» y ofrece «Gran Concepción» y «Provincia de Arauco» (solo cambia el texto: el valor guardado sigue siendo «Región del Biobío» / «Provincia Arauco» y los slugs no cambian). Sin `region` en la URL el catálogo aplica «Gran Concepción» (`withDefaultRegion`; la URL queda limpia y el contador de filtros no la cuenta); «Provincia Arauco» se elige con `?region=provincia-arauco`. En el formulario del administrador región, ciudad y sector son listas encadenadas.
+- `GET /api/properties/filter-options` (sin uso en el catálogo actual) entrega las regiones, ciudades y comunas con propiedades publicadas (`{ slug, name }`) para el formulario.
 - La API responde 400 a valores inválidos (`minPrice` > `maxPrice` con mensaje específico). El catálogo ignora valores inválidos de una URL editada en vez de fallar.
 
 ### Ordenamiento
@@ -437,6 +438,8 @@ Implementación (sin claves):
 - La dirección (en azul, sobre el mapa) y el enlace «Abrir en Google Maps» (debajo del mapa) abren Google Maps con la dirección, sin clave. Si la geocodificación falla, se ve solo el enlace.
 - Con tráfico real, guardar las coordenadas en la BD desde la API al guardar la propiedad (transparente para ADMIN).
 
+Portada: «Conocemos tu comuna» usa el mismo Leaflet con tiles de OSM (constante `TILE_URL` en `commune-map-canvas.tsx`, filtro cálido por CSS), con pines en las coordenadas de `lib/communes.ts`; el mapa se monta solo al acercarse al viewport y no es arrastrable.
+
 Si posteriormente se requiere geocodificación interna, debe ser transparente para ADMIN y no modificar los campos obligatorios del formulario.
 
 ## 13. Web3Forms
@@ -534,3 +537,13 @@ Una tarea está terminada cuando:
 - las validaciones correspondientes pasan;
 - no quedan errores bloqueantes;
 - su checkbox se actualiza en `tasks.md`.
+
+## 18. Identidad visual (rediseño de la portada)
+
+- Marca PropiZoom, con la paleta y tipografía del video de referencia (no la del logo): `paper` crema `#fef7e5`, `sand` arena `#eae3c9`, `ink` marrón casi negro `#231a14`, `night` gris-verde `#263031` (clase `.night` para escenas oscuras), `accent`/`brass` naranja `#f56908` (degradado `--ember` hasta `#ea2403`; texto `ink` sobre naranja por contraste) y `brand-blue` `#0e4a87` solo en el logo y un bloque. Los nombres de tokens se conservan.
+- Tipografía: Newsreader (`font-display`, peso 400, tracking -0.02em), Hanken Grotesk (`font-sans`) y Geist Mono (`font-mono`, etiquetas en mayúsculas).
+- Header: píldora blanca flotante (`SiteHeader`), el hero sube bajo ella con margen negativo. Solo tema claro.
+- Logo: `apps/web/public/logo-mark.png` (isotipo con fondo transparente); el nombre va como texto.
+- Animación nativa (CSS + IntersectionObserver + rAF), sin librerías nuevas; todo respeta `prefers-reduced-motion`.
+- Identidad: corredora de proyectos nuevos del Gran Concepción (también tasación y corretaje tradicional; capta inmobiliarias). El hero (`HeroSection`) tiene fondo tipo video (`HeroBackdrop`, mp4 opcional con `videoSrc`) y buscador por comuna y tipo (`HeroSearch`).
+- Secuencia de la portada: hero en capas, cifras, pasos fijos con ilustración isométrica, escena oscura, «Conocemos tu comuna» inmersivo, propiedades, cierre split y pie naranja con ondas.

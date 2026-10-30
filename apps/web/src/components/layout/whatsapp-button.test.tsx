@@ -22,6 +22,7 @@ describe("WhatsAppButton", () => {
     expect(html).toContain('aria-label="Consultar por WhatsApp"');
     expect(html).toContain('target="_blank"');
     expect(html).toContain('rel="noopener noreferrer"');
+    expect(html).toContain("Asesoría personalizada");
   });
 
   it("renders nothing without a number", () => {

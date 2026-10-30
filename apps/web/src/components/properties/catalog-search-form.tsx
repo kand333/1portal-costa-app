@@ -40,7 +40,7 @@ export function CatalogSearchForm({ search }: CatalogSearchFormProps) {
     <form action={pathname} method="get" role="search" aria-label="Buscar en el catálogo" onSubmit={handleSubmit} className="mb-8 flex flex-wrap gap-3">
       <div className="min-w-0 flex-1 basis-64">
         <label htmlFor="catalog-search" className="sr-only">
-          Buscar por título, comuna, ciudad, región o descripción
+          Buscar por título, sector, ciudad, región o descripción
         </label>
         <input
           id="catalog-search"
@@ -49,7 +49,7 @@ export function CatalogSearchForm({ search }: CatalogSearchFormProps) {
           value={text}
           onChange={handleChange}
           maxLength={MAX_SEARCH_LENGTH}
-          placeholder="Busca por comuna, ciudad o palabra clave"
+          placeholder="Busca por sector, ciudad o palabra clave"
           className="h-12 w-full rounded-full border border-line bg-surface px-5 text-ink shadow-soft transition-colors duration-200 hover:border-brass/60 focus-visible:border-brass focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brass/40"
         />
       </div>

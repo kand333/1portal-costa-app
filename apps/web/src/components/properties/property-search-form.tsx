@@ -35,14 +35,14 @@ export function PropertySearchForm() {
     >
       <div className="sm:col-span-2 lg:col-span-1">
         <label htmlFor="search" className="sr-only">
-          Comuna, ciudad o palabra clave
+          Sector, ciudad o palabra clave
         </label>
         <input
           id="search"
           name="search"
           type="search"
           autoComplete="off"
-          placeholder="Comuna, ciudad o palabra clave"
+          placeholder="Sector, ciudad o palabra clave"
           className={fieldClassName}
         />
       </div>

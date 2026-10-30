@@ -2,7 +2,7 @@ import type { PropertyDetail } from "@portal/shared/property";
 import type { Metadata } from "next";
 import { formatLocation, formatPrice, operationLabels, propertyTypeLabels } from "@/lib/property-format";
 
-export const SITE_NAME = "Portal Inmobiliario";
+export const SITE_NAME = "PropiZoom";
 
 /** Search engines show about 155–160 characters of a description. */
 export const DESCRIPTION_MAX_LENGTH = 160;

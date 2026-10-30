@@ -4,7 +4,7 @@ import { AuthForm } from "@/components/auth/auth-form";
 import { AuthPageLayout } from "@/components/auth/auth-page-layout";
 
 export const metadata: Metadata = {
-  title: "Crear cuenta | Portal Inmobiliario",
+  title: "Crear cuenta | PropiZoom",
   description: "Crea tu cuenta para guardar propiedades y revisar tus consultas.",
 };
 

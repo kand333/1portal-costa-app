@@ -1,38 +1,42 @@
 @import "tailwindcss";
 
-/* Palette: bone paper, ink, deep pine and brass. Dark mode keeps the same roles. */
+/* Palette sampled from the reference video: cream and sand grounds, warm near-black ink, orange (with an ember gradient) and a charcoal-green night. The logo blue only appears in the logo and one split block. Light only. */
 :root {
-  --paper: #f6f5f2;
+  --paper: #fef7e5;
+  --sand: #eae3c9;
   --surface: #ffffff;
-  --ink: #121719;
-  --muted: #596064;
-  --line: #dad9d4;
-  --accent: #1e3b3a;
-  --accent-hover: #162d2c;
-  --on-accent: #f6f5f2;
-  --brass: #a98b5b;
-  --brass-text: #7a6238;
-  --shadow-ink: 18 23 25;
+  --ink: #231a14;
+  --muted: #6b6257;
+  --line: #e3dac0;
+  --night: #263031;
+  --accent: #f56908;
+  --accent-hover: #e4540a;
+  --on-accent: #231a14;
+  --brass: #f56908;
+  --brass-text: #b84300;
+  --brand-blue: #0e4a87;
+  --ember: linear-gradient(135deg, #f56908, #ea2403);
+  --shadow-ink: 35 26 20;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --paper: #0e1213;
-    --surface: #151b1d;
-    --ink: #ecebe7;
-    --muted: #a3a9ab;
-    --line: #2a3235;
-    --accent: #c2a574;
-    --accent-hover: #d2b886;
-    --on-accent: #121719;
-    --brass: #c2a574;
-    --brass-text: #c2a574;
-    --shadow-ink: 0 0 0;
-  }
+/* A dark scene: remaps the tokens so any section can use the same utilities on the charcoal ground. */
+.night {
+  --paper: #263031;
+  --surface: #323d3e;
+  --ink: #fef7e5;
+  --muted: rgb(254 247 229 / 0.72);
+  --line: rgb(255 255 255 / 0.16);
+  --brass-text: #ff8a3d;
+  --shadow-ink: 0 0 0;
+  background: var(--paper);
+  color: var(--ink);
 }
 
 @theme inline {
   --color-paper: var(--paper);
+  --color-sand: var(--sand);
+  --color-night: var(--night);
+  --color-brand-blue: var(--brand-blue);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
@@ -43,15 +47,16 @@
   --color-brass: var(--brass);
   --color-brass-text: var(--brass-text);
   --font-sans: var(--font-hanken);
-  --font-display: var(--font-cormorant);
+  --font-display: var(--font-newsreader);
+  --font-mono: var(--font-geist-mono);
   --shadow-soft: 0 1px 2px rgb(var(--shadow-ink) / 0.05), 0 14px 32px -14px rgb(var(--shadow-ink) / 0.14);
   --shadow-lift: 0 2px 4px rgb(var(--shadow-ink) / 0.06), 0 30px 60px -22px rgb(var(--shadow-ink) / 0.32);
 }
 
 @layer base {
   html {
-    color-scheme: light dark;
-    scroll-padding-top: 5rem;
+    color-scheme: light;
+    scroll-padding-top: 6.5rem;
   }
 
   body {
@@ -160,5 +165,347 @@
   .glow-spot,
   .glow-ring {
     display: none;
+  }
+}
+
+/* Display serif is set light and tight, like the reference headlines (unlayered, so it wins over weight utilities). */
+.font-display {
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Tiles rise into place as they enter the viewport, driven by scroll (no JavaScript). Browsers without scroll timelines just show them. */
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    transform: translateY(2.5rem) scale(0.97);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .tile-in {
+    animation: tile-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 55%;
+  }
+}
+
+/* Words of the big statement darken one after another as they scroll in; without scroll timelines they are simply dark. */
+@keyframes scrub-word {
+  from {
+    color: color-mix(in srgb, var(--ink) 16%, transparent);
+  }
+}
+
+@keyframes roof-lift {
+  from {
+    translate: 0 0;
+  }
+}
+
+@keyframes route-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes phone-float {
+  50% {
+    transform: translateY(-0.6rem);
+  }
+}
+
+.roof-lift {
+  translate: 0 -46px;
+}
+
+.route-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+
+.phone-float {
+  animation: phone-float 6s ease-in-out infinite;
+}
+
+@supports (animation-timeline: view()) {
+  .scrub-word {
+    animation: scrub-word linear both;
+    animation-timeline: view();
+    animation-range: entry 25% cover 38%;
+  }
+
+  .roof-lift {
+    animation: roof-lift ease-out both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 100%;
+  }
+
+  .route-draw {
+    animation: route-draw ease-out both;
+    animation-timeline: view();
+    animation-range: entry 10% entry 100%;
+  }
+}
+
+/* Scroll-driven entrances are shown at their final state when motion is reduced. */
+@media (prefers-reduced-motion: reduce) {
+  .scrub-word,
+  .roof-lift,
+  .route-draw,
+  .tile-in {
+    animation: none !important;
+  }
+}
+
+/* Commune showcase: the photo blooms from the commune's pin like a lens, slowly drifts, and its text rises in turn. */
+@keyframes lens-open {
+  from {
+    clip-path: circle(0% at var(--lx, 50%) var(--ly, 50%));
+  }
+  to {
+    clip-path: circle(150% at var(--lx, 50%) var(--ly, 50%));
+  }
+}
+
+@keyframes ken-burns {
+  to {
+    transform: scale(1.14) translate(-1.5%, -1%);
+  }
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+.lens-open {
+  animation: lens-open 0.95s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.ken-burns {
+  animation: ken-burns 18s ease-out both;
+}
+
+.chip-in {
+  animation: chip-in 0.6s ease-out both;
+  animation-delay: calc(0.45s + var(--i, 0) * 0.08s);
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns {
+    animation: none !important;
+  }
+}
+
+/* Closing block: the orange tile slides in over the photo as the section arrives; the footer waves drift slowly. */
+@keyframes tile-slide {
+  from {
+    opacity: 0;
+    transform: translateX(40%);
+  }
+}
+
+@keyframes footer-waves {
+  to {
+    transform: translateX(8%);
+  }
+}
+
+.footer-waves {
+  animation: footer-waves 16s ease-in-out infinite alternate;
+}
+
+@supports (animation-timeline: view()) {
+  .tile-slide {
+    animation: tile-slide ease-out both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 40%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer-waves,
+  .tile-slide {
+    animation: none !important;
+  }
+}
+
+/* The destination pin of the city route appears once the route has been drawn. */
+@keyframes route-pin {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+.route-pin {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@supports (animation-timeline: view()) {
+  .route-pin {
+    animation: route-pin ease-out both;
+    animation-timeline: view();
+    animation-range: entry 70% entry 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-pin {
+    animation: none !important;
+  }
+}
+
+/* Commune map: real OpenStreetMap tiles, warmed to the site palette (a CSS filter, so the sea keeps a muted blue). */
+.commune-map .leaflet-container {
+  background: var(--sand);
+  font-family: inherit;
+}
+
+.map-tiles {
+  filter: grayscale(0.5) sepia(0.3) saturate(0.85) brightness(1.04) contrast(0.92);
+}
+
+.commune-map .leaflet-control-attribution {
+  background: rgb(254 247 229 / 0.85);
+  color: var(--muted);
+  font-size: 10px;
+}
+
+.map-pin {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.4rem;
+  border-radius: 9999px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgb(35 26 20 / 0.22);
+  color: var(--ink);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  transition:
+    transform 0.3s ease,
+    background-color 0.3s ease;
+  cursor: pointer;
+}
+
+/* A larger hit area than the visible pill. */
+.map-pin::before {
+  content: "";
+  position: absolute;
+  inset: -0.6rem;
+}
+
+.map-pin-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  border-radius: 9999px;
+  background: #f56908;
+}
+
+.map-pin-active {
+  background: var(--ember);
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.map-pin-active .map-pin-dot {
+  background: #fff;
+}
+
+.leaflet-marker-icon:focus-visible .map-pin {
+  outline: 2px solid var(--brass-text);
+  outline-offset: 3px;
+}
+
+@keyframes arc-flow {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+.map-arc-active {
+  stroke-dasharray: 8 8;
+  animation: arc-flow 1.2s linear infinite;
+}
+
+/* The sea banner drifts a little as the section scrolls by. */
+@keyframes banner-drift {
+  from {
+    transform: translateY(-6%);
+  }
+  to {
+    transform: translateY(6%);
+  }
+}
+
+@supports (animation-timeline: view()) {
+  .banner-drift {
+    animation: banner-drift linear both;
+    animation-timeline: view();
+    animation-range: cover;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-arc-active,
+  .banner-drift {
+    animation: none !important;
+  }
+}
+
+/* Hero backdrop that feels like video: each photo drifts (slow zoom) and cross-fades into the next, in a 28 s loop. */
+@keyframes hero-cycle {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  3% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 1;
+  }
+  29% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+}
+
+.hero-slide {
+  animation: hero-cycle 28s linear infinite both;
+  /* The first photo starts already visible; the others take their turn every 7 s. */
+  animation-delay: calc(var(--slide, 0) * 7s - 0.9s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide {
+    animation: none !important;
+    opacity: 0;
+  }
+
+  .hero-slide:first-child {
+    opacity: 1;
   }
 }

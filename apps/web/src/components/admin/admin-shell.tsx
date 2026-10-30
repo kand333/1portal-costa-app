@@ -93,7 +93,7 @@ export function AdminShell({ user, children }: AdminShellProps) {
             onClick={() => setIsDrawerOpen(false)}
             className={cn("min-w-0 flex-1 leading-tight", isCollapsed && "lg:hidden")}
           >
-            <span className="block truncate text-sm font-semibold tracking-wide">Portal Inmobiliario</span>
+            <span className="block truncate text-sm font-semibold tracking-wide">PropiZoom</span>
             <span className="block text-xs uppercase tracking-[0.18em] text-on-accent/70">Administración</span>
           </Link>
           <button

@@ -1,20 +1,21 @@
 /**
- * Communes of Gran Concepción covered by the home page. `x`/`y` place each one on the schematic
- * map of `CommuneDial` (percent of its box, north up); they are an illustration, not cartography.
+ * Communes of Gran Concepción covered by the home page. `latitude`/`longitude` are the approximate
+ * centre of each commune, used to place its pin on the map of `CommuneDial`. The first one is the hub
+ * the network lines of the map start from.
  */
-export type CoverageCommune = { name: string; x: number; y: number };
+export type CoverageCommune = { name: string; latitude: number; longitude: number };
 
 export const COVERAGE_COMMUNES: readonly CoverageCommune[] = [
-  { name: "Concepción", x: 47, y: 38 },
-  { name: "San Pedro de la Paz", x: 44, y: 60 },
-  { name: "Chiguayante", x: 64, y: 46 },
-  { name: "Hualpén", x: 24, y: 50 },
-  { name: "Talcahuano", x: 22, y: 28 },
-  { name: "Penco", x: 44, y: 20 },
-  { name: "Tomé", x: 48, y: 8 },
-  { name: "Hualqui", x: 76, y: 64 },
-  { name: "Coronel", x: 34, y: 80 },
-  { name: "Lota", x: 22, y: 91 },
+  { name: "Concepción", latitude: -36.827, longitude: -73.05 },
+  { name: "San Pedro de la Paz", latitude: -36.843, longitude: -73.108 },
+  { name: "Chiguayante", latitude: -36.926, longitude: -73.029 },
+  { name: "Hualpén", latitude: -36.786, longitude: -73.093 },
+  { name: "Talcahuano", latitude: -36.724, longitude: -73.117 },
+  { name: "Penco", latitude: -36.741, longitude: -72.998 },
+  { name: "Tomé", latitude: -36.617, longitude: -72.957 },
+  { name: "Hualqui", latitude: -36.975, longitude: -72.939 },
+  { name: "Coronel", latitude: -37.03, longitude: -73.157 },
+  { name: "Lota", latitude: -37.089, longitude: -73.158 },
 ];
 
 export const COMMUNE_NAMES: readonly string[] = COVERAGE_COMMUNES.map((commune) => commune.name);
