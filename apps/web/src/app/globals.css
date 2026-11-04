@@ -151,6 +151,21 @@
   animation-delay: var(--delay, 0s);
 }
 
+/* Soft orange halo that pulses around the main lead button. */
+@keyframes cta-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(245 105 8 / 0.55);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 16px rgb(245 105 8 / 0);
+  }
+}
+
+.cta-pulse {
+  animation: cta-pulse 2.4s ease-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -165,6 +180,10 @@
   .glow-spot,
   .glow-ring {
     display: none;
+  }
+
+  .cta-pulse {
+    animation: none;
   }
 }
 

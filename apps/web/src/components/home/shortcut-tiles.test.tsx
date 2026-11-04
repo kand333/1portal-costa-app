@@ -11,7 +11,8 @@ describe("home shortcuts", () => {
     expect(html).toContain("Encuentra tu hogar ideal en el Gran Concepción");
     expect(html).toContain('role="search"');
     expect(html).toContain("Se han encontrado 22 resultados");
-    expect(html).toContain('href="/#tasacion-gratis"');
+    expect(html).toContain('href="/tasador-propiedades"');
+    expect(html).not.toContain('href="/#tasacion-gratis"');
     expect(html).toContain('href="/#cierre"');
   });
 

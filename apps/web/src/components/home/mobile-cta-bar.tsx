@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 
 /** Phones only: a fixed "Tasar gratis" bar that steps aside while a lead form is on screen. */
@@ -27,13 +28,13 @@ export function MobileCtaBar() {
         isFormVisible ? "translate-y-full" : "translate-y-0"
       }`}
     >
-      <a
-        href="#cierre"
+      <Link
+        href="/tasador-propiedades"
         tabIndex={isFormVisible ? -1 : undefined}
-        className="flex h-12 items-center justify-center rounded-full bg-accent font-semibold text-on-accent"
+        className="flex h-12 items-center justify-center rounded-full bg-accent font-bold text-on-accent shadow-soft"
       >
-        Cuéntanos qué necesitas
-      </a>
+        Tasar gratis
+      </Link>
     </div>
   );
 }

@@ -68,8 +68,8 @@ export function LeadSteps() {
                   <p className="mt-4 text-lg leading-relaxed text-muted">{step.description}</p>
                   {index === 0 && (
                     <Link
-                      href="/#tasacion-gratis"
-                      className="mt-8 inline-flex h-12 items-center rounded-lg bg-ink px-6 font-semibold text-paper transition-transform duration-200 hover:-translate-y-0.5"
+                      href="/tasador-propiedades"
+                      className="mt-8 inline-flex h-12 items-center rounded-lg bg-accent px-6 font-bold text-on-accent shadow-soft transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accent-hover"
                     >
                       Contáctanos
                     </Link>
