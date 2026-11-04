@@ -12,6 +12,7 @@ import { useCommune } from "@/components/home/commune-context";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { flash } from "@/lib/flash";
 import { COMMUNE_NAMES } from "@/lib/communes";
+import { trackEvent } from "@/lib/analytics";
 import { submitLead } from "@/lib/lead-submission";
 import { operationLabels, propertyTypeLabels } from "@/lib/property-format";
 
@@ -108,6 +109,7 @@ export function LeadForm({ source, idPrefix, fixedKind, initialAddress, message,
     if (result.status === "sent") {
       flash("Recibimos tu solicitud. Te contactaremos pronto.");
       setStep("sent");
+      trackEvent("generate_lead", { lead_source: source });
       onSent?.();
     } else {
       setErrorMessage(result.message);
