@@ -16,6 +16,9 @@ export function truncateDescription(text: string, maxLength = DESCRIPTION_MAX_LE
   return `${(lastSpace > maxLength / 2 ? cut.slice(0, lastSpace) : cut).replace(/[\s.,;:]+$/, "")}…`;
 }
 
+/** Room left in a ~60 character result title once " | PropiZoom" is added. */
+export const TITLE_MAX_LENGTH = 50;
+
 /** Open Graph's recommended size; social networks crop to about 1.91:1. */
 export const SHARE_IMAGE_WIDTH = 1200;
 export const SHARE_IMAGE_HEIGHT = 630;
@@ -48,7 +51,8 @@ const shareImageOf = ({ images }: PropertyDetail) =>
  * (operation, type, price, location), the canonical URL and Open Graph / Twitter with the main image.
  */
 export function buildPropertyMetadata(property: PropertyDetail): Metadata {
-  const title = `${property.title} | ${SITE_NAME}`;
+  // Long titles are cut at a word boundary so the search result shows the site name; the page heading stays whole.
+  const title = `${truncateDescription(property.title, TITLE_MAX_LENGTH)} | ${SITE_NAME}`;
   const facts = [
     `${propertyTypeLabels[property.propertyType]} en ${operationLabels[property.operationType].toLowerCase()}`,
     formatPrice(property.price, property.currency, property.operationType),

@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { CountUp } from "@/components/home/count-up";
 import { LeadForm } from "@/components/home/lead-form";
 import { COMMUNE_NAMES } from "@/lib/communes";
@@ -13,7 +14,13 @@ const CREDENTIALS = [
   { value: 1000, label: "tasaciones" },
 ] as const;
 
-const SPECIALTIES = ["Departamentos", "Casas", "Terrenos", "Oficinas"] as const;
+// Houses and apartments have their own valuation page (also an internal link for search engines).
+const SPECIALTIES: readonly { label: string; href?: string }[] = [
+  { label: "Departamentos", href: "/tasacion/departamento/concepcion" },
+  { label: "Casas", href: "/tasacion/casa/concepcion" },
+  { label: "Terrenos" },
+  { label: "Oficinas" },
+];
 
 /** The lead hook: a free valuation (sale price or rental price) with proof of experience and a short form beside it. */
 export function FreeValuationPitch() {
@@ -24,7 +31,8 @@ export function FreeValuationPitch() {
         <div>
           <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-brass-text">Tasación gratuita</p>
           <h2 id="pitch-title" className="mt-5 font-display text-[clamp(2.25rem,4.6vw,4rem)] leading-[1.05] text-ink">
-            Obtén tu tasación de venta o valoración de precio de arriendo profesional, de manera gratuita
+            Obtén tu tasación de venta o valoración de precio de arriendo profesional, de manera{" "}
+            <span className="text-brass">gratuita</span> en Concepción
           </h2>
           <p className="mt-5 max-w-xl text-lg text-muted">Sin gastar tiempo, sin perder dinero, sin letra chica, sin preocupaciones.</p>
 
@@ -45,8 +53,19 @@ export function FreeValuationPitch() {
           <p className="mt-8 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">Especializados en</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {SPECIALTIES.map((specialty) => (
-              <li key={specialty} className="rounded-full border border-line px-4 py-1.5 text-sm font-medium text-ink">
-                {specialty}
+              <li key={specialty.label}>
+                {specialty.href ? (
+                  <Link
+                    href={specialty.href}
+                    className="inline-flex min-h-11 items-center rounded-full border border-line px-4 py-1.5 text-sm font-medium text-ink transition-colors duration-200 hover:border-brass hover:text-brass-text"
+                  >
+                    {specialty.label}
+                  </Link>
+                ) : (
+                  <span className="inline-flex min-h-11 items-center rounded-full border border-line px-4 py-1.5 text-sm font-medium text-ink">
+                    {specialty.label}
+                  </span>
+                )}
               </li>
             ))}
           </ul>
