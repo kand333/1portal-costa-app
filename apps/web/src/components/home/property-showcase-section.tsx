@@ -44,7 +44,8 @@ export function PropertyShowcaseSection({
       <PropertyResults
         data={data}
         error={error}
-        isLoading={isLoading}
+        // SWR does not count the server-loaded fallback as "loaded", so isLoading stays true until it revalidates.
+        isLoading={isLoading && data === undefined}
         onRetry={() => mutate()}
         skeletonCount={query.pageSize}
         loadingLabel={`Cargando ${title.toLowerCase()}`}

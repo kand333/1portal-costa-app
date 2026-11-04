@@ -22,7 +22,8 @@ describe("PropertyValuationPage", () => {
     expect(html).toContain("Preguntas frecuentes");
     // The amenities step only appears after the data step.
     expect(html).not.toContain("Amenidades de la propiedad");
-    expect(html.match(/<details/g)).toHaveLength(3);
+    expect(html.match(/<details/g)).toHaveLength(5);
+    expect(html).toContain("¿Cuánto vale mi casa o departamento en Concepción?");
   });
 
   it("keeps «Continuar» disabled until the data is complete", () => {

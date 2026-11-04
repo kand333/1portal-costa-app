@@ -1,0 +1,38 @@
+import { describe, expect, it } from "vitest";
+import {
+  getValuationLanding,
+  listValuationLandings,
+  valuationLandingDescription,
+  valuationLandingTitle,
+} from "./valuation-landing";
+
+describe("valuation landings", () => {
+  it("exists only for houses and apartments in Concepción", () => {
+    expect(listValuationLandings().map((landing) => landing.path)).toEqual([
+      "/tasacion/casa/concepcion",
+      "/tasacion/departamento/concepcion",
+    ]);
+  });
+
+  it("returns null for unknown types and communes, including prototype keys", () => {
+    expect(getValuationLanding("terreno", "concepcion")).toBeNull();
+    expect(getValuationLanding("casa", "talcahuano")).toBeNull();
+    expect(getValuationLanding("constructor", "concepcion")).toBeNull();
+    expect(getValuationLanding("casa", "__proto__")).toBeNull();
+  });
+
+  it("maps each type to the property type the catalog filters by", () => {
+    expect(getValuationLanding("casa", "concepcion")?.propertyType).toBe("HOUSE");
+    expect(getValuationLanding("departamento", "concepcion")?.propertyType).toBe("APARTMENT");
+  });
+
+  it("builds a title and a description with the zone and the service", () => {
+    const landing = getValuationLanding("departamento", "concepcion");
+    if (!landing) throw new Error("missing landing");
+    expect(valuationLandingTitle(landing)).toBe("Tasación de departamentos en Concepción gratis | PropiZoom");
+    expect(valuationLandingDescription(landing)).toContain("¿Cuánto vale tu departamento en Concepción?");
+    for (const other of listValuationLandings()) {
+      expect(valuationLandingDescription(other).length).toBeLessThanOrEqual(155);
+    }
+  });
+});

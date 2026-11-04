@@ -5,7 +5,8 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useProperties } from "@/hooks/use-properties";
-import { countActiveFilters, parseCatalogFilters, withDefaultRegion } from "@/lib/catalog-filters";
+import { countActiveFilters, parseCatalogFilters } from "@/lib/catalog-filters";
+import { buildCatalogQuery } from "@/lib/catalog-query";
 import { parseSortParam } from "@/lib/catalog-sort";
 import { parsePageParam } from "@/lib/pagination";
 import { parseSearchParam } from "@/lib/property-search";
@@ -31,13 +32,9 @@ export function PropertyCatalog() {
   const [filtersOpenChoice, setFiltersOpenChoice] = useState<boolean | null>(null);
   const areFiltersOpen = filtersOpenChoice ?? isLargeScreen;
 
-  const { data, error, isLoading, isValidating, mutate } = useProperties({
-    ...withDefaultRegion(filters),
-    page: requestedPage,
-    pageSize: DEFAULT_PAGE_SIZE,
-    search,
-    sort,
-  });
+  const { data, error, isLoading, isValidating, mutate } = useProperties(
+    buildCatalogQuery(new URLSearchParams(searchParams.toString())),
+  );
   // SWR counts previous results as "not loaded", so `isLoading` is also true while a new page, filter
   // or order loads. Placeholders are for the very first load only; afterwards the previous results
   // stay on screen (dimmed) until the new ones arrive.

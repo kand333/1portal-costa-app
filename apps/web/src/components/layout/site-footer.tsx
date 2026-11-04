@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { listValuationLandings } from "@/lib/valuation-landing";
 import { navigationItems } from "./navigation-items";
 
 // An orange band with slow waves closes the page, like the reference. Dark text keeps the small links readable on orange.
@@ -49,6 +50,20 @@ export function SiteFooter() {
           </nav>
           <p className="font-display text-4xl leading-tight text-white lg:text-right">Tu corredora en el Gran Concepción.</p>
         </div>
+        <nav aria-label="Tasaciones por tipo de propiedad">
+          <ul className="flex flex-wrap gap-x-6 gap-y-1">
+            {listValuationLandings().map((landing) => (
+              <li key={landing.path}>
+                <Link
+                  href={landing.path}
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm font-medium underline underline-offset-4 transition-opacity duration-200 hover:opacity-70 focus-visible:outline-white"
+                >
+                  Tasación de {landing.plural} en {landing.commune.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
         <p className="font-mono text-xs uppercase tracking-[0.18em]">
           © {currentYear} PropiZoom · Corredora de propiedades en el Gran Concepción
         </p>

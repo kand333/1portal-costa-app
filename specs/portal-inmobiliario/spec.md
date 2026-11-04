@@ -579,6 +579,8 @@ Las páginas públicas de propiedades deben generar metadata dinámica:
 - Open Graph;
 - imagen principal cuando corresponda.
 
+El sitio debe publicar `robots.txt` y `sitemap.xml`, y las páginas de captación (portada y tasador) deben tener título y descripción con la zona (Gran Concepción) y su servicio, canónica y Open Graph.
+
 ---
 
 ## 26. Criterios de aceptación finales

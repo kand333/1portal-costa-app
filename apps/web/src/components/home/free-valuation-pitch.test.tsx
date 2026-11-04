@@ -16,6 +16,11 @@ describe("FreeValuationPitch", () => {
     expect(text).toContain("Especializados en");
   });
 
+  it("links houses and apartments to their valuation pages", () => {
+    expect(html).toContain('href="/tasacion/casa/concepcion"');
+    expect(html).toContain('href="/tasacion/departamento/concepcion"');
+  });
+
   it("limits the offer to the communes of the selector", () => {
     expect(text).toContain(`* Aplica solamente para las comunas de ${COMMUNE_NAMES.join(", ")}.`);
   });

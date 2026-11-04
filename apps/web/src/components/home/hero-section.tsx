@@ -7,6 +7,10 @@ import { HeroSearch } from "@/components/home/hero-search";
 const glassButtonClassName =
   "inline-flex h-12 items-center rounded-full border border-white/50 bg-white/10 px-6 text-sm font-semibold text-white backdrop-blur-md transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-white/20";
 
+// Primary lead CTA: solid orange with dark ink text (AA contrast), larger than the glass buttons, with a soft pulsing halo.
+const primaryButtonClassName =
+  "cta-pulse group inline-flex h-14 items-center gap-3 rounded-full bg-accent pl-7 pr-3 text-base font-bold text-on-accent shadow-[0_14px_36px_-10px_rgb(245_105_8/0.75)] transition-[background-color,transform] duration-200 hover:-translate-y-0.5 hover:bg-accent-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white";
+
 type HeroSectionProps = {
   /** Published properties for «Se han encontrado N resultados»; null when the API cannot answer. */
   resultCount: number | null;
@@ -46,7 +50,7 @@ export function HeroSection({ resultCount }: HeroSectionProps) {
         className="mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-center px-4 pb-56 pt-36 sm:px-6 sm:pb-40 sm:pt-40 lg:px-8"
       >
         <p style={{ "--delay": "0s" } as CSSProperties} className="rise text-base text-white/90">
-          Proyectos nuevos en venta
+          Corredora de propiedades en Concepción · Proyectos nuevos en venta
         </p>
         <h1
           id="hero-title"
@@ -58,13 +62,22 @@ export function HeroSection({ resultCount }: HeroSectionProps) {
         <div style={{ "--delay": "0.25s" } as CSSProperties} className="rise">
           <HeroSearch resultCount={resultCount} />
         </div>
-        <div style={{ "--delay": "0.4s" } as CSSProperties} className="rise mt-10 flex flex-wrap gap-3">
-          <Link href="/#tasacion-gratis" className={glassButtonClassName}>
+        <div style={{ "--delay": "0.4s" } as CSSProperties} className="rise mt-10 flex flex-wrap items-center gap-x-4 gap-y-3">
+          <Link href="/tasador-propiedades" className={primaryButtonClassName}>
             Tasación gratuita
+            <span
+              aria-hidden="true"
+              className="flex size-10 items-center justify-center rounded-full bg-ink text-white transition-transform duration-300 group-hover:translate-x-1"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
           </Link>
           <Link href="/#cierre" className={glassButtonClassName}>
             Corretaje tradicional
           </Link>
+          <p className="basis-full text-sm text-white/85">Gratis · sin compromiso · resultado en segundos</p>
         </div>
       </section>
     </div>

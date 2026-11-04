@@ -14,6 +14,16 @@ const questions = [
     answer:
       "Es una estimación orientativa. No ve el estado, la orientación ni las terminaciones de tu propiedad, y depende de cuántas propiedades comparables haya publicadas. Las amenidades que marcas suman un ajuste pequeño y fijo, no uno medido en el mercado. Si necesitas una cifra más precisa, un corredor puede tasarla contigo.",
   },
+  {
+    question: "¿Cuánto vale mi casa o departamento en Concepción?",
+    answer:
+      "Depende de la comuna, el sector, los metros cuadrados, la antigüedad y el estado. Nuestro tasador gratuito te da un precio y un rango a partir de propiedades comparables publicadas en el Gran Concepción; con eso puedes decidir a cuánto publicar o pedir que un corredor lo revise contigo.",
+  },
+  {
+    question: "¿Una tasación online es lo mismo que una tasación bancaria?",
+    answer:
+      "No. La estimación online es referencial y no reemplaza la tasación presencial de un tasador, que los bancos suelen exigir para un crédito hipotecario. Sirve para orientarte antes de vender, comprar o arrendar.",
+  },
 ] as const;
 
 export function ValuationFaq() {

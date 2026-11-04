@@ -56,6 +56,15 @@ describe("toShareImageUrl", () => {
 });
 
 describe("buildPropertyMetadata", () => {
+  it("cuts a long title at a word boundary and keeps the site name", () => {
+    const metadata = buildPropertyMetadata({
+      ...property,
+      title: "Casa de campo en el Valle de Nonguén, a minutos del centro y con alta proyección",
+    });
+    expect(metadata.title).toBe("Casa de campo en el Valle de Nonguén, a minutos… | PropiZoom");
+    expect(String(metadata.title).length).toBeLessThanOrEqual(65);
+  });
+
   it("builds the title and a description that leads with the key facts", () => {
     const metadata = buildPropertyMetadata(property);
     expect(metadata.title).toBe("Casa con piscina en Lo Barnechea | PropiZoom");
