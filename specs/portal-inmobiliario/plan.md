@@ -498,6 +498,8 @@ No exponer stack traces internos.
 - Ficha `/properties/{id}`: `generateMetadata` usa `buildPropertyMetadata` (`apps/web/src/lib/property-metadata.ts`), comparte la petición con la página (`cache`): título «{título} | Portal Inmobiliario», descripción que empieza con tipo, operación, precio y ubicación (máx. 160 caracteres, corte en palabra), canónica, Open Graph y Twitter con la imagen principal (o la primera; sin imagen, tarjeta `summary`). Si no existe, `notFound()` pone `noindex`.
 - Catálogo con canónica `/properties` (filtros y páginas apuntan a la misma). El resto hereda el Open Graph del layout raíz. Next combina la metadata de forma superficial: una página que define `openGraph` reemplaza el objeto completo.
 
+- Paso 48: `app/robots.ts` (permite todo salvo `/admin`, `/account`, `/api`) y `app/sitemap.ts` (portada, catálogo, tasador y propiedades publicadas, paginando la API de 50 en 50; si la API falla, solo las páginas fijas). Ambos usan `siteUrl()` (`lib/site-url.ts`, de `NEXT_PUBLIC_SITE_URL`). Portada y tasador con título propio, descripción con la zona, canónica y Open Graph; el catálogo dice «Gran Concepción».
+
 ## 15. Variables de entorno
 
 Utilizar variables de entorno para:
