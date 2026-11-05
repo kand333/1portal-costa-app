@@ -102,7 +102,7 @@ export function ValuationResultView({ request, result, contacted, onContact, onR
         <p className="mt-1 text-sm text-muted">
           {propertyTypeLabels[request.propertyType]} en {operationLabels[request.operation].toLowerCase()}, {request.totalArea} m²
           totales, {request.usableArea} m² construidos, {request.bedrooms} dormitorios, {request.bathrooms} baños y{" "}
-          {request.parkingSpaces} estacionamientos.
+          {request.parkingSpaces} estacionamientos{request.hasStorage === undefined ? "." : request.hasStorage ? ", con bodega." : ", sin bodega."}
         </p>
         {request.amenities.length > 0 && (
           <p className="mt-1 text-sm text-muted">

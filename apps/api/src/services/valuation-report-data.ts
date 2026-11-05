@@ -100,6 +100,9 @@ export function buildReportContent(
       : "No se pudo obtener el valor de la UF al emitir este informe: falta actualizar la conversión, por eso el valor se muestra en pesos."
     : "Los arriendos se expresan en pesos chilenos mensuales.";
 
+  // Informative only: it does not enter the price. Null when the person did not say.
+  const storage = request.hasStorage === undefined ? null : request.hasStorage ? "Sí" : "No";
+
   const amenities = request.amenities.map((amenity) => ({
     label: VALUATION_AMENITY_LABELS[amenity],
     adjustment: percent(AMENITY_ADJUSTMENT[amenity]),
@@ -170,7 +173,7 @@ export function buildReportContent(
         { label: "Dormitorios", value: String(request.bedrooms) },
         { label: "Baños", value: String(request.bathrooms) },
         { label: "Estacionamientos", value: String(request.parkingSpaces) },
-        { label: "Bodega", value: "Sin antecedentes" },
+        { label: "Bodega", value: storage ?? "Sin antecedentes" },
       ],
       meaning: [
         `Es el precio al que se ofrecen hoy propiedades parecidas a la tuya: ${request.operation === "SALE" ? "de venta" : "de arriendo"}, del mismo tipo y con características similares. Sirve como punto de partida para decidir a qué precio publicar.`,
@@ -193,7 +196,7 @@ export function buildReportContent(
         value: amenities.length ? amenities.map((amenity) => amenity.label).join(", ") : "Ninguna informada",
         status: "informed",
       },
-      { label: "Bodega", value: "Sin antecedentes", status: "pending" },
+      { label: "Bodega", value: storage ?? "Sin antecedentes", status: storage ? "informed" : "pending" },
       { label: "Año de construcción", value: "Sin antecedentes", status: "pending" },
       { label: "Materialidad y terminaciones", value: "Sin antecedentes", status: "pending" },
       { label: "Estado de conservación", value: "Sin antecedentes", status: "pending" },

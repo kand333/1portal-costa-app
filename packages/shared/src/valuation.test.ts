@@ -39,6 +39,13 @@ describe("valuationRequestSchema", () => {
     expect(valuationRequestSchema.safeParse({ ...request, amenities: ["sauna"] }).success).toBe(false);
   });
 
+  it("takes the storage as an optional yes or no and rejects anything else", () => {
+    expect(valuationRequestSchema.parse(request).hasStorage).toBeUndefined();
+    expect(valuationRequestSchema.parse({ ...request, hasStorage: true }).hasStorage).toBe(true);
+    expect(valuationRequestSchema.parse({ ...request, hasStorage: false }).hasStorage).toBe(false);
+    expect(valuationRequestSchema.safeParse({ ...request, hasStorage: "si" }).success).toBe(false);
+  });
+
   it("allows no parking spaces", () => {
     expect(valuationRequestSchema.safeParse({ ...request, parkingSpaces: 0 }).success).toBe(true);
   });

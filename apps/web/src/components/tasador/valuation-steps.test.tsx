@@ -41,6 +41,10 @@ describe("AmenitiesStep", () => {
     expect(html).toContain("Estimar precio");
   });
 
+  it("pins the actions to the bottom so «Estimar precio» is always in reach", () => {
+    expect(render()).toMatch(/class="[^"]*\bsticky\b[^"]*\bbottom-0\b[^"]*"[^>]*>\s*<button[^>]*>Atrás/);
+  });
+
   it("checks the selected ones and shows progress and errors", () => {
     expect(render(["pool"]).match(/checked=""/g)).toHaveLength(1);
     expect(render([], true)).toContain("Calculando…");

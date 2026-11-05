@@ -24,6 +24,11 @@ const operationOptions = [
   { value: "SALE", label: "Venta" },
 ] as const;
 
+const storageOptions = [
+  { value: "yes", label: "Sí" },
+  { value: "no", label: "No" },
+] as const;
+
 /** Options `min` to `max`, the last one shown as "max+". */
 const countOptions = (min: number, max: number) =>
   Array.from({ length: max - min + 1 }, (_, index) => {
@@ -61,10 +66,13 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
     bedrooms: "",
     bathrooms: "",
     parkingSpaces: "",
+    // "" = not answered; it is optional and does not change the price.
+    hasStorage: "",
   });
 
   const parsed = valuationRequestSchema.safeParse({
     ...values,
+    hasStorage: values.hasStorage === "" ? undefined : values.hasStorage === "yes",
     totalArea: toNumber(values.totalArea),
     usableArea: toNumber(values.usableArea),
     bedrooms: toNumber(values.bedrooms),
@@ -85,7 +93,7 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
   }
 
   const choiceGroup = (
-    name: "propertyType" | "operation",
+    name: "propertyType" | "operation" | "hasStorage",
     id: string,
     question: string,
     options: readonly { value: string; label: string }[],
@@ -207,7 +215,6 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
 
       {choiceGroup("propertyType", "valuation-type-label", "¿Qué tipo de propiedad es?", propertyTypeOptions)}
       {choiceGroup("operation", "valuation-operation-label", "¿Qué precio quieres conocer?", operationOptions)}
-      {areaField("totalArea", "Superficie total en m² (estimada)", "Ej. 200")}
       {areaField(
         "usableArea",
         "Superficie construida en m² (estimada)",
@@ -218,9 +225,11 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
           </p>
         ),
       )}
+      {areaField("totalArea", "Superficie total en m² (estimada)", "Ej. 200")}
       {countGroup("bedrooms", "valuation-bedrooms-label", "Número de dormitorios", 1, VALUATION_MAX_BEDROOMS)}
       {countGroup("bathrooms", "valuation-bathrooms-label", "Número de baños", 1, VALUATION_MAX_BATHROOMS)}
       {countGroup("parkingSpaces", "valuation-parking-label", "Número de estacionamientos", 0, VALUATION_MAX_PARKING_SPACES)}
+      {choiceGroup("hasStorage", "valuation-storage-label", "¿Tiene bodega?", storageOptions)}
 
       <div className="flex justify-end pt-5">
         <button

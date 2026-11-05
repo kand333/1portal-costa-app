@@ -69,6 +69,14 @@ describe("buildReportContent", () => {
     }
   });
 
+  it("reports the storage the owner declared, and still does not touch the price", () => {
+    const withStorage = buildReportContent({ ...request, hasStorage: true }, result, issuedAt, quote);
+    expect(withStorage.characteristics.find((row) => row.label === "Bodega")).toMatchObject({ value: "Sí", status: "informed" });
+    const without = buildReportContent({ ...request, hasStorage: false }, result, issuedAt, quote);
+    expect(without.characteristics.find((row) => row.label === "Bodega")).toMatchObject({ value: "No", status: "informed" });
+    expect(withStorage.hero.headline).toBe(without.hero.headline);
+  });
+
   it("uses the request data and never fixed figures", () => {
     const other = buildReportContent(
       { ...request, address: "Otra calle 9", commune: "Penco", usableArea: 55 },
