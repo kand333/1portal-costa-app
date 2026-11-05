@@ -17,8 +17,9 @@ export function summarizeValuation(request: ValuationRequest, result: ValuationR
   const amenities = request.amenities.length
     ? ` Amenidades: ${request.amenities.map((amenity) => VALUATION_AMENITY_LABELS[amenity].toLowerCase()).join(", ")}.`
     : "";
+  const storage = request.hasStorage === undefined ? "" : ` Bodega: ${request.hasStorage ? "sí" : "no"}.`;
   const subject = `${propertyTypeLabels[request.propertyType]} en ${request.commune}, ${request.usableArea} m² construidos (${operationLabels[request.operation].toLowerCase()})`;
-  if (result.status !== "ok") return `${subject}. Sin estimación: faltan comparables.${amenities}`;
+  if (result.status !== "ok") return `${subject}. Sin estimación: faltan comparables.${amenities}${storage}`;
   const uf = result.uf ? ` (${formatUf(result.uf.estimate)})` : "";
-  return `${subject}. Estimación ${formatPesos(result.estimate)}${uf}, rango ${formatPesos(result.low)} a ${formatPesos(result.high)}, ${result.comparablesCount} comparables.${amenities}`;
+  return `${subject}. Estimación ${formatPesos(result.estimate)}${uf}, rango ${formatPesos(result.low)} a ${formatPesos(result.high)}, ${result.comparablesCount} comparables.${amenities}${storage}`;
 }

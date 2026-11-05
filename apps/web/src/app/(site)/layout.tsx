@@ -3,6 +3,7 @@ import { GoogleAnalytics } from "@/components/layout/google-analytics";
 import { SkipLink } from "@/components/layout/skip-link";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { TopBar } from "@/components/layout/top-bar";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 
 /** Public site: header, content and footer. `/admin` has its own layout instead. */
@@ -10,6 +11,7 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <SkipLink />
+      <TopBar />
       <SiteHeader />
       <main id="main-content" className="flex flex-1 flex-col">
         {children}

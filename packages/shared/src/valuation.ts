@@ -67,6 +67,8 @@ export const valuationRequestSchema = z
       .array(z.enum(VALUATION_AMENITIES, { error: "Amenidad inválida" }))
       .default([])
       .transform((amenities) => [...new Set(amenities)]),
+    /** Optional and informative only: it is shown in the summary and the report but does not change the price. */
+    hasStorage: z.boolean({ error: "Indica si tiene bodega" }).optional(),
   })
   .refine((request) => request.usableArea <= request.totalArea, {
     error: "Los m² construidos no pueden superar los m² totales",

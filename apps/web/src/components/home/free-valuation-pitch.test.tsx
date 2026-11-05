@@ -7,12 +7,12 @@ describe("FreeValuationPitch", () => {
   const html = renderToStaticMarkup(<FreeValuationPitch />);
   const text = html.replace(/<[^>]+>/g, "");
 
-  it("states the free valuation, the reassurance and the credentials", () => {
+  it("states the free valuation, the reassurance and the regularization service, without unverifiable figures", () => {
     expect(text).toContain("Obtén tu tasación de venta o valoración de precio de arriendo profesional");
     expect(text).toContain("Sin gastar tiempo, sin perder dinero, sin letra chica, sin preocupaciones");
-    expect(text).toContain("5+");
-    expect(text).toContain("500+");
-    expect(text).toContain("1.000+");
+    expect(text).toContain("Asesoría en regularización de propiedades con problemas");
+    expect(html).toContain('href="/regularizacion"');
+    expect(text).not.toMatch(/\d+\+|años de experiencia|negocios realizados/);
     expect(text).toContain("Especializados en");
   });
 

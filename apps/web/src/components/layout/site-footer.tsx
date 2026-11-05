@@ -64,9 +64,17 @@ export function SiteFooter() {
             ))}
           </ul>
         </nav>
-        <p className="font-mono text-xs uppercase tracking-[0.18em]">
-          © {currentYear} PropiZoom · Corredora de propiedades en el Gran Concepción
-        </p>
+        <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">
+          <p className="font-mono text-xs uppercase tracking-[0.18em]">
+            © {currentYear} PropiZoom · Corredora de propiedades en el Gran Concepción
+          </p>
+          <Link
+            href="/privacidad"
+            className="inline-flex min-h-11 items-center rounded-sm text-sm font-medium underline underline-offset-4 transition-opacity duration-200 hover:opacity-70 focus-visible:outline-white"
+          >
+            Política de privacidad
+          </Link>
+        </div>
       </div>
     </footer>
   );

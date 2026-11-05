@@ -1,18 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CountUp } from "@/components/home/count-up";
 import { LeadForm } from "@/components/home/lead-form";
 import { COMMUNE_NAMES } from "@/lib/communes";
 
 // Test photo (Unsplash). Swap it here for the real one.
 const BACKGROUND = "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2000&q=75";
-
-// Credentials shown to visitors; real figures of the business, kept here so they are easy to update.
-const CREDENTIALS = [
-  { value: 5, label: "años de experiencia" },
-  { value: 500, label: "negocios realizados" },
-  { value: 1000, label: "tasaciones" },
-] as const;
 
 // Houses and apartments have their own valuation page (also an internal link for search engines).
 const SPECIALTIES: readonly { label: string; href?: string }[] = [
@@ -36,19 +28,25 @@ export function FreeValuationPitch() {
           </h2>
           <p className="mt-5 max-w-xl text-lg text-muted">Sin gastar tiempo, sin perder dinero, sin letra chica, sin preocupaciones.</p>
 
-          <dl className="mt-10 grid grid-cols-3 gap-4 border-y border-line py-8">
-            {CREDENTIALS.map((item) => (
-              <div key={item.label}>
-                <dt className="sr-only">{item.label}</dt>
-                <dd>
-                  <span className="block font-display text-[clamp(2rem,5vw,3.75rem)] leading-none text-brass lining-nums tabular-nums">
-                    <CountUp value={item.value} suffix="+" />
-                  </span>
-                  <span className="mt-2 block text-sm text-muted">{item.label}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <Link
+            href="/regularizacion"
+            className="group mt-10 flex items-center justify-between gap-6 border-y border-line py-8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            <span>
+              <span className="block font-display text-[clamp(1.5rem,3vw,2.25rem)] leading-tight text-brass">
+                Asesoría en regularización de propiedades con problemas
+              </span>
+              <span className="mt-2 block text-sm text-muted">¿Tu propiedad tiene problemas para venderse? Conoce el camino.</span>
+            </span>
+            <span
+              aria-hidden="true"
+              className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[image:var(--ember)] text-white transition-transform duration-300 group-hover:translate-x-1"
+            >
+              <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </span>
+          </Link>
 
           <p className="mt-8 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">Especializados en</p>
           <ul className="mt-3 flex flex-wrap gap-2">

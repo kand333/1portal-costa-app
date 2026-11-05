@@ -1,4 +1,5 @@
 import { COMMUNE_NAMES } from "./communes";
+import { configuredSocialLinks, type SocialLink } from "./contact";
 import { SITE_NAME } from "./property-metadata";
 import { siteUrl } from "./site-url";
 
@@ -12,7 +13,10 @@ function toInternationalPhone(rawNumber: string | undefined): string | null {
  * schema.org `RealEstateAgent` for the brokerage. Only facts the site already states: name, URL, logo, the communes
  * it serves and the public WhatsApp number. No street address until the business supplies a real one.
  */
-export function buildRealEstateAgentSchema(whatsappNumber: string | undefined = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER) {
+export function buildRealEstateAgentSchema(
+  whatsappNumber: string | undefined = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER,
+  socialLinks: readonly SocialLink[] = configuredSocialLinks(),
+) {
   const origin = siteUrl();
   const telephone = toInternationalPhone(whatsappNumber);
   return {
@@ -23,6 +27,7 @@ export function buildRealEstateAgentSchema(whatsappNumber: string | undefined = 
     logo: `${origin}/logo-mark.png`,
     areaServed: COMMUNE_NAMES.map((name) => ({ "@type": "City", name })),
     ...(telephone ? { telephone } : {}),
+    ...(socialLinks.length > 0 ? { sameAs: socialLinks.map((link) => link.href) } : {}),
   };
 }
 

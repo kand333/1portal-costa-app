@@ -15,4 +15,6 @@ Fuente: búsquedas web y lectura de páginas públicas de la competencia (2026-1
 Una página por tipo × comuna (`/tasacion/casa/concepcion`) con título «Tasación de casas en Concepción: precios y valor por m²», descripción con una pregunta, precio por m², plusvalía, proyectos nuevos, FAQ, enlaces a otras comunas y `BreadcrumbList`. Nuestra ventaja es un corredor local real con contacto.
 
 ## Pendiente de datos reales
-UF/m² y plusvalía por comuna, dirección y teléfono (para `RealEstateAgent`), más comunas (solo Concepción por ahora). Los precios de la base actual son de muestra: no se publican como datos de mercado.
+UF/m² y plusvalía por comuna y más comunas (solo Concepción por ahora). Los precios de la base actual son de muestra: no se publican como datos de mercado.
+
+Decidido: sin dirección pública (solo área de servicio y teléfono en `RealEstateAgent`); página `/privacidad` publicada con contacto `propizoom@gmail.com`; cifras de la portada (5+ años, 500+ negocios, 1.000+ tasaciones) retiradas por no ser verificables y reemplazadas por «Asesoría en regularización de propiedades con problemas».

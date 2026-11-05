@@ -58,7 +58,14 @@ export function NavigationLinks({ activeHref, orientation, onNavigate, userName,
         }
 
         return (
-          <li key={item.href} className={cn(isLogin && orientation === "horizontal" && "ml-3")}>
+          <li
+            key={item.href}
+            // Six items do not fit the header pill on tablets (768-1023 px): there «Regularización» stays in the footer and the hero.
+            className={cn(
+              isLogin && orientation === "horizontal" && "ml-3",
+              item.href === "/regularizacion" && orientation === "horizontal" && "hidden lg:block",
+            )}
+          >
             <Link
               href={item.href}
               onClick={onNavigate}
