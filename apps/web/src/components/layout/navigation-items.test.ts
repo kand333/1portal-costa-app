@@ -8,6 +8,7 @@ describe("navigationItems", () => {
       "Proyectos nuevos",
       "Tasación",
       "Corretaje",
+      "Regularización",
       "Ingresar",
     ]);
   });
@@ -37,6 +38,10 @@ describe("getActiveNavigationHref", () => {
 
   it("marks the valuation page on its route", () => {
     expect(getActiveNavigationHref("/tasador-propiedades", null)).toBe("/tasador-propiedades");
+  });
+
+  it("marks the regularization page on its route", () => {
+    expect(getActiveNavigationHref("/regularizacion", null)).toBe("/regularizacion");
   });
 
   it("marks login on the login page", () => {

@@ -10,6 +10,8 @@ const STATIC_PATHS: readonly string[] = [
   "/properties",
   "/tasador-propiedades",
   ...listValuationLandings().map((landing) => landing.path),
+  "/regularizacion",
+  "/privacidad",
 ];
 
 /** Safety stop: 20 pages of 50 properties. */

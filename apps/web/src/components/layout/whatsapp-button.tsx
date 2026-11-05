@@ -28,7 +28,7 @@ export function WhatsAppButton({ number = whatsappNumber }: { number?: string })
       </svg>
       <span className="hidden text-left text-xs font-bold uppercase leading-tight tracking-wide lg:block">
         Asesoría personalizada
-        <span className="block font-medium normal-case tracking-normal">Compra tu depto</span>
+        <span className="block font-medium normal-case tracking-normal">¡Contacta a nuestros agentes!</span>
       </span>
     </a>
   );

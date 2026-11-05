@@ -24,9 +24,17 @@ describe("agent schema", () => {
   });
 
   it("omits the phone when there is no number and never invents an address", () => {
-    const schema = buildRealEstateAgentSchema(undefined);
+    const schema = buildRealEstateAgentSchema(undefined, []);
     expect(schema).not.toHaveProperty("telephone");
     expect(schema).not.toHaveProperty("address");
+    expect(schema).not.toHaveProperty("sameAs");
+  });
+
+  it("lists the configured social profiles in sameAs", () => {
+    const schema = buildRealEstateAgentSchema(undefined, [
+      { network: "instagram", label: "Instagram", href: "https://www.instagram.com/propizoom" },
+    ]);
+    expect(schema.sameAs).toEqual(["https://www.instagram.com/propizoom"]);
   });
 
   it("escapes < so the data cannot close the script tag", () => {

@@ -6,14 +6,17 @@ import { HeroSection } from "./hero-section";
 import { ShortcutTiles } from "./shortcut-tiles";
 
 describe("home shortcuts", () => {
-  it("shows the search by commune and type, the result count and the two services in the hero", () => {
+  it("shows the search by commune and type, the result count and the two buttons in the hero", () => {
     const html = renderToStaticMarkup(<HeroSection resultCount={22} />);
     expect(html).toContain("Encuentra tu hogar ideal en el Gran Concepción");
     expect(html).toContain('role="search"');
     expect(html).toContain("Se han encontrado 22 resultados");
-    expect(html).toContain('href="/tasador-propiedades"');
-    expect(html).not.toContain('href="/#tasacion-gratis"');
-    expect(html).toContain('href="/#cierre"');
+    expect(html).toContain('href="/properties?operation=SALE"');
+    expect(html).toContain("Entrega inmediata");
+    expect(html).toContain('href="/regularizacion"');
+    expect(html).toContain("Equipo jurídico");
+    expect(html).not.toContain('href="/tasador-propiedades"');
+    expect(html).not.toContain("Corretaje tradicional");
   });
 
   it("omits the result count when the API cannot answer", () => {
