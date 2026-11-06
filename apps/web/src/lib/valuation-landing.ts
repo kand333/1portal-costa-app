@@ -46,9 +46,16 @@ const LANDING_TYPES = {
   },
 } as const satisfies Record<string, LandingType>;
 
-/** Only Concepción for now: more communes are added here once the first one brings leads. */
+/**
+ * Communes with a valuation landing. A landing is indexed only while the portal has real properties of its type in the
+ * commune (see `landing-availability.ts`); the rest stay noindex and out of the sitemap.
+ */
 const LANDING_COMMUNES = {
   concepcion: { name: "Concepción", citySlug: "concepcion" },
+  "san-pedro-de-la-paz": { name: "San Pedro de la Paz", citySlug: "san-pedro-de-la-paz" },
+  chiguayante: { name: "Chiguayante", citySlug: "chiguayante" },
+  hualpen: { name: "Hualpén", citySlug: "hualpen" },
+  talcahuano: { name: "Talcahuano", citySlug: "talcahuano" },
 } as const satisfies Record<string, LandingCommune>;
 
 export type ValuationLanding = LandingType & {

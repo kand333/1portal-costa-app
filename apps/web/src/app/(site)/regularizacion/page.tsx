@@ -1,10 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { RelatedGuides } from "@/components/guides/related-guides";
 import { BlueprintArt } from "@/components/regularizacion/blueprint-art";
 import { ProblemExplorer } from "@/components/regularizacion/problem-explorer";
+import { serializeJsonLd } from "@/lib/agent-schema";
 import { BRAND_SHARE_IMAGE } from "@/lib/brand-share-image";
 import { SITE_NAME } from "@/lib/property-metadata";
 import { buildRegularizationUrl } from "@/lib/regularization";
+import { siteUrl } from "@/lib/site-url";
 
 const title = `Regularización de propiedades en Concepción | ${SITE_NAME}`;
 const description =
@@ -56,9 +59,38 @@ const QUESTIONS = [
 
 export default function RegularizationPage() {
   const consultationUrl = buildRegularizationUrl(process.env.NEXT_PUBLIC_WHATSAPP_NUMBER);
+  const origin = siteUrl();
+  const jsonLd = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Service",
+      name: "Asesoría en regularización de propiedades",
+      description,
+      serviceType: "Regularización de propiedades",
+      provider: { "@type": "RealEstateAgent", name: SITE_NAME, url: origin },
+      areaServed: { "@type": "AdministrativeArea", name: "Gran Concepción" },
+      url: `${origin}/regularizacion`,
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Inicio", item: origin },
+        { "@type": "ListItem", position: 2, name: "Regularización de propiedades", item: `${origin}/regularizacion` },
+      ],
+    },
+  ];
 
   return (
     <>
+      {jsonLd.map((entry, index) => (
+        <script
+          key={index}
+          type="application/ld+json"
+          // Static data from this repository, with "<" escaped so it cannot close the tag.
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(entry) }}
+        />
+      ))}
       <section aria-labelledby="regularization-title" className="mx-auto grid w-full max-w-7xl items-center gap-10 px-4 pb-16 pt-12 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:gap-16 lg:px-8 lg:pb-24 lg:pt-20">
         <div>
           <h1 id="regularization-title" className="font-display text-[clamp(2.5rem,6vw,5rem)] leading-[1.02] text-ink">
@@ -137,6 +169,8 @@ export default function RegularizationPage() {
           </a>
         </div>
       </section>
+
+      <RelatedGuides sections={["regularizacion", "tasacion-compra"]} className="mx-auto w-full max-w-3xl px-4 pt-4 sm:px-6" />
 
       <section aria-labelledby="faq-title" className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6 lg:py-24">
         <h2 id="faq-title" className="font-display text-3xl text-ink sm:text-5xl">

@@ -1,11 +1,16 @@
 import Image from "next/image";
 import Link from "next/link";
+import { listGuides, SHOW_DRAFT_GUIDES } from "@/lib/guides";
 import { listValuationLandings } from "@/lib/valuation-landing";
 import { navigationItems } from "./navigation-items";
 
 // An orange band with slow waves closes the page, like the reference. Dark text keeps the small links readable on orange.
+// The footer keeps to the main commune: the others are reached from the landings themselves and the sitemap.
+const FOOTER_LANDINGS = listValuationLandings().filter((landing) => landing.communeSlug === "concepcion");
+
 export function SiteFooter() {
   const currentYear = new Date().getFullYear();
+  const hasGuides = listGuides({ includeDrafts: SHOW_DRAFT_GUIDES }).length > 0;
 
   return (
     <footer className="relative isolate overflow-hidden bg-[image:var(--ember)] text-ink">
@@ -52,7 +57,7 @@ export function SiteFooter() {
         </div>
         <nav aria-label="Tasaciones por tipo de propiedad">
           <ul className="flex flex-wrap gap-x-6 gap-y-1">
-            {listValuationLandings().map((landing) => (
+            {FOOTER_LANDINGS.map((landing) => (
               <li key={landing.path}>
                 <Link
                   href={landing.path}
@@ -62,6 +67,16 @@ export function SiteFooter() {
                 </Link>
               </li>
             ))}
+            {hasGuides && (
+              <li>
+                <Link
+                  href="/guias"
+                  className="inline-flex min-h-11 items-center rounded-sm text-sm font-medium underline underline-offset-4 transition-opacity duration-200 hover:opacity-70 focus-visible:outline-white"
+                >
+                  Guías de tasación y compra
+                </Link>
+              </li>
+            )}
           </ul>
         </nav>
         <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1">

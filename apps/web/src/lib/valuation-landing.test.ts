@@ -7,16 +7,23 @@ import {
 } from "./valuation-landing";
 
 describe("valuation landings", () => {
-  it("exists only for houses and apartments in Concepción", () => {
-    expect(listValuationLandings().map((landing) => landing.path)).toEqual([
+  it("exists only for houses and apartments in the five covered communes", () => {
+    const paths = listValuationLandings().map((landing) => landing.path);
+    expect(paths).toHaveLength(10);
+    expect(paths).toEqual(expect.arrayContaining([
       "/tasacion/casa/concepcion",
       "/tasacion/departamento/concepcion",
-    ]);
+      "/tasacion/casa/san-pedro-de-la-paz",
+      "/tasacion/departamento/chiguayante",
+      "/tasacion/casa/hualpen",
+      "/tasacion/departamento/talcahuano",
+    ]));
+    expect(new Set(paths).size).toBe(paths.length);
   });
 
   it("returns null for unknown types and communes, including prototype keys", () => {
     expect(getValuationLanding("terreno", "concepcion")).toBeNull();
-    expect(getValuationLanding("casa", "talcahuano")).toBeNull();
+    expect(getValuationLanding("casa", "lota")).toBeNull();
     expect(getValuationLanding("constructor", "concepcion")).toBeNull();
     expect(getValuationLanding("casa", "__proto__")).toBeNull();
   });

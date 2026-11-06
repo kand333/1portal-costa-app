@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
+import { RelatedGuides } from "@/components/guides/related-guides";
 import { PropertyValuator } from "@/components/tasador/property-valuator";
 import { ValuationFaq } from "@/components/tasador/valuation-faq";
+import { serializeJsonLd } from "@/lib/agent-schema";
 import { BRAND_SHARE_IMAGE } from "@/lib/brand-share-image";
 import { SITE_NAME } from "@/lib/property-metadata";
+import { siteUrl } from "@/lib/site-url";
 
 const title = `Tasación de propiedades gratis en Concepción | ${SITE_NAME}`;
 const description = "Estima gratis el precio de venta o arriendo de tu casa o departamento en Concepción y alrededores.";
@@ -23,8 +26,23 @@ export const metadata: Metadata = {
 };
 
 export default function PropertyValuationPage() {
+  const origin = siteUrl();
+  const breadcrumbs = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Inicio", item: origin },
+      { "@type": "ListItem", position: 2, name: "Tasación de propiedades", item: `${origin}/tasador-propiedades` },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // Static data from this repository, with "<" escaped so it cannot close the tag.
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbs) }}
+      />
       <section aria-labelledby="valuation-title" className="mx-auto w-full max-w-6xl px-4 pb-16 pt-10 sm:px-6">
         <h1 id="valuation-title" className="text-center text-2xl font-semibold text-ink">
           Tasación de propiedades gratis y online en Concepción y alrededores
@@ -44,6 +62,7 @@ export default function PropertyValuationPage() {
         </div>
       </section>
       <ValuationFaq />
+      <RelatedGuides sections={["tasacion-compra"]} className="mx-auto w-full max-w-4xl px-4 pb-16 sm:px-6" />
     </>
   );
 }
