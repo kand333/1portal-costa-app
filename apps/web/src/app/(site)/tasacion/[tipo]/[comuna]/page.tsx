@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { RelatedGuides } from "@/components/guides/related-guides";
 import { PropertyShowcaseSection } from "@/components/home/property-showcase-section";
 import { PropertiesFallbackProvider } from "@/components/properties/properties-fallback";
+import { countLandingProperties, isLandingIndexable } from "@/lib/landing-availability";
+import { buildPropertiesApiUrl } from "@/lib/property-search";
 import { fetchPropertiesFallback } from "@/lib/properties-server";
 import { serializeJsonLd } from "@/lib/agent-schema";
 import { BRAND_SHARE_IMAGE } from "@/lib/brand-share-image";
@@ -28,10 +31,13 @@ export async function generateMetadata({ params }: PageProps<"/tasacion/[tipo]/[
   if (!landing) return { title: `Página no encontrada | ${SITE_NAME}` };
   const title = valuationLandingTitle(landing);
   const description = valuationLandingDescription(landing);
+  // Without real properties for this type and commune the page would nearly copy its siblings: keep it out of Google.
+  const indexable = isLandingIndexable(await countLandingProperties(landing));
   return {
     title,
     description,
     alternates: { canonical: landing.path },
+    robots: indexable ? undefined : { index: false, follow: true },
     openGraph: {
       type: "website",
       siteName: SITE_NAME,
@@ -56,7 +62,14 @@ export default async function ValuationLandingPage({ params }: PageProps<"/tasac
   // Same object for the server fetch and the client list, so both use the same cache key.
   const showcaseQuery = { city: [commune.citySlug], type: landing.propertyType, pageSize: 3 };
   const fallback = await fetchPropertiesFallback([showcaseQuery]);
-  const otherLandings = listValuationLandings().filter((other) => other.path !== landing.path);
+  // Same commune in the other property type, and the same type in the other communes, only while they have properties.
+  const siblings = listValuationLandings().filter(
+    (other) => other.path !== landing.path && (other.communeSlug === landing.communeSlug || other.typeSlug === landing.typeSlug),
+  );
+  const siblingCounts = await Promise.all(siblings.map((other) => countLandingProperties(other)));
+  const otherLandings = siblings.filter((_, index) => isLandingIndexable(siblingCounts[index]));
+  const listed = fallback[buildPropertiesApiUrl(showcaseQuery)];
+  const sectors = [...new Set((listed?.data ?? []).map((property) => property.commune))].slice(0, 3);
   const origin = siteUrl();
   const breadcrumbs = {
     "@context": "https://schema.org",
@@ -110,6 +123,13 @@ export default async function ValuationLandingPage({ params }: PageProps<"/tasac
           </Link>
         </div>
 
+        {listed && listed.meta.total > 0 && (
+          <p className="mt-6 text-muted">
+            Hoy hay {listed.meta.total} {plural} publicadas en {commune.name}
+            {sectors.length > 0 ? `, por ejemplo en ${sectors.join(", ")}` : ""}.
+          </p>
+        )}
+
         <h2 className="mt-14 text-2xl font-semibold text-ink">
           Qué influye en el valor de {landing.article} {singular} en {commune.name}
         </h2>
@@ -140,6 +160,8 @@ export default async function ValuationLandingPage({ params }: PageProps<"/tasac
           viewAllLabel={`Ver ${landing.all} ${plural}`}
         />
       </PropertiesFallbackProvider>
+
+      <RelatedGuides sections={["tasacion-compra"]} className="mx-auto w-full max-w-4xl px-4 pb-10 sm:px-6" />
 
       {otherLandings.length > 0 && (
         <nav aria-label="Otras tasaciones" className="mx-auto w-full max-w-4xl px-4 pb-20 sm:px-6">
