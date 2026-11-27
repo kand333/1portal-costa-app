@@ -77,13 +77,24 @@ export function namesMatchingSlugs(names: string[], slugs: string[] | undefined)
  * Names the neighbourhood of each listing from the sectors of the reference table. It never fails the catalog:
  * if the table or the texts cannot be read, the listings simply have no sector.
  */
+// The sectors of the reference table change rarely: they are kept for a few minutes instead of being read on every listing.
+const SECTORS_TTL_MS = 5 * 60 * 1000;
+let cachedSectors: { sectors: NamedSector[]; expiresAt: number } | null = null;
+
+async function loadSectors(): Promise<NamedSector[]> {
+  if (cachedSectors && cachedSectors.expiresAt > Date.now()) return cachedSectors.sectors;
+  const cities = await listValuationCities();
+  const sectors = cities.flatMap((city) => city.sectors.map((sector) => ({ name: sector.name, commune: sector.commune })));
+  cachedSectors = { sectors, expiresAt: Date.now() + SECTORS_TTL_MS };
+  return sectors;
+}
+
 async function withSectors(records: PropertySummaryRecord[]): Promise<PropertySummary[]> {
   let sectors: NamedSector[] = [];
   let texts = new Map<string, { address: string; description: string }>();
   try {
-    const [cities, rows] = await Promise.all([listValuationCities(), findPropertyTexts(records.map((record) => record.id))]);
-    sectors = cities.flatMap((city) => city.sectors.map((sector) => ({ name: sector.name, commune: sector.commune })));
-    texts = new Map(rows.map((row) => [row.id, row]));
+    sectors = await loadSectors();
+    texts = new Map((await findPropertyTexts(records.map((record) => record.id))).map((row) => [row.id, row]));
   } catch {
     // Without sectors the catalog still loads.
   }
