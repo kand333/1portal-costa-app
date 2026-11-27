@@ -29,6 +29,16 @@ describe("getDatabaseConnectionConfig", () => {
     expect(getDatabaseConnectionConfig(local)).toEqual({ connectionString: local });
   });
 
+  it("keeps one connection per process in production, so serverless instances do not exhaust the pooler", () => {
+    const url = `${pooler}:5432/postgres`;
+    expect(getDatabaseConnectionConfig(url, { NODE_ENV: "production" }).max).toBe(1);
+    expect(getDatabaseConnectionConfig(url, { NODE_ENV: "development" }).max).toBe(5);
+    expect(getDatabaseConnectionConfig(url, { NODE_ENV: "production", DATABASE_POOL_MAX: "3" }).max).toBe(3);
+    expect(getDatabaseConnectionConfig(url, { NODE_ENV: "production", DATABASE_POOL_MAX: "x" }).max).toBe(1);
+    expect(getDatabaseConnectionConfig(url, { NODE_ENV: "production" }).idleTimeoutMillis).toBe(10_000);
+    expect(getDatabaseConnectionConfig("postgresql://u:p@localhost:5432/db", { NODE_ENV: "production" }).max).toBeUndefined();
+  });
+
   it("bundles the same certificate as certs/prod-ca-2021.crt: the Supabase Root 2021 CA", () => {
     const certificate = new X509Certificate(SUPABASE_ROOT_CA);
     expect(certificate.subject).toContain("CN=Supabase Root 2021 CA");
