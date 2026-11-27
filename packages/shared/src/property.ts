@@ -3,6 +3,8 @@ import type { Currency, OperationType, PropertyType } from "./enums";
 /** Public data shown in catalog cards. */
 export type PropertySummary = {
   id: string;
+  /** Public listing number, e.g. 5888. */
+  code: number;
   title: string;
   operationType: OperationType;
   propertyType: PropertyType;
@@ -17,6 +19,8 @@ export type PropertySummary = {
   region: string;
   isFeatured: boolean;
   mainImageUrl: string | null;
+  /** Neighbourhood of the reference table that the listing names («Centro»); only in the public catalog lists. */
+  sector?: string | null;
   createdAt: string;
 };
 

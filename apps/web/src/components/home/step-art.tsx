@@ -187,7 +187,7 @@ export function PhoneMockup() {
       </svg>
       <div className="relative flex h-full flex-col items-center justify-center gap-6 text-center">
         <p className="font-display text-3xl leading-tight">Tasa tu propiedad</p>
-        <span className="rounded-full bg-white px-6 py-2 text-sm font-semibold text-ink">Comenzar</span>
+        <span className="rounded-full bg-accent px-6 py-2 text-sm font-semibold text-on-accent">Comenzar</span>
       </div>
     </div>
   );

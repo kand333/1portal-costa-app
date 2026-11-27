@@ -29,9 +29,6 @@ export async function POST(request: NextRequest) {
 
   try {
     const result = await estimateValuation(parsed.data);
-    if (result.status !== "ok") {
-      return errorResponse(422, "No hay datos suficientes para generar el informe de esta propiedad");
-    }
     const issuedAt = new Date();
     const pdf = await renderValuationReport(buildReportContent(parsed.data, result, issuedAt, await getUfQuote()));
     return new Response(new Uint8Array(pdf), {

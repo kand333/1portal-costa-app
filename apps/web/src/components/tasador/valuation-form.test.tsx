@@ -12,11 +12,12 @@ describe("ValuationForm", () => {
     expect(html.indexOf("Superficie construida")).toBeLessThan(html.indexOf("Superficie total"));
   });
 
-  it("closes with the storage question, Sí / No, after the parking spaces", () => {
-    expect(html).toContain("¿Tiene bodega?");
-    expect(html.indexOf("Número de estacionamientos")).toBeLessThan(html.indexOf("¿Tiene bodega?"));
-    expect(html.indexOf("¿Tiene bodega?")).toBeGreaterThan(html.lastIndexOf("Superficie total"));
-    expect(html.slice(html.indexOf("¿Tiene bodega?"))).toMatch(/aria-pressed="false"[^>]*>Sí<[\s\S]*aria-pressed="false"[^>]*>No</);
+  it("closes with the construction year, a numeric field, after the parking spaces", () => {
+    expect(html).toContain("Año de construcción");
+    expect(html).not.toContain("¿Tiene bodega?");
+    expect(html.indexOf("Número de estacionamientos")).toBeLessThan(html.indexOf("Año de construcción"));
+    expect(html).toMatch(/id="valuation-constructionYear"[^>]*inputMode="numeric"/);
+    expect(html).toContain("una propiedad más nueva vale más");
   });
 });
 
@@ -32,12 +33,26 @@ describe("summarizeValuation", () => {
     bathrooms: 2,
     parkingSpaces: 1,
     amenities: [],
+    constructionYear: 2008,
   };
-  const result: ValuationResult = { status: "insufficient" };
+  const result: ValuationResult = {
+    status: "ok",
+    estimate: 90_000_000,
+    low: 80_000_000,
+    high: 100_000_000,
+    pricePerSquareMeter: 1_285_714,
+    comparablesCount: 0,
+    scope: "portal",
+    uf: null,
+    basis: "reference",
+    confidence: "low",
+    sector: null,
+  };
 
-  it("mentions the storage only when it was answered", () => {
-    expect(summarizeValuation(request, result)).not.toContain("Bodega");
-    expect(summarizeValuation({ ...request, hasStorage: true }, result)).toContain("Bodega: sí.");
-    expect(summarizeValuation({ ...request, hasStorage: false }, result)).toContain("Bodega: no.");
+  it("carries the construction year, and says when there were no comparables", () => {
+    const text = summarizeValuation(request, result);
+    expect(text).toContain("Año de construcción: 2008.");
+    expect(text).toContain("referencia por sector, sin comparables");
+    expect(text).not.toContain("Bodega");
   });
 });

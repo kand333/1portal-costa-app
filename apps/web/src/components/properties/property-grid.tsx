@@ -4,12 +4,14 @@ import { PropertyCardSkeleton } from "./property-card-skeleton";
 
 /**
  * - `full`: the grid uses the whole page width: 1 column on phones, 2 on tablets, 3 on desktop.
+ * - `wide`: like `full`, but with a fourth column on wide screens (home showcase, up to 8 cards).
  * - `withSidebar`: next to a sidebar (catalog filters), so the third column waits for wide screens.
  */
-export type PropertyGridLayout = "full" | "withSidebar";
+export type PropertyGridLayout = "full" | "wide" | "withSidebar";
 
 const gridClassNames: Record<PropertyGridLayout, string> = {
   full: "grid grid-cols-1 gap-7 sm:grid-cols-2 lg:grid-cols-3",
+  wide: "grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-4",
   withSidebar: "grid grid-cols-1 gap-7 sm:grid-cols-2 xl:grid-cols-3",
 };
 

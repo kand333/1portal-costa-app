@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { AccentWord } from "@/components/ui/accent-word";
 import Link from "next/link";
 import { LeadForm } from "@/components/home/lead-form";
 import { COMMUNE_NAMES } from "@/lib/communes";
@@ -17,14 +18,14 @@ const SPECIALTIES: readonly { label: string; href?: string }[] = [
 /** The lead hook: a free valuation (sale price or rental price) with proof of experience and a short form beside it. */
 export function FreeValuationPitch() {
   return (
-    <section id="tasacion-gratis" aria-labelledby="pitch-title" className="night relative isolate scroll-mt-24 overflow-hidden">
-      <Image src={BACKGROUND} alt="" fill sizes="100vw" className="-z-10 object-cover opacity-20" />
+    <section id="tasacion-gratis" aria-labelledby="pitch-title" className="relative isolate scroll-mt-24 overflow-hidden bg-sand">
+      <Image src={BACKGROUND} alt="" fill sizes="100vw" className="-z-10 object-cover opacity-[0.12]" />
       <div className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.15fr_1fr] lg:items-start lg:gap-16 lg:px-8 lg:py-28">
         <div>
           <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-brass-text">Tasación gratuita</p>
-          <h2 id="pitch-title" className="mt-5 font-display text-[clamp(2.25rem,4.6vw,4rem)] leading-[1.05] text-ink">
+          <h2 id="pitch-title" className="mt-5 font-display display-heavy text-[clamp(2.25rem,4.6vw,4rem)] leading-[1.05] text-ink">
             Obtén tu tasación de venta o valoración de precio de arriendo profesional, de manera{" "}
-            <span className="text-brass">gratuita</span> en Concepción
+            <AccentWord>gratuita</AccentWord> en Concepción
           </h2>
           <p className="mt-5 max-w-xl text-lg text-muted">Sin gastar tiempo, sin perder dinero, sin letra chica, sin preocupaciones.</p>
 
@@ -48,7 +49,7 @@ export function FreeValuationPitch() {
             </span>
           </Link>
 
-          <p className="mt-8 font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">Especializados en</p>
+          <p className="mt-8 font-mono text-xs font-medium uppercase tracking-[0.18em] text-brass-text">Especializados en</p>
           <ul className="mt-3 flex flex-wrap gap-2">
             {SPECIALTIES.map((specialty) => (
               <li key={specialty.label}>

@@ -153,6 +153,19 @@ describe.skipIf(!hasDatabaseUrl)("public properties API", () => {
       expect(property).not.toHaveProperty("isPublished");
     });
 
+    it("gives every property its own listing code, in sequence, from 5888 on", async () => {
+      const prisma = await getPrisma();
+      const { body } = await listProperties("?pageSize=50");
+      const listed = (body as PaginatedResponse<PropertySummary>).data.find((item) => item.id === publishedId);
+      const stored = await prisma.property.findMany({ where: { title: { contains: testRunId } }, select: { code: true }, orderBy: { createdAt: "asc" } });
+
+      expect(listed?.code).toBeGreaterThanOrEqual(5888);
+      expect(new Set(stored.map((row) => row.code)).size).toBe(stored.length);
+      const codes = stored.map((row) => row.code);
+      expect(codes).toEqual([...codes].sort((a, b) => a - b));
+      expect((await getProperty(publishedId)).body).toMatchObject({ code: listed?.code });
+    });
+
     it("never includes unpublished properties", async () => {
       const ids = await fetchAllPublishedIds();
       expect(ids).toContain(publishedId);

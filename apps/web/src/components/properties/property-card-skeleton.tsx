@@ -9,7 +9,12 @@ export function PropertyCardSkeleton() {
         <div className="h-7 w-1/3 rounded-full bg-line/60" />
         <div className="h-4 w-4/5 rounded-full bg-line/60" />
         <div className="h-4 w-1/2 rounded-full bg-line/60" />
-        <div className="mt-3 h-4 w-3/4 rounded-full bg-line/60" />
+        <div className="h-3 w-16 rounded-full bg-line/60" />
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="h-16 rounded-xl bg-line/60" />
+          <div className="h-16 rounded-xl bg-line/60" />
+          <div className="h-16 rounded-xl bg-line/60" />
+        </div>
       </div>
     </div>
   );

@@ -1,39 +1,16 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 
-/** Phones only: a fixed "Tasar gratis" bar that steps aside while a lead form is on screen. */
-export function MobileCtaBar() {
-  const [isFormVisible, setIsFormVisible] = useState(true);
+type MobileCtaBarProps = {
+  /** Where the button leads; on `/vender` it jumps to the form instead of reloading the page. */
+  href?: string;
+};
 
-  useEffect(() => {
-    const forms = ["cierre"].flatMap((id) => document.getElementById(id) ?? []);
-    const visible = new Set<Element>();
-    const observer = new IntersectionObserver((entries) => {
-      for (const entry of entries) {
-        if (entry.isIntersecting) visible.add(entry.target);
-        else visible.delete(entry.target);
-      }
-      setIsFormVisible(visible.size > 0);
-    });
-    forms.forEach((form) => observer.observe(form));
-    return () => observer.disconnect();
-  }, []);
-
+/** Phones only: a «VENDE CON NOSOTROS» bar fixed to the bottom of the screen at all times. */
+export function MobileCtaBar({ href = "/vender" }: MobileCtaBarProps) {
   return (
-    <div
-      aria-hidden={isFormVisible}
-      className={`fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-300 lg:hidden ${
-        isFormVisible ? "translate-y-full" : "translate-y-0"
-      }`}
-    >
-      <Link
-        href="/tasador-propiedades"
-        tabIndex={isFormVisible ? -1 : undefined}
-        className="flex h-12 items-center justify-center rounded-full bg-accent font-bold text-on-accent shadow-soft"
-      >
-        Tasar gratis
+    <div className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface/95 px-3 pt-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
+      <Link href={href} className="flex h-12 items-center justify-center rounded-full bg-accent font-bold text-on-accent shadow-soft">
+        VENDE CON NOSOTROS
       </Link>
     </div>
   );

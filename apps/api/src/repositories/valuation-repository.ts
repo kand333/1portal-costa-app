@@ -21,7 +21,7 @@ export function findComparableProperties(filter: ComparableFilter) {
       ...(filter.commune ? { commune: { equals: filter.commune, mode: "insensitive" } } : {}),
       OR: [{ usableArea: { gt: 0 } }, { totalArea: { gt: 0 } }],
     },
-    select: { price: true, usableArea: true, totalArea: true, bedrooms: true, bathrooms: true, parkingSpaces: true },
+    select: { price: true, usableArea: true, totalArea: true, bedrooms: true, bathrooms: true, parkingSpaces: true, ageInYears: true },
     take: 500,
   });
 }

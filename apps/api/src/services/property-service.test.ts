@@ -80,6 +80,7 @@ describe("listPublishedProperties", () => {
       commune: "Lo Barnechea",
       city: "Santiago",
       region: "Región Metropolitana",
+      sector: null,
       isFeatured: true,
       mainImageUrl: "https://example.com/main.jpg",
       createdAt: "2026-09-01T10:00:00.000Z",

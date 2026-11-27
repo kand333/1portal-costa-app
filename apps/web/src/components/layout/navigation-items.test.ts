@@ -5,56 +5,48 @@ describe("navigationItems", () => {
   it("exposes the public navigation in the specified order", () => {
     expect(navigationItems.map((item) => item.label)).toEqual([
       "Inicio",
-      "Proyectos nuevos",
-      "Tasación",
-      "Corretaje",
-      "Regularización",
-      "Ingresar",
+      "Propiedades",
+      "Vender",
+      "Tasar",
+      "Regularizar",
+      "Entrar a mi cuenta",
     ]);
   });
 });
 
 describe("getActiveNavigationHref", () => {
-  it("marks home on the root path", () => {
-    expect(getActiveNavigationHref("/", null)).toBe("/");
+  it("marks «Inicio» on the home page", () => {
+    expect(getActiveNavigationHref("/")).toBe("/");
   });
 
-  it("marks the catalog when no operation is selected", () => {
-    expect(getActiveNavigationHref("/properties", null)).toBe("/properties");
+  it("marks «Propiedades» on the catalog and on a property page", () => {
+    expect(getActiveNavigationHref("/properties")).toBe("/properties");
+    expect(getActiveNavigationHref("/properties/abc")).toBe("/properties");
   });
 
-  it("marks buy and rent according to the operation parameter", () => {
-    expect(getActiveNavigationHref("/properties", "SALE")).toBe("/properties?operation=SALE");
-    expect(getActiveNavigationHref("/properties", "RENT")).toBe("/properties?operation=RENT");
-  });
-
-  it("falls back to the catalog for unknown operations", () => {
-    expect(getActiveNavigationHref("/properties", "OTHER")).toBe("/properties");
-  });
-
-  it("marks the catalog on a property detail page", () => {
-    expect(getActiveNavigationHref("/properties/abc", "SALE")).toBe("/properties");
+  it("marks the sell page on its route", () => {
+    expect(getActiveNavigationHref("/vender")).toBe("/vender");
   });
 
   it("marks the valuation page on its route", () => {
-    expect(getActiveNavigationHref("/tasador-propiedades", null)).toBe("/tasador-propiedades");
+    expect(getActiveNavigationHref("/tasador-propiedades")).toBe("/tasador-propiedades");
   });
 
   it("marks the regularization page on its route", () => {
-    expect(getActiveNavigationHref("/regularizacion", null)).toBe("/regularizacion");
+    expect(getActiveNavigationHref("/regularizacion")).toBe("/regularizacion");
   });
 
   it("marks login on the login page", () => {
-    expect(getActiveNavigationHref("/login", null)).toBe("/login");
+    expect(getActiveNavigationHref("/login")).toBe("/login");
   });
 
   it("marks the account (the user name link) on the account pages", () => {
-    expect(getActiveNavigationHref("/account", null)).toBe("/account");
-    expect(getActiveNavigationHref("/account/favorites", null)).toBe("/account");
+    expect(getActiveNavigationHref("/account")).toBe("/account");
+    expect(getActiveNavigationHref("/account/favorites")).toBe("/account");
   });
 
   it("returns null for routes outside the public navigation", () => {
-    expect(getActiveNavigationHref("/admin", null)).toBeNull();
-    expect(getActiveNavigationHref("/propertiesx", null)).toBeNull();
+    expect(getActiveNavigationHref("/admin")).toBeNull();
+    expect(getActiveNavigationHref("/propertiesx")).toBeNull();
   });
 });

@@ -21,21 +21,21 @@ export default async function OpenGraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "0 90px",
-          background: "#fef7e5",
-          color: "#231a14",
+          background: "#14181d",
+          color: "#f5efe6",
           borderBottom: "18px solid #f56908",
         }}
       >
         <div style={{ display: "flex", alignItems: "center" }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- ImageResponse renders plain elements */}
-          <img src={logoSource} width={120} height={116} alt="" />
+          <img src={logoSource} width={120} height={116} alt="" style={{ background: "#ffffff", borderRadius: 9999, padding: 10 }} />
           <div style={{ display: "flex", fontSize: 96, fontWeight: 700, marginLeft: 28 }}>
             <span>Propi</span>
             <span style={{ color: "#f56908" }}>Zoom</span>
           </div>
         </div>
         <div style={{ fontSize: 48, marginTop: 36, lineHeight: 1.2 }}>Corredora de propiedades en el Gran Concepción</div>
-        <div style={{ fontSize: 36, marginTop: 20, color: "#b84300", fontWeight: 700 }}>Tasación gratis · Proyectos nuevos · Corretaje</div>
+        <div style={{ fontSize: 36, marginTop: 20, color: "#ff8a3d", fontWeight: 700 }}>Tasación gratis · Proyectos nuevos · Corretaje</div>
       </div>
     ),
     size,

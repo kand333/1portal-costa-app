@@ -5,7 +5,7 @@ import PropertyValuationPage from "./page";
 describe("PropertyValuationPage", () => {
   it("shows the heading, the estimator fields, the map area and the FAQ", () => {
     const html = renderToStaticMarkup(<PropertyValuationPage />);
-    expect(html).toContain("Tasación de propiedades gratis y online");
+    expect(html.replace(/<[^>]+>/g, "")).toContain("Tasación de propiedades gratis y online");
     for (const label of [
       "Dirección de la propiedad",
       "Comuna",
@@ -19,7 +19,7 @@ describe("PropertyValuationPage", () => {
     ]) {
       expect(html).toContain(label);
     }
-    expect(html).toContain("Preguntas frecuentes");
+    expect(html.replace(/<[^>]+>/g, "")).toContain("Preguntas frecuentes");
     // The amenities step only appears after the data step.
     expect(html).not.toContain("Amenidades de la propiedad");
     expect(html.match(/<details/g)).toHaveLength(5);

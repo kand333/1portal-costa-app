@@ -16,6 +16,9 @@ const ok: ValuationResult = {
   comparablesCount: 7,
   scope: "commune",
   uf: null,
+  basis: "mixed",
+  confidence: "medium",
+  sector: "Centro",
 };
 
 const validRequest = () => ({
@@ -28,6 +31,7 @@ const validRequest = () => ({
   bedrooms: 3,
   bathrooms: 2,
   parkingSpaces: 1,
+  constructionYear: 2010,
   amenities: ["pool"],
 });
 
@@ -55,11 +59,6 @@ describe("valuation report API", () => {
     expect(response.headers.get("Content-Disposition")).toContain("attachment");
     const bytes = Buffer.from(await response.arrayBuffer());
     expect(bytes.subarray(0, 5).toString()).toBe("%PDF-");
-  });
-
-  it("answers 422 when there is not enough data for an estimate", async () => {
-    estimate.current = { status: "insufficient" };
-    expect((await postReport(validRequest())).status).toBe(422);
   });
 
   it("rejects invalid data with 400", async () => {

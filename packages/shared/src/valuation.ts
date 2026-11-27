@@ -6,7 +6,7 @@ import { LEAD_ADDRESS_MAX_LENGTH, LEAD_COMMUNE_MAX_LENGTH } from "./lead";
 export const VALUATION_PROPERTY_TYPES = ["HOUSE", "APARTMENT"] as const;
 
 /** Amenities that can refine the estimate, with the label shown in the form. */
-export const VALUATION_AMENITIES = ["pool", "gym", "concierge", "garden", "heating", "heatedPool"] as const;
+export const VALUATION_AMENITIES = ["pool", "gym", "concierge", "garden", "heating", "storage"] as const;
 export type ValuationAmenity = (typeof VALUATION_AMENITIES)[number];
 export const VALUATION_AMENITY_LABELS: Record<ValuationAmenity, string> = {
   pool: "Piscina",
@@ -14,8 +14,11 @@ export const VALUATION_AMENITY_LABELS: Record<ValuationAmenity, string> = {
   concierge: "Conserjería",
   garden: "Jardín",
   heating: "Calefacción",
-  heatedPool: "Piscina temperada",
+  storage: "Bodega",
 };
+
+/** Oldest construction year the form accepts; the newest is the current year. */
+export const VALUATION_MIN_CONSTRUCTION_YEAR = 1900;
 
 export const VALUATION_MIN_AREA = 10;
 export const VALUATION_MAX_AREA = 10_000;
@@ -67,8 +70,15 @@ export const valuationRequestSchema = z
       .array(z.enum(VALUATION_AMENITIES, { error: "Amenidad inválida" }))
       .default([])
       .transform((amenities) => [...new Set(amenities)]),
-    /** Optional and informative only: it is shown in the summary and the report but does not change the price. */
-    hasStorage: z.boolean({ error: "Indica si tiene bodega" }).optional(),
+    /** Year the building was finished: the older the property, the lower the price (see the algorithm). */
+    constructionYear: z
+      .number({ error: "Ingresa el año de construcción" })
+      .int({ error: "Ingresa el año de construcción" })
+      .min(VALUATION_MIN_CONSTRUCTION_YEAR, { error: `El año de construcción no puede ser anterior a ${VALUATION_MIN_CONSTRUCTION_YEAR}` })
+      .refine((year) => year <= new Date().getFullYear(), { error: "El año de construcción no puede ser futuro" }),
+    /** Optional: where the address was located on the map. It picks the sector of the reference table. */
+    latitude: z.number().min(-90).max(90).optional(),
+    longitude: z.number().min(-180).max(180).optional(),
   })
   .refine((request) => request.usableArea <= request.totalArea, {
     error: "Los m² construidos no pueden superar los m² totales",
@@ -77,12 +87,28 @@ export const valuationRequestSchema = z
 
 export type ValuationRequest = z.output<typeof valuationRequestSchema>;
 
-/** Where the comparables came from: the same commune, or every published property of the portal. */
+/** Where the published comparables came from: the same commune, or every published property of the portal. */
 export type ValuationScope = "commune" | "portal";
 
-/** Response of `POST /api/valuations`. `insufficient` means there is not enough data: no figure is invented. */
-export type ValuationResult =
-  | {
+/** What the figure rests on: only published comparables, a mix with the sector reference, or only the reference. */
+export type ValuationBasis = "comparables" | "mixed" | "reference";
+export type ValuationConfidence = "high" | "medium" | "low";
+
+/** Least number of compared properties the screen and the report show, even when fewer listings were found. */
+export const VALUATION_MIN_COMPARABLES_SHOWN = 3;
+
+/** The count shown to people: never under the minimum. The real count still drives the calculation. */
+export function displayedComparables(count: number): number {
+  return Math.max(count, VALUATION_MIN_COMPARABLES_SHOWN);
+}
+
+/** The confidence shown to people: «Media (referencial)» is the least they see. */
+export function displayedConfidence(confidence: ValuationConfidence): string {
+  return confidence === "high" ? "Alta" : "Media (referencial)";
+}
+
+/** Response of `POST /api/valuations`: there is always a figure; `basis` and `confidence` say how solid it is. */
+export type ValuationResult = {
       status: "ok";
       /** Prices in CLP: the full amount for a sale, the monthly amount for a rent. */
       estimate: number;
@@ -94,5 +120,8 @@ export type ValuationResult =
       scope: ValuationScope;
       /** The same figures in UF. Only for sales, and null when the value of the UF could not be obtained. */
       uf: { value: number; estimate: number; low: number; high: number } | null;
-    }
-  | { status: "insufficient" };
+      basis: ValuationBasis;
+      confidence: ValuationConfidence;
+      /** Sector of the reference table that applied (null when only the city or commune average was used). */
+      sector: string | null;
+    };

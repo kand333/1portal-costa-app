@@ -135,7 +135,7 @@ export function LeadForm({ source, idPrefix, fixedKind, initialAddress, message,
             setStep("place");
             setAddress("");
           }}
-          className="mt-4 border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+          className="mt-4 border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink"
         >
           Enviar otra solicitud
         </button>

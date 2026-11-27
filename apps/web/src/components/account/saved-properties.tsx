@@ -14,7 +14,7 @@ export function SavedProperties() {
         <p className="text-muted">Aún no tienes propiedades guardadas.</p>
         <Link
           href="/properties"
-          className="mt-4 inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+          className="mt-4 inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink"
         >
           Explorar propiedades
         </Link>

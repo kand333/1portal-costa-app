@@ -11,10 +11,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(currentSearch),
 }));
 
-const render = (filters: CatalogFilters, isOpen = true) =>
-  renderToStaticMarkup(
-    <CatalogFiltersPanel filters={filters} isOpen={isOpen} onToggle={() => {}} closeAfterApply={false} />,
-  );
+const render = (filters: CatalogFilters) => renderToStaticMarkup(<CatalogFiltersPanel filters={filters} />);
 
 /** The `<select>` element with this id, to check its options in isolation. */
 const selectHtml = (html: string, id: string) => html.match(new RegExp(`<select id="${id}"[\\s\\S]*?</select>`))?.[0] ?? "";
@@ -45,14 +42,24 @@ describe("CatalogFiltersPanel", () => {
 
   it("offers the operations, property types and room minimums in Spanish", () => {
     const html = render({});
-    for (const text of ["Venta", "Arriendo", "Casa", "Departamento", "Terreno", "Oficina", "Local comercial", "3+"]) {
+    for (const text of ["En venta", "Arriendo", "Casa", "Departamento", "Terreno", "Oficina", "Local comercial", "3+"]) {
       expect(html, text).toContain(text);
     }
   });
 
-  it("places city, sector and region right under the operation, before the other filters", () => {
+  it("puts the main filters in the top bar and the rest under «Más filtros»", () => {
     const html = render({});
-    const order = ["Operación", 'id="filter-city"', 'id="filter-commune"', 'id="filter-region"', 'id="filter-type"', 'id="filter-minPrice"'].map(
+    const order = [
+      "Operación",
+      'id="filter-city"',
+      'id="filter-type"',
+      'id="filter-maxPrice"',
+      'id="filter-bedrooms"',
+      "Más filtros",
+      'id="filter-region"',
+      'id="filter-commune"',
+      'id="filter-minPrice"',
+    ].map(
       (marker) => html.indexOf(marker),
     );
 
@@ -143,7 +150,7 @@ describe("CatalogFiltersPanel", () => {
     expect(html).toMatch(/<legend[^>]*>Operación/);
     expect(html).toMatch(/id="filter-operation-SALE"[^>]*checked=""/);
     expect(html).toMatch(/id="filter-operation-RENT"[^>]*checked=""/);
-    expect(html).toMatch(/for="filter-operation-SALE"[^>]*>Venta<\/label>/);
+    expect(html).toMatch(/for="filter-operation-SALE"[^>]*>En venta<\/label>/);
     expect(html).toMatch(/for="filter-operation-RENT"[^>]*>Arriendo<\/label>/);
     expect(html).not.toMatch(/<select[^>]*name="operation"/);
   });
@@ -183,19 +190,58 @@ describe("CatalogFiltersPanel", () => {
     expect(render({ region: ["provincia-arauco"] })).toContain("Limpiar filtros");
   });
 
-  it("has a toggle, on every screen size, that announces each active choice", () => {
-    const html = render({ type: "HOUSE", commune: ["nunoa", "providencia"] });
-
-    expect(html).toMatch(/<button type="button" aria-expanded="true" aria-controls="catalog-filters"/);
-    expect(html).not.toMatch(/<button[^>]*lg:hidden/);
-    // Read by screen readers as "3 filtros activos": 1 type + 2 sectors.
-    expect(html).toContain('3<span class="sr-only"> filtros activos</span>');
+  it("always shows the form, with no outer «Mostrar filtros» toggle", () => {
+    const html = render({});
+    expect(html).not.toContain("Mostrar filtros");
+    expect(html).not.toContain("Ocultar filtros");
+    expect(html).not.toMatch(new RegExp('<form id="catalog-filters"[^>]*hidden=""'));
   });
 
-  it("hides the form when folded", () => {
-    const html = render({}, false);
-    expect(html).toContain('aria-expanded="false"');
-    expect(html).toContain("Mostrar filtros");
-    expect(html).toMatch(/<form id="catalog-filters"[^>]*hidden=""/);
+  it("keeps operation and comuna in view on phones and folds type, maximum price and bedrooms under «Más filtros»", () => {
+    const html = render({});
+    const wrapper = (id: string) => html.match(new RegExp('<div class="([^"]*)"><label for="' + id + '"'))?.[1] ?? "";
+    for (const id of ["filter-type", "filter-maxPrice", "filter-bedrooms"]) expect(wrapper(id), id).toContain("max-lg:hidden");
+    expect(html).toMatch(new RegExp('<div><label for="filter-city"'));
+    expect(html).toContain('id="filter-operation-SALE"');
+  });
+
+  it("shows those folded filters on phones once «Más filtros» is open because a secondary filter is active", () => {
+    const html = render({ bathrooms: 2 });
+    expect(html.match(new RegExp('<div class="([^"]*)"><label for="filter-type"'))).toBeNull();
+    expect(html).toContain("Menos filtros");
+  });
+
+  it("puts operation and comuna on one line on phones", () => {
+    const html = render({});
+    const wrapper = html.indexOf("grid-cols-[auto_minmax(0,1fr)]");
+    expect(wrapper).toBeGreaterThan(0);
+    expect(wrapper).toBeLessThan(html.indexOf("filter-operation-SALE"));
+    expect(html.indexOf("filter-operation-SALE")).toBeLessThan(html.indexOf('id="filter-city"'));
+    expect(html.indexOf('id="filter-city"')).toBeLessThan(html.indexOf('id="filter-type"'));
+    expect(html).toContain('<option value="" selected="">Todas</option>');
+  });
+
+  it("has no «Buscar» while «Más filtros» is folded, and only desktop shows it once it is open", () => {
+    const folded = render({});
+    expect(folded).not.toContain("Buscar");
+    expect(folded).not.toContain('type="submit"');
+    const open = render({ bathrooms: 2 });
+    expect(open).toContain("Buscar");
+    // Only from `lg`: on phones nothing needs the button, every field applies on its own.
+    expect(open.match(new RegExp('<button type="submit" class="([^"]*)"'))?.[1]).toContain("max-lg:hidden");
+    expect(open.indexOf("Buscar")).toBeGreaterThan(open.indexOf('id="filter-minUsableArea"'));
+  });
+
+  it("gives the Operación and Comuna titles the same fixed height so they line up", () => {
+    const html = render({});
+    expect(html).toMatch(new RegExp('<legend class="[^"]*h-5[^"]*">Operación'));
+    expect(html).toMatch(new RegExp('for="filter-city" class="[^"]*h-5'));
+  });
+
+  it("announces the active filters hidden under «Más filtros» on phones", () => {
+    const html = render({ type: "HOUSE", commune: ["nunoa", "providencia"], city: ["concepcion"], operation: "RENT" });
+    // 1 type + 2 sectors; the operation and the comuna are always in view, so they are not counted here.
+    expect(html).toContain('3<span class="sr-only"> filtros activos</span>');
+    expect(html).toMatch(new RegExp('Más filtros|Menos filtros'));
   });
 });

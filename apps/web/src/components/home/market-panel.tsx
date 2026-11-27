@@ -49,7 +49,7 @@ export function MarketPanel({ sale, rent }: MarketPanelProps) {
               onClick={() => setActiveId(tab.id)}
               className={cn(
                 "h-11 rounded-full px-6 text-sm font-semibold transition-colors duration-200",
-                tab.id === active.id ? "bg-ink text-paper" : "text-muted hover:text-ink",
+                tab.id === active.id ? "bg-accent text-on-accent" : "text-muted hover:text-ink",
               )}
             >
               {tab.label}
@@ -61,11 +61,11 @@ export function MarketPanel({ sale, rent }: MarketPanelProps) {
             <span className="font-display text-[clamp(4.5rem,14vw,9rem)] leading-none text-brass lining-nums tabular-nums">
               <CountUp key={active.id} value={active.count} />
             </span>
-            <span className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">{active.caption}</span>
+            <span className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-brass-text">{active.caption}</span>
           </p>
           <Link
             href={active.href}
-            className="inline-flex h-12 items-center rounded-lg bg-ink px-6 font-semibold text-paper transition-transform duration-200 hover:-translate-y-0.5"
+            className="inline-flex h-12 items-center rounded-full bg-accent px-6 font-semibold text-on-accent transition-transform duration-200 hover:-translate-y-0.5"
           >
             Ver propiedades
           </Link>

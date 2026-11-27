@@ -215,6 +215,45 @@ describe.skipIf(!hasDatabaseUrl || !hasAuthSecret)("admin properties API", () =>
     expect(found.data.map((property: { id: string }) => property.id)).toContain(id);
   });
 
+  it("publishes and unpublishes through PATCH without touching other fields; 401, 403, 400 and 404 otherwise", async () => {
+    const { body } = await create({ ...validInput(), title: `Casa publicacion ${testRunId}` }, admin);
+    const created = body as AdminPropertyDetail;
+    const id = created.id;
+    const patch = async (target: string, cookie?: string, payload?: unknown) => {
+      const { PATCH } = await import("@/app/api/admin/properties/[id]/publication/route");
+      const response = await PATCH(request(`${baseUrl}/${target}/publication`, "PATCH", cookie, payload), {
+        params: Promise.resolve({ id: target }),
+      });
+      return readResponse(response);
+    };
+    const statusOf = async (status: "published" | "draft") =>
+      ((await list(`?status=${status}&search=publicacion ${testRunId}`, admin)).body as PaginatedResponse<AdminPropertySummary>).meta.total;
+
+    expect((await patch(id, undefined, { isPublished: true })).status).toBe(401);
+    expect((await patch(id, user, { isPublished: true })).status).toBe(403);
+    expect((await patch(id, admin, { isPublished: "yes" })).status).toBe(400);
+    expect((await patch(id, admin, {})).status).toBe(400);
+    expect((await patch("not-a-uuid", admin, { isPublished: true })).status).toBe(400);
+    expect((await patch(randomUUID(), admin, { isPublished: true })).status).toBe(404);
+    expect(await statusOf("draft")).toBe(1);
+
+    expect(await patch(id, admin, { isPublished: true })).toEqual({ status: 200, body: { id, isPublished: true } });
+    expect(await statusOf("published")).toBe(1);
+    expect(await statusOf("draft")).toBe(0);
+
+    expect(await patch(id, admin, { isPublished: false })).toEqual({ status: 200, body: { id, isPublished: false } });
+    expect(await statusOf("draft")).toBe(1);
+
+    // Title, features and the rest stay as they were.
+    const reread = (await onProperty("GET", id, admin)).body as AdminPropertyDetail;
+    expect(reread.title).toBe(created.title);
+    expect(reread.features).toEqual(created.features);
+
+    // A deleted property can no longer be changed.
+    await onProperty("DELETE", id, admin);
+    expect((await patch(id, admin, { isPublished: true })).status).toBe(404);
+  });
+
   it("soft-deletes a property: 204, then hidden everywhere except the deleted list", async () => {
     const { body } = await create({ ...validInput(), title: `Casa borrada ${testRunId}`, isPublished: true }, admin);
     const id = (body as AdminPropertyDetail).id;

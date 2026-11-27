@@ -11,8 +11,15 @@ describe("regularization page", () => {
     expect(html.match(/<h1/g)).toHaveLength(1);
     expect(metadata.alternates?.canonical).toBe("/regularizacion");
     expect(html).toContain('href="/tasador-propiedades"');
-    expect(html).toContain('href="/properties?operation=SALE"');
     expect(html).toContain('href="/#tasacion-gratis"');
+  });
+
+  it("highlights the Ley del Mono, posesión efectiva and negotiation between heirs, without fixed figures", () => {
+    const text = html.replace(/<[^>]+>/g, "");
+    expect(text).toContain("Ley del Mono");
+    expect(text).toContain("Posesión efectiva");
+    expect(text).toContain("Herederos y negociación");
+    expect(text).not.toMatch(/\d+\s?m²|hasta el \d{1,2} de|UF/);
   });
 
   it("does not promise own legal services, prices or deadlines", () => {

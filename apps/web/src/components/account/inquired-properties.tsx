@@ -15,7 +15,7 @@ const lastEntryFormatter = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium
 const FEEDBACK_DURATION_MS = 4000;
 
 const linkClassName =
-  "inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink";
+  "inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink";
 const pageButtonClassName =
   "inline-flex h-10 items-center rounded-full border border-line px-4 text-sm font-semibold text-ink transition-colors duration-200 hover:border-brass hover:bg-surface disabled:pointer-events-none disabled:opacity-40";
 /** Cells stack in a two-column grid on phones and become a table from `sm` up. */

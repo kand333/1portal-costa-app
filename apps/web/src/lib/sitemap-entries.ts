@@ -7,7 +7,7 @@ import { countLandingProperties, isLandingIndexable } from "./landing-availabili
 import { siteUrl } from "./site-url";
 import { listValuationLandings } from "./valuation-landing";
 
-const STATIC_PATHS: readonly string[] = ["/", "/properties", "/tasador-propiedades", "/regularizacion", "/privacidad"];
+const STATIC_PATHS: readonly string[] = ["/", "/properties", "/tasador-propiedades", "/vender", "/regularizacion", "/privacidad"];
 
 /** Safety stop: 20 pages of 50 properties. */
 const MAX_PAGES = 20;

@@ -8,6 +8,7 @@ import {
   findFeaturesByNames,
   insertProperty,
   replaceProperty,
+  setPropertyPublication,
   softDeleteProperty,
   type AdminPropertyDetailRecord,
 } from "@/repositories/admin-property-repository";
@@ -87,6 +88,16 @@ export async function updateProperty(id: string, input: PropertyInputData): Prom
   const { fields, features } = splitInput(input);
   try {
     return toAdminDetail(await replaceProperty(id, fields, await canonicalFeatureNames(features)));
+  } catch (error) {
+    if (isNotFound(error)) throw new ApiError(404, NOT_FOUND);
+    throw error;
+  }
+}
+
+/** Publishes or unpublishes a property without rewriting its other fields or features. */
+export async function changePropertyPublication(id: string, isPublished: boolean): Promise<{ id: string; isPublished: boolean }> {
+  try {
+    return await setPropertyPublication(id, isPublished);
   } catch (error) {
     if (isNotFound(error)) throw new ApiError(404, NOT_FOUND);
     throw error;

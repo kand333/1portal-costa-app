@@ -7,6 +7,7 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push: vi.fn(), refresh: 
 
 const property = (overrides: Partial<AdminPropertySummary>): AdminPropertySummary => ({
   id: "11111111-1111-4111-8111-111111111111",
+  code: 5888,
   title: "Casa en Ñuñoa",
   operationType: "SALE",
   propertyType: "HOUSE",
@@ -56,6 +57,17 @@ describe("AdminPropertyList", () => {
     expect(html).toContain('href="/properties/11111111-1111-4111-8111-111111111111"');
     expect(html).not.toContain(`href="/properties/${draft.id}"`);
     expect(html).toContain("aria-label=\"Eliminar «Depto borrador»\"");
+  });
+
+  it("shows «Publicado» / «Sin publicar» buttons: the current state is pressed, green when published", () => {
+    const html = render([property({}), draft]);
+    const [publishedRow, draftRow] = html.split("<li ").slice(1);
+    expect(publishedRow).toContain('aria-label="Publicación de «Casa en Ñuñoa»"');
+    expect(publishedRow).toMatch(/aria-pressed="true"[^>]*class="[^"]*bg-success\/12[^"]*"[^>]*>Publicado</);
+    expect(publishedRow).toMatch(/aria-pressed="false"[^>]*class="[^"]*opacity-50[^"]*"[^>]*>Sin publicar</);
+    expect(draftRow).toMatch(/aria-pressed="false"[^>]*class="[^"]*opacity-50[^"]*"[^>]*>Publicado</);
+    expect(draftRow).not.toContain("bg-success/12");
+    expect(draftRow).toMatch(/aria-pressed="true"[^>]*>Sin publicar</);
   });
 
   it("keeps the search in the form and in the page links", () => {

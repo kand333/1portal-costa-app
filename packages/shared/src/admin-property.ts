@@ -74,6 +74,12 @@ export const propertyInputSchema = z.object({
   features: featureNamesSchema,
 });
 
+/** Body of `PATCH /api/admin/properties/{id}/publication`: publishes or unpublishes without touching other fields. */
+export const propertyPublicationSchema = z.object({
+  isPublished: z.boolean({ error: "Indica si la propiedad está publicada" }),
+});
+export type PropertyPublicationInput = z.output<typeof propertyPublicationSchema>;
+
 export type PropertyInput = z.input<typeof propertyInputSchema>;
 export type PropertyInputData = z.output<typeof propertyInputSchema>;
 

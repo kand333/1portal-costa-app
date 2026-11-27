@@ -12,6 +12,8 @@ const hankenGrotesk = Hanken_Grotesk({
 const newsreader = Newsreader({
   variable: "--font-newsreader",
   subsets: ["latin"],
+  // The italic is the headline accent (see `.display-accent`), so both styles load.
+  style: ["normal", "italic"],
   axes: ["opsz"],
 });
 
@@ -37,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fef7e5",
+  themeColor: "#14181d",
   viewportFit: "cover",
 };
 

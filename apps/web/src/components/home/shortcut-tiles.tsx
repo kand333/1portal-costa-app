@@ -12,18 +12,11 @@ const SHORTCUTS = [
     className: "min-h-[26rem] lg:col-span-7 lg:row-span-2 lg:min-h-[34rem]",
   },
   {
-    href: "/tasador-propiedades",
-    label: "Gratis",
-    title: "Tasación",
-    image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1000&q=80",
-    className: "min-h-[15rem] lg:col-span-5",
-  },
-  {
-    href: "/#cierre",
+    href: "/vender",
     label: "Para dueños",
     title: "Corretaje tradicional",
     image: "https://images.unsplash.com/photo-1613490493576-7fde63acd811?auto=format&fit=crop&w=1000&q=80",
-    className: "min-h-[15rem] lg:col-span-5",
+    className: "min-h-[20rem] lg:col-span-5 lg:row-span-2",
   },
 ] as const;
 
@@ -43,10 +36,10 @@ export function ShortcutTiles() {
                   sizes="(min-width: 1024px) 60vw, 100vw"
                   className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                 />
-                <span className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/80 to-transparent" aria-hidden="true" />
+                <span className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-night/80 to-transparent" aria-hidden="true" />
                 <span className="absolute inset-x-6 bottom-6 flex items-end justify-between gap-4 text-white">
                   <span>
-                    <span className="block font-mono text-xs font-medium uppercase tracking-[0.2em] text-white/80">
+                    <span className="block font-mono text-xs font-medium uppercase tracking-[0.2em] text-brass-text">
                       {shortcut.label}
                     </span>
                     <span className="mt-1 block font-display text-3xl sm:text-4xl">{shortcut.title}</span>

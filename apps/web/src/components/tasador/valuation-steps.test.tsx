@@ -1,22 +1,7 @@
-import type { ValuationRequest, ValuationResult } from "@portal/shared/valuation";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 import { AmenitiesStep } from "./amenities-step";
-import { ContactOfferDialog } from "./contact-offer-dialog";
-
-const request: ValuationRequest = {
-  address: "Barros Arana 1000",
-  commune: "Concepción",
-  propertyType: "APARTMENT",
-  operation: "SALE",
-  totalArea: 80,
-  usableArea: 70,
-  bedrooms: 3,
-  bathrooms: 2,
-  parkingSpaces: 1,
-  amenities: [],
-};
-const result: ValuationResult = { status: "insufficient" };
+import { ValuationGate } from "./valuation-gate";
 
 describe("AmenitiesStep", () => {
   const render = (selected: ("pool" | "gym")[] = [], isSending = false, errorMessage = "") =>
@@ -33,9 +18,10 @@ describe("AmenitiesStep", () => {
 
   it("lists the six amenities as checkboxes and both actions", () => {
     const html = render();
-    for (const label of ["Piscina", "Gimnasio", "Conserjería", "Jardín", "Calefacción", "Piscina temperada"]) {
+    for (const label of ["Piscina", "Gimnasio", "Conserjería", "Jardín", "Calefacción", "Bodega"]) {
       expect(html).toContain(label);
     }
+    expect(html).not.toContain("Piscina temperada");
     expect(html.match(/type="checkbox"/g)).toHaveLength(6);
     expect(html).toContain("Atrás");
     expect(html).toContain("Estimar precio");
@@ -52,26 +38,20 @@ describe("AmenitiesStep", () => {
   });
 });
 
-describe("ContactOfferDialog", () => {
-  const dialog = (startWithForm: boolean) =>
-    renderToStaticMarkup(<ContactOfferDialog estimate={{ request, result }} startWithForm={startWithForm} onClose={() => undefined} />);
+describe("ValuationGate", () => {
+  const gate = () => renderToStaticMarkup(<ValuationGate onSubmit={async () => null} onBack={() => undefined} />);
 
-  it("offers contact or just the price", () => {
-    const html = dialog(false);
-    expect(html).toContain("Tu precio está listo");
-    expect(html).toContain("Quiero que me contacten");
-    expect(html).toContain("No, solo quiero saber el precio");
+  it("asks only for name and email before showing the price", () => {
+    const html = gate();
+    expect(html).toContain("Tu tasación está lista");
+    expect(html).toContain("Nombre");
+    expect(html).toContain("Correo");
+    expect(html).toContain("Ver mi tasación");
+    expect(html).not.toContain("Teléfono");
+    expect(html).not.toContain("Precio estimado");
   });
 
-  it("opens straight on the contact form from the summary button", () => {
-    const html = dialog(true);
-    expect(html).toContain("Deja tus datos");
-    expect(html).toContain("Enviar solicitud");
-    expect(html).toContain("Volver al precio");
-  });
-
-  it("renders nothing inside while there is no estimate", () => {
-    const html = renderToStaticMarkup(<ContactOfferDialog estimate={null} startWithForm={false} onClose={() => undefined} />);
-    expect(html).not.toContain("Quiero que me contacten");
+  it("lets the person go back to the amenities", () => {
+    expect(gate()).toContain("Atrás");
   });
 });

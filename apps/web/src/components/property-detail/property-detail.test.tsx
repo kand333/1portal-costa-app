@@ -6,6 +6,7 @@ import { PropertyDetail } from "./property-detail";
 
 const property: PropertyDetailData = {
   id: "5eed0000-0000-4000-8000-000000000001",
+  code: 5888,
   title: "Casa mediterránea con piscina",
   description: "Amplia casa familiar.\nJardín con piscina.",
   operationType: "SALE",
@@ -39,7 +40,7 @@ describe("PropertyDetail", () => {
   it("shows the title as the page heading, the price and the description", () => {
     const html = render();
     expect(html).toMatch(/<h1[^>]*>Casa mediterránea con piscina<\/h1>/);
-    expect(html).toContain("$846 millones");
+    expect(html).toContain("$846.000.000");
     expect(html).toContain("Amplia casa familiar.\nJardín con piscina.");
   });
 
@@ -94,7 +95,37 @@ describe("PropertyDetail", () => {
     );
   });
 
+  it("shows the breadcrumb, the sale label and the listing code", () => {
+    const html = render();
+    expect(html).toContain('aria-label="Migas de pan"');
+    expect(html).toContain('href="/properties?operation=SALE"');
+    expect(html).toContain("En venta");
+    expect(html).toContain("Código 5888");
+  });
+
+  it("shows the key figures in boxes", () => {
+    const html = render();
+    expect(html).toContain("dormitorios");
+    expect(html).toContain("320 m²");
+    expect(html).toContain("superficie útil");
+    expect(html).toContain("años de antigüedad");
+  });
+
+  it("offers the executive with WhatsApp (code in the message), a call and the visit form", () => {
+    const html = render();
+    expect(html).toContain("Felipe Smith");
+    expect(html).toContain("https://wa.me/56920593331?text=");
+    expect(html).toContain("C%C3%B3d.+5888");
+    expect(html).toContain('href="tel:+56920593331"');
+    expect(html).toContain('href="#contact-title"');
+    expect(html).toContain('id="property-contact-bar"');
+  });
+
+  it("has no video section", () => {
+    expect(render().toLowerCase()).not.toContain("video");
+  });
+
   it("links back to the catalog", () => {
-    expect(render()).toContain('href="/properties"');
+    expect(render()).toContain('href="/properties?operation=SALE"');
   });
 });

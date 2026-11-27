@@ -34,6 +34,7 @@ describe("sitemap and robots", () => {
       "https://propizoom.example",
       "https://propizoom.example/properties",
       "https://propizoom.example/tasador-propiedades",
+      "https://propizoom.example/vender",
       "https://propizoom.example/regularizacion",
       "https://propizoom.example/privacidad",
       "https://propizoom.example/tasacion/casa/concepcion",
@@ -58,7 +59,7 @@ describe("sitemap and robots", () => {
     const urls = (await buildSitemapEntries()).map((entry) => entry.url);
 
     // Fixed pages, the guides and every landing (an unknown count keeps a landing).
-    expect(urls).toHaveLength(5 + 10 + 5);
+    expect(urls).toHaveLength(6 + 10 + 5);
   });
 
   it("blocks private areas in robots.txt and points to the sitemap", () => {

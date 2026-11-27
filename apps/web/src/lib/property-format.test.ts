@@ -2,6 +2,11 @@ import { describe, expect, it } from "vitest";
 import {
   formatAge,
   formatArea,
+  formatClp,
+  formatUfAmount,
+  getCardStats,
+  getDetailStats,
+  toUf,
   formatLocation,
   formatPrice,
   getPropertyFacts,
@@ -127,6 +132,57 @@ describe("getPropertyFacts", () => {
       "Tipo",
       "Superficie total",
       "Estacionamientos",
+    ]);
+  });
+});
+
+describe("UF and pesos", () => {
+  it("formats the full price in pesos", () => {
+    expect(formatClp(89_900_000)).toBe("$89.900.000");
+  });
+
+  it("converts to whole UF, or returns null when the UF is unknown", () => {
+    expect(toUf(89_900_000, 41_400)).toBe(2171);
+    expect(toUf(89_900_000, null)).toBeNull();
+    expect(toUf(89_900_000, 0)).toBeNull();
+  });
+
+  it("formats UF with Chilean separators", () => {
+    expect(formatUfAmount(2171)).toBe("UF 2.171");
+    expect(formatUfAmount(12_500)).toBe("UF 12.500");
+  });
+});
+
+describe("getCardStats", () => {
+  const base = { bedrooms: 2, bathrooms: 2, usableArea: 57, totalArea: 60 };
+
+  it("gives the three short figures", () => {
+    expect(getCardStats(base).map((stat) => stat.text)).toEqual(["2 dorm.", "2 baños", "57 m²"]);
+  });
+
+  it("uses the singular, falls back to the total area and skips what does not apply", () => {
+    expect(getCardStats({ ...base, bathrooms: 1 })[1]?.text).toBe("1 baño");
+    expect(getCardStats({ bedrooms: null, bathrooms: null, usableArea: null, totalArea: 5000 }).map((stat) => stat.text)).toEqual(["5.000 m²"]);
+    expect(getCardStats({ bedrooms: 0, bathrooms: null, usableArea: null, totalArea: null })).toEqual([]);
+  });
+});
+
+describe("getDetailStats", () => {
+  it("lists the key figures with a label each", () => {
+    expect(
+      getDetailStats({ bedrooms: 2, bathrooms: 2, parkingSpaces: 1, usableArea: 57, totalArea: null, ageInYears: 20 }),
+    ).toEqual([
+      { value: "2", label: "dormitorios" },
+      { value: "2", label: "baños" },
+      { value: "1", label: "estacionamiento" },
+      { value: "57 m²", label: "superficie útil" },
+      { value: "20", label: "años de antigüedad" },
+    ]);
+  });
+
+  it("leaves out what the property does not have", () => {
+    expect(getDetailStats({ bedrooms: null, bathrooms: null, parkingSpaces: null, usableArea: null, totalArea: 5000, ageInYears: null })).toEqual([
+      { value: "5.000 m²", label: "superficie total" },
     ]);
   });
 });
