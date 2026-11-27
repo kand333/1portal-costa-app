@@ -1,3 +1,5 @@
+import { AccentWord } from "@/components/ui/accent-word";
+
 const questions = [
   {
     question: "¿Qué significa el valor de una propiedad?",
@@ -29,8 +31,8 @@ const questions = [
 export function ValuationFaq() {
   return (
     <section aria-labelledby="valuation-faq-title" className="mx-auto w-full max-w-6xl px-4 pb-20 sm:px-6">
-      <h2 id="valuation-faq-title" className="text-center text-3xl font-semibold tracking-tight text-ink">
-        Preguntas frecuentes
+      <h2 id="valuation-faq-title" className="text-center font-display display-heavy text-4xl tracking-tight text-ink">
+        Preguntas <AccentWord>frecuentes</AccentWord>
       </h2>
       <div className="mx-auto mt-8 max-w-5xl divide-y divide-line border-b border-line">
         {questions.map((item) => (

@@ -41,7 +41,7 @@ export function ConfirmDialog({ request, onClose }: ConfirmDialogProps) {
         event.preventDefault();
         onClose(false);
       }}
-      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.25rem] border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-ink/50 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-[1.25rem] border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-black/60 backdrop:backdrop-blur-sm"
     >
       {request && (
         <div className="p-6">

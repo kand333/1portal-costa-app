@@ -116,6 +116,11 @@ export function replaceProperty(
   });
 }
 
+/** Sets only `isPublished`. Throws P2025 when the property does not exist or was deleted. */
+export function setPropertyPublication(id: string, isPublished: boolean) {
+  return prisma.property.update({ where: { id, ...notDeleted }, data: { isPublished }, select: { id: true, isPublished: true } });
+}
+
 /**
  * Soft delete: stamps deletedAt and keeps every related row (images, features, favorites, inquiries).
  * Throws P2025 when it does not exist or was already deleted.

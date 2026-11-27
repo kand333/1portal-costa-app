@@ -1,24 +1,31 @@
 "use client";
 
+import { leadCreateSchema } from "@portal/shared/lead";
 import type { ValuationAmenity, ValuationRequest, ValuationResult } from "@portal/shared/valuation";
 import { useEffect, useRef, useState } from "react";
 import { AmenitiesStep } from "@/components/tasador/amenities-step";
-import { ContactOfferDialog } from "@/components/tasador/contact-offer-dialog";
 import { ValuationForm } from "@/components/tasador/valuation-form";
+import { ValuationGate, type GateContact } from "@/components/tasador/valuation-gate";
 import { ValuationMapLoader } from "@/components/tasador/valuation-map-loader";
 import { ValuationResultView } from "@/components/tasador/valuation-result";
+import { summarizeValuation } from "@/components/tasador/valuation-summary";
 import { ApiClientError } from "@/lib/api-client";
+import { trackEvent } from "@/lib/analytics";
+import { submitLead } from "@/lib/lead-submission";
 import { DEFAULT_MAP_LOCATION, locateInBrowser } from "@/lib/geocode-client";
 import type { MapLocation } from "@/lib/property-location";
 import { requestValuation } from "@/lib/valuation-api";
 
-type Step = "data" | "amenities" | "summary";
+type Step = "data" | "amenities" | "gate" | "summary";
+
+// Public by design (see .env.example); inlined at build time.
+const web3FormsAccessKey = process.env.NEXT_PUBLIC_WEB3FORMS_ACCESS_KEY;
 type Estimate = { request: ValuationRequest; result: ValuationResult };
 type LocationQuery = { address: string; commune: string };
 
 /**
  * Four steps in two columns, with a map that follows the address on the right: (1) data, (2) amenities,
- * (3) a dialog offering contact once the price is ready, (4) the summary.
+ * (3) name and email, required to see the price, (4) the summary.
  */
 export function PropertyValuator() {
   const [step, setStep] = useState<Step>("data");
@@ -27,11 +34,6 @@ export function PropertyValuator() {
   const [draft, setDraft] = useState<ValuationRequest | null>(null);
   const [amenities, setAmenities] = useState<ValuationAmenity[]>([]);
   const [estimate, setEstimate] = useState<Estimate | null>(null);
-  const [isSending, setIsSending] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [dialogStartsWithForm, setDialogStartsWithForm] = useState(false);
-  const [contacted, setContacted] = useState(false);
 
   const [query, setQuery] = useState<LocationQuery | null>(null);
   const [location, setLocation] = useState<MapLocation>(DEFAULT_MAP_LOCATION);
@@ -56,29 +58,41 @@ export function PropertyValuator() {
   function goToAmenities(request: ValuationRequest) {
     setDraft(request);
     setQuery({ address: request.address, commune: request.commune });
-    setErrorMessage("");
     setStep("amenities");
   }
 
-  async function estimatePrice() {
-    if (!draft || isSending) return;
-    const request: ValuationRequest = { ...draft, amenities };
-    setIsSending(true);
-    setErrorMessage("");
+  /** Computes the price, stores the lead and only then shows the summary. Returns an error message, or null. */
+  async function revealPrice(contact: GateContact): Promise<string | null> {
+    if (!draft) return "Vuelve a ingresar los datos de la propiedad.";
+    // The located address picks the sector of the reference table; without it the estimate uses the commune average.
+    const request: ValuationRequest = {
+      ...draft,
+      amenities,
+      ...(isLocated ? { latitude: location.latitude, longitude: location.longitude } : {}),
+    };
+    let result: ValuationResult;
     try {
-      const result = await requestValuation(request);
-      setEstimate({ request, result });
-      setContacted(false);
-      setDialogStartsWithForm(false);
-      setIsDialogOpen(true);
-      setStep("summary");
+      result = await requestValuation(request);
     } catch (error) {
-      setErrorMessage(
-        error instanceof ApiClientError ? error.message : "No pudimos calcular el precio. Inténtalo de nuevo.",
-      );
-    } finally {
-      setIsSending(false);
+      return error instanceof ApiClientError ? error.message : "No pudimos calcular el precio. Inténtalo de nuevo.";
     }
+    const parsed = leadCreateSchema.safeParse({
+      kind: "VALUATION",
+      source: "tasador",
+      name: contact.name,
+      email: contact.email,
+      address: request.address,
+      commune: request.commune,
+      message: summarizeValuation(request, result),
+      website: contact.website,
+    });
+    if (!parsed.success) return parsed.error.issues[0]?.message ?? "Revisa tu nombre y correo.";
+    const sent = await submitLead(parsed.data, web3FormsAccessKey);
+    if (sent.status === "error") return sent.message;
+    trackEvent("generate_lead", { lead_source: "tasador" });
+    setEstimate({ request, result });
+    setStep("summary");
+    return null;
   }
 
   function restart() {
@@ -86,14 +100,13 @@ export function PropertyValuator() {
     setDraft(null);
     setAmenities([]);
     setEstimate(null);
-    setContacted(false);
     setFormKey((key) => key + 1);
     window.scrollTo({ top: 0 });
   }
 
   return (
     <div className="grid gap-10 lg:grid-cols-2 lg:gap-14">
-      <div>
+      <div className="min-w-0">
         {/* Hidden, not unmounted, so «Atrás» finds the data as it was left. */}
         <div hidden={step !== "data"}>
           <ValuationForm key={formKey} onContinue={goToAmenities} onLocationChange={setQuery} />
@@ -107,35 +120,23 @@ export function PropertyValuator() {
               )
             }
             onBack={() => setStep("data")}
-            onSubmit={() => void estimatePrice()}
-            isSending={isSending}
-            errorMessage={errorMessage}
+            onSubmit={() => setStep("gate")}
+            isSending={false}
+            errorMessage=""
           />
         )}
+        {step === "gate" && <ValuationGate onSubmit={revealPrice} onBack={() => setStep("amenities")} />}
         {step === "summary" && estimate && (
           <ValuationResultView
             request={estimate.request}
             result={estimate.result}
-            contacted={contacted}
-            onContact={() => {
-              setDialogStartsWithForm(true);
-              setIsDialogOpen(true);
-            }}
             onRestart={restart}
           />
         )}
       </div>
-      <div className="relative z-0 h-80 overflow-hidden rounded-xl shadow-lift ring-1 ring-line lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:min-h-[28rem] lg:self-start">
+      <div className="relative z-0 h-80 overflow-hidden rounded-xl shadow-lift ring-1 ring-accent/30 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)] lg:min-h-[28rem] lg:self-start">
         <ValuationMapLoader location={location} showPin={isLocated} label="Mapa de la ubicación de la propiedad" />
       </div>
-      <ContactOfferDialog
-        estimate={isDialogOpen ? estimate : null}
-        startWithForm={dialogStartsWithForm}
-        onClose={(didContact) => {
-          if (didContact) setContacted(true);
-          setIsDialogOpen(false);
-        }}
-      />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { buildPropertyMetadata, toShareImageUrl, truncateDescription } from "./p
 
 const property: PropertyDetail = {
   id: "5eed0000-0000-4000-8000-000000000001",
+  code: 5888,
   title: "Casa con piscina en Lo Barnechea",
   operationType: "SALE",
   propertyType: "HOUSE",

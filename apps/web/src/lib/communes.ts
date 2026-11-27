@@ -19,3 +19,13 @@ export const COVERAGE_COMMUNES: readonly CoverageCommune[] = [
 ];
 
 export const COMMUNE_NAMES: readonly string[] = COVERAGE_COMMUNES.map((commune) => commune.name);
+
+/** Slug of a commune as the catalog filters (`?city=`) expect it: «San Pedro de la Paz» → `san-pedro-de-la-paz`. */
+export function communeSlug(name: string): string {
+  return name
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-");
+}

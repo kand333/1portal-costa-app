@@ -10,6 +10,7 @@ export const publishedOnly = { isPublished: true, deletedAt: null } satisfies Pr
 
 export const propertySummarySelect = {
   id: true,
+  code: true,
   title: true,
   operationType: true,
   propertyType: true,
@@ -171,4 +172,9 @@ export async function findPublishedLocations(): Promise<PublishedLocations> {
     cities: cities.map((row) => row.city),
     regions: regions.map((row) => row.region),
   };
+}
+
+/** Address and description of some properties: text the summaries leave out, used to name their neighbourhood. */
+export function findPropertyTexts(ids: string[]) {
+  return prisma.property.findMany({ where: { id: { in: ids } }, select: { id: true, address: true, description: true } });
 }

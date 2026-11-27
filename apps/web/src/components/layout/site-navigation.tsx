@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState, type KeyboardEvent } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useRef, useState, useSyncExternalStore, type KeyboardEvent } from "react";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { logOut } from "@/lib/auth-client";
 import { flash } from "@/lib/flash";
@@ -10,15 +10,20 @@ import { NavigationLinks } from "./navigation-links";
 
 const mobileNavigationId = "mobile-navigation";
 
+const subscribeNever = () => () => undefined;
+/** False while rendering on the server and hydrating, true afterwards. */
+const useIsHydrated = () => useSyncExternalStore(subscribeNever, () => true, () => false);
+
 export function SiteNavigation() {
   const pathname = usePathname();
   const router = useRouter();
   const { data: currentUser } = useCurrentUser();
-  const searchParams = useSearchParams();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
-  const activeHref = getActiveNavigationHref(pathname, searchParams.get("operation"));
+  // Hydration renders no active link (like the Suspense fallback): the server HTML cannot disagree with the URL.
+  const isHydrated = useIsHydrated();
+  const activeHref = isHydrated ? getActiveNavigationHref(pathname) : null;
 
   function closeMenu() {
     setIsMenuOpen(false);
@@ -38,7 +43,7 @@ export function SiteNavigation() {
 
   return (
     <>
-      <nav aria-label="Principal" className="hidden md:block">
+      <nav aria-label="Principal" className="hidden lg:order-2 lg:block">
         <NavigationLinks
           activeHref={activeHref}
           orientation="horizontal"
@@ -51,7 +56,7 @@ export function SiteNavigation() {
       <button
         ref={menuButtonRef}
         type="button"
-        className="inline-flex size-11 items-center justify-center rounded-full border border-line text-ink transition-colors duration-200 hover:bg-surface md:hidden"
+        className="order-3 inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-line text-ink transition-colors duration-200 hover:bg-surface lg:hidden"
         aria-expanded={isMenuOpen}
         aria-controls={mobileNavigationId}
         aria-label={isMenuOpen ? "Cerrar menú" : "Abrir menú"}
@@ -66,7 +71,7 @@ export function SiteNavigation() {
         <nav
           id={mobileNavigationId}
           aria-label="Principal"
-          className="absolute inset-x-0 top-full mt-2 rounded-3xl border border-line bg-surface px-4 py-3 shadow-lift md:hidden"
+          className="absolute inset-x-0 top-full mt-2 rounded-3xl border border-line bg-surface px-4 py-3 shadow-lift lg:hidden"
           onKeyDown={handleMobileNavigationKeyDown}
         >
           <NavigationLinks

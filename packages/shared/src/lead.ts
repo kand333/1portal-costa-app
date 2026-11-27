@@ -7,7 +7,7 @@ export const LEAD_ADDRESS_MAX_LENGTH = 200;
 export const LEAD_COMMUNE_MAX_LENGTH = 100;
 
 /** Forms that capture leads (home page and valuation page); stored in `Lead.source`. */
-export const LEAD_SOURCES = ["home-hero", "home-closing", "tasador"] as const;
+export const LEAD_SOURCES = ["home-hero", "home-closing", "tasador", "vender"] as const;
 export type LeadSource = (typeof LEAD_SOURCES)[number];
 
 /** Digits with optional "+", spaces, dots, hyphens and parentheses, e.g. "+56 9 1234 5678". */

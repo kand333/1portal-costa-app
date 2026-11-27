@@ -1,4 +1,4 @@
-export type AdminSection = "dashboard" | "properties" | "users" | "inquiries" | "leads" | "account";
+export type AdminSection = "dashboard" | "properties" | "users" | "inquiries" | "leads" | "valuation" | "account";
 
 export type AdminNavigationItem = { section: AdminSection; label: string; href: string };
 
@@ -9,6 +9,7 @@ export const adminNavigationItems: readonly AdminNavigationItem[] = [
   { section: "users", label: "Administrar usuarios", href: "/admin/users" },
   { section: "inquiries", label: "Consultas", href: "/admin/inquiries" },
   { section: "leads", label: "Leads", href: "/admin/leads" },
+  { section: "valuation", label: "Tasación por sector", href: "/admin/valuation-sectors" },
   { section: "account", label: "Mi cuenta", href: "/admin/account" },
 ];
 

@@ -1,13 +1,15 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { CommuneMap } from "@/components/home/commune-map-loader";
+import { AccentWord } from "@/components/ui/accent-word";
 import { CommuneShowcase } from "@/components/home/commune-showcase";
 import { useCommune } from "@/components/home/commune-context";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { useScrollProgress } from "@/hooks/use-scroll-progress";
-import { COMMUNE_NAMES, COVERAGE_COMMUNES } from "@/lib/communes";
+import { COMMUNE_NAMES, COVERAGE_COMMUNES, communeSlug } from "@/lib/communes";
 import { COMMUNE_PROFILES } from "@/lib/commune-profiles";
 
 // Test photo (Unsplash). Swap it here for the real one.
@@ -26,6 +28,7 @@ export function CommuneDial() {
   const { commune, setCommune } = useCommune();
   const [pinned, setPinned] = useState<string | null>(null);
   const [opened, setOpened] = useState<string | null>(null);
+  const [syncedCommune, setSyncedCommune] = useState(commune);
   const isWide = useMediaQuery("(min-width: 1024px)");
   const allowsMotion = useMediaQuery("(prefers-reduced-motion: no-preference)");
   const isTouring = isWide && allowsMotion && pinned === null;
@@ -34,6 +37,15 @@ export function CommuneDial() {
   const tourName = COVERAGE_COMMUNES[Math.min(COVERAGE_COMMUNES.length - 1, Math.floor(progress * COVERAGE_COMMUNES.length))].name;
   const highlighted = pinned ?? (isTouring ? tourName : null);
   const openedProfile = opened ? COMMUNE_PROFILES[opened] : undefined;
+
+  // A commune chosen elsewhere on the page (the hero) pins the map too, the same as choosing it here.
+  if (commune !== syncedCommune) {
+    setSyncedCommune(commune);
+    if (commune && commune !== pinned) {
+      setOpened(null);
+      setPinned(commune);
+    }
+  }
 
   useEffect(() => {
     if (!pinned) return;
@@ -63,8 +75,8 @@ export function CommuneDial() {
         </div>
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 -z-10 h-3/4 bg-gradient-to-t from-night/75 to-transparent" />
         <div className="mx-auto w-full max-w-7xl px-4 pb-20 pt-24 sm:px-6 lg:px-8 lg:pb-24">
-          <h2 id="coverage-title" className="font-display text-[clamp(2.5rem,6vw,5rem)] leading-[1.02] text-white">
-            Conocemos tu comuna
+          <h2 id="coverage-title" className="font-display display-heavy text-[clamp(2.5rem,6vw,5rem)] leading-[1.02] text-white">
+            Conocemos <AccentWord>tu comuna</AccentWord>
           </h2>
           <p className="mt-3 max-w-md text-lg text-white/85">Elige la tuya y entra: la dejamos lista en el formulario.</p>
         </div>
@@ -80,8 +92,9 @@ export function CommuneDial() {
 
       <section
         ref={tourRef}
+        id="mapa-comunas"
         aria-labelledby="coverage-title"
-        className="relative mx-auto w-full max-w-7xl px-4 py-12 sm:px-6 lg:h-[260vh] lg:px-8 lg:py-0"
+        className="relative mx-auto scroll-mt-24 w-full max-w-7xl px-4 py-12 sm:px-6 lg:h-[260vh] lg:px-8 lg:py-0"
       >
         <div className="grid items-center gap-8 lg:sticky lg:top-24 lg:h-[calc(100vh-7rem)] lg:grid-cols-[1fr_1.4fr] lg:gap-14">
           <div>
@@ -109,20 +122,25 @@ export function CommuneDial() {
               })}
             </ul>
             <div aria-live="polite" className="mt-8 min-h-24 rounded-[1.25rem] border border-line bg-surface p-5 shadow-soft">
-              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-muted">
+              <p className="font-mono text-xs font-medium uppercase tracking-[0.18em] text-brass-text">
                 {commune || highlighted ? "Comuna" : "Toca una comuna"}
               </p>
               <p className="font-display text-3xl text-ink">{commune || highlighted || " "}</p>
-              <a
-                href="#cierre"
-                className="mt-3 inline-flex min-h-11 items-center border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+              <Link
+                href={commune || highlighted ? `/properties?city=${communeSlug(commune || highlighted || "")}` : "/properties"}
+                className="mt-3 inline-flex min-h-11 items-center border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink"
               >
-                Tasar mi propiedad aquí
-              </a>
+                Propiedades Disponibles
+              </Link>
             </div>
           </div>
 
-          <div className="relative order-first aspect-[4/5] w-full sm:aspect-[4/3] overflow-hidden rounded-[1.75rem] lg:order-none border border-line bg-sand shadow-lift lg:aspect-auto lg:h-full lg:max-h-[40rem]">
+          <div
+            id="mapa-comunas-cuadro"
+            className={`relative order-first aspect-[4/5] w-full sm:aspect-[4/3] overflow-hidden rounded-[1.75rem] lg:order-none border bg-sand shadow-lift transition-shadow duration-300 lg:aspect-auto lg:h-full lg:max-h-[40rem] ${
+              pinned ? "border-accent ring-2 ring-accent" : "border-line"
+            }`}
+          >
             <CommuneMap
               activeName={highlighted}
               pinnedName={pinned}

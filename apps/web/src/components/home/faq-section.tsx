@@ -1,3 +1,5 @@
+import { AccentWord } from "@/components/ui/accent-word";
+
 const questions = [
   { question: "¿La tasación es gratis?", answer: "Sí. Dejas tus datos, un corredor revisa tu propiedad y te contacta sin costo ni compromiso." },
   { question: "¿Qué es el corretaje tradicional?", answer: "Es vender o arrendar tu propiedad con un corredor que la promociona, atiende a los interesados y te acompaña hasta la firma." },
@@ -9,8 +11,8 @@ const questions = [
 export function FaqSection() {
   return (
     <section aria-labelledby="faq-title" className="mx-auto w-full max-w-3xl px-4 py-16 sm:px-6">
-      <h2 id="faq-title" className="font-display text-4xl font-semibold tracking-tight text-ink sm:text-5xl">
-        Preguntas frecuentes
+      <h2 id="faq-title" className="font-display display-heavy text-4xl tracking-tight text-ink sm:text-5xl">
+        Preguntas <AccentWord>frecuentes</AccentWord>
       </h2>
       <div className="mt-8 divide-y divide-line border-y border-line">
         {questions.map((item) => (

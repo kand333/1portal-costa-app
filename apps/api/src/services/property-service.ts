@@ -2,7 +2,10 @@ import "server-only";
 import { ApiError } from "@/lib/http/api-error";
 import { normalizeSearchText } from "@/lib/normalize-search-text";
 import { toSlug } from "@/lib/slug";
+import { listValuationCities } from "@/repositories/valuation-sector-repository";
+import { detectSector, type NamedSector } from "@/services/property-sector";
 import {
+  findPropertyTexts,
   findPublishedLocations,
   findPublishedProperties,
   findPublishedPropertyById,
@@ -70,6 +73,27 @@ export function namesMatchingSlugs(names: string[], slugs: string[] | undefined)
   return names.filter((name) => requested.has(toSlug(name)));
 }
 
+/**
+ * Names the neighbourhood of each listing from the sectors of the reference table. It never fails the catalog:
+ * if the table or the texts cannot be read, the listings simply have no sector.
+ */
+async function withSectors(records: PropertySummaryRecord[]): Promise<PropertySummary[]> {
+  let sectors: NamedSector[] = [];
+  let texts = new Map<string, { address: string; description: string }>();
+  try {
+    const [cities, rows] = await Promise.all([listValuationCities(), findPropertyTexts(records.map((record) => record.id))]);
+    sectors = cities.flatMap((city) => city.sectors.map((sector) => ({ name: sector.name, commune: sector.commune })));
+    texts = new Map(rows.map((row) => [row.id, row]));
+  } catch {
+    // Without sectors the catalog still loads.
+  }
+  return records.map((record) => {
+    const text = texts.get(record.id);
+    const sector = text ? detectSector({ title: record.title, commune: record.commune, ...text }, sectors) : null;
+    return { ...toPropertySummary(record), sector };
+  });
+}
+
 export async function listPublishedProperties({
   page,
   pageSize,
@@ -109,7 +133,7 @@ export async function listPublishedProperties({
     sort,
   );
   return {
-    data: records.map(toPropertySummary),
+    data: await withSectors(records),
     meta: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
   };
 }

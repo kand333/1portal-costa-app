@@ -111,7 +111,7 @@ function EditUserDialog({ user, onClose, confirm }: EditUserDialogProps) {
         event.preventDefault();
         onClose();
       }}
-      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-[1.25rem] border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-ink/50 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-[1.25rem] border border-line bg-surface p-0 text-ink shadow-lift backdrop:bg-black/60 backdrop:backdrop-blur-sm"
     >
       <form noValidate onSubmit={handleSubmit} className="space-y-4 p-6">
         <h2 id={titleId} className="font-display text-2xl font-semibold tracking-tight">

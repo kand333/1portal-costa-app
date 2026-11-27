@@ -9,11 +9,45 @@ import {
   type ValuationRequest,
 } from "@portal/shared/valuation";
 import { useState, type FormEvent, type ReactNode } from "react";
+import { ValuationProgress } from "@/components/tasador/valuation-progress";
 import { COMMUNE_NAMES } from "@/lib/communes";
 
 const errorClassName = "mt-2 text-sm text-red-700 dark:text-red-400";
-const sectionClassName = "border-b border-line py-5";
 const questionClassName = "mb-3 block font-semibold text-ink";
+
+type FieldName = "address" | "commune" | "propertyType" | "operation" | "totalArea" | "usableArea" | "bedrooms" | "bathrooms" | "parkingSpaces" | "constructionYear";
+const FIELD_COUNT = 10;
+
+type QuestionCardProps = { number: number; done: boolean; children: ReactNode; role?: "group"; labelledBy?: string };
+
+/** One question as a card: a numbered badge that turns into an orange check once it has a valid answer. */
+function QuestionCard({ number, done, children, role, labelledBy }: QuestionCardProps) {
+  return (
+    <div
+      role={role}
+      aria-labelledby={labelledBy}
+      className={`relative rounded-2xl border bg-surface p-5 pl-16 transition-[border-color,box-shadow] duration-300 motion-reduce:transition-none ${
+        done ? "border-accent/50 shadow-[0_12px_32px_-20px_rgb(245_105_8/0.6)]" : "border-line"
+      }`}
+    >
+      <span
+        aria-hidden="true"
+        className={`absolute left-4 top-5 grid size-9 place-items-center rounded-full text-sm font-bold transition-colors duration-300 motion-reduce:transition-none ${
+          done ? "bg-accent text-on-accent" : "bg-paper text-muted ring-1 ring-line"
+        }`}
+      >
+        {done ? (
+          <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth={3} strokeLinecap="round" strokeLinejoin="round">
+            <path d="m5 12.5 4.5 4.5L19 7.5" />
+          </svg>
+        ) : (
+          number
+        )}
+      </span>
+      {children}
+    </div>
+  );
+}
 
 const propertyTypeOptions = [
   { value: "APARTMENT", label: "Departamento" },
@@ -24,10 +58,20 @@ const operationOptions = [
   { value: "SALE", label: "Venta" },
 ] as const;
 
-const storageOptions = [
-  { value: "yes", label: "Sí" },
-  { value: "no", label: "No" },
-] as const;
+// Same colours as the property cards: sale is orange, rent is the brand blue.
+const selectedClassName: Record<string, string> = {
+  RENT: "aria-pressed:border-brand-blue aria-pressed:bg-brand-blue aria-pressed:text-white",
+  SALE: "aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent",
+  HOUSE: "aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent",
+  APARTMENT: "aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent",
+};
+
+const optionIcons: Record<string, string> = {
+  HOUSE: "M3 11.5 12 4l9 7.5M5.5 10v10h13V10M10 20v-5h4v5",
+  APARTMENT: "M5 21V4h9v17M14 9h5v12M8 8h2M8 12h2M8 16h2M3 21h18",
+  SALE: "M12 3v18M16.5 7.5c-.8-1.2-2.3-2-4.5-2-2.6 0-4 1.2-4 2.8 0 4.2 9 2 9 6.4 0 1.7-1.6 2.8-4.5 2.8-2.4 0-4-.9-4.8-2.2",
+  RENT: "M4 9h10a4 4 0 1 1 0 8H4M4 9l3-3M4 9l3 3",
+};
 
 /** Options `min` to `max`, the last one shown as "max+". */
 const countOptions = (min: number, max: number) =>
@@ -37,9 +81,11 @@ const countOptions = (min: number, max: number) =>
   });
 
 const pillClassName =
-  "rounded-full border border-line px-4 py-1.5 text-muted transition-colors duration-200 hover:border-brass hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent";
+  "chip-pop inline-flex h-12 items-center gap-2 rounded-full border border-line bg-paper px-5 font-medium text-muted transition-[color,border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-brass hover:text-ink motion-reduce:transition-none motion-reduce:hover:translate-y-0";
 const chipClassName =
-  "grid size-9 place-items-center rounded-full border border-line text-sm text-muted transition-colors duration-200 hover:border-brass hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent";
+  "chip-pop grid size-11 place-items-center rounded-full border border-line bg-paper text-base font-medium text-muted transition-[color,border-color,background-color,transform] duration-200 hover:-translate-y-0.5 hover:border-brass hover:text-ink aria-pressed:border-accent aria-pressed:bg-accent aria-pressed:text-on-accent motion-reduce:transition-none motion-reduce:hover:translate-y-0";
+const bigInputClassName =
+  "w-full min-w-0 flex-1 border-0 bg-transparent p-0 font-display text-3xl text-ink placeholder:text-muted/50 focus-visible:outline-none focus-visible:ring-0";
 
 /** Empty text is `undefined` so the schema reports the field as missing. */
 const toNumber = (text: string) => {
@@ -66,13 +112,13 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
     bedrooms: "",
     bathrooms: "",
     parkingSpaces: "",
-    // "" = not answered; it is optional and does not change the price.
-    hasStorage: "",
+    // Year the building was finished: it weighs on the price, so it is required.
+    constructionYear: "",
   });
 
   const parsed = valuationRequestSchema.safeParse({
     ...values,
-    hasStorage: values.hasStorage === "" ? undefined : values.hasStorage === "yes",
+    constructionYear: toNumber(values.constructionYear),
     totalArea: toNumber(values.totalArea),
     usableArea: toNumber(values.usableArea),
     bedrooms: toNumber(values.bedrooms),
@@ -85,6 +131,17 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
       ? parsed.error.issues.find((issue) => issue.path[0] === "usableArea" && issue.message.includes("superar"))?.message
       : undefined;
 
+  // A year typed but out of range gets its message; an empty one just keeps «Continuar» closed.
+  const yearError =
+    values.constructionYear.trim() !== "" && !parsed.success
+      ? parsed.error.issues.find((issue) => issue.path[0] === "constructionYear")?.message
+      : undefined;
+
+  // A field counts once it has a value the schema does not complain about.
+  const hasIssue = (name: string) => !parsed.success && parsed.error.issues.some((issue) => issue.path[0] === name);
+  const isDone = (name: FieldName) => values[name].trim() !== "" && !hasIssue(name);
+  const doneCount = (Object.keys(values) as FieldName[]).filter(isDone).length;
+
   const setValue = (name: keyof typeof values, value: string) => setValues((current) => ({ ...current, [name]: value }));
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -93,12 +150,13 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
   }
 
   const choiceGroup = (
-    name: "propertyType" | "operation" | "hasStorage",
+    number: number,
+    name: "propertyType" | "operation",
     id: string,
     question: string,
     options: readonly { value: string; label: string }[],
   ) => (
-    <div role="group" aria-labelledby={id} className={sectionClassName}>
+    <QuestionCard number={number} done={isDone(name)} role="group" labelledBy={id}>
       <span id={id} className={questionClassName}>
         {question}
       </span>
@@ -109,23 +167,27 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
             type="button"
             aria-pressed={values[name] === option.value}
             onClick={() => setValue(name, option.value)}
-            className={pillClassName}
+            className={`${pillClassName} ${selectedClassName[option.value]}`}
           >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 shrink-0" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round">
+              <path d={optionIcons[option.value]} />
+            </svg>
             {option.label}
           </button>
         ))}
       </div>
-    </div>
+    </QuestionCard>
   );
 
   const countGroup = (
+    number: number,
     name: "bedrooms" | "bathrooms" | "parkingSpaces",
     id: string,
     question: string,
     min: number,
     max: number,
   ) => (
-    <div role="group" aria-labelledby={id} className={sectionClassName}>
+    <QuestionCard number={number} done={isDone(name)} role="group" labelledBy={id}>
       <span id={id} className={questionClassName}>
         {question}
       </span>
@@ -143,35 +205,42 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
           </button>
         ))}
       </div>
-    </div>
+    </QuestionCard>
   );
 
-  const areaField = (name: "totalArea" | "usableArea", label: string, placeholder: string, extra?: ReactNode) => (
-    <div className={sectionClassName}>
+  const areaField = (number: number, name: "totalArea" | "usableArea", label: string, placeholder: string, extra?: ReactNode) => (
+    <QuestionCard number={number} done={isDone(name)}>
       <label htmlFor={`valuation-${name}`} className={questionClassName}>
         {label}
       </label>
-      <input
-        id={`valuation-${name}`}
-        value={values[name]}
-        onChange={(event) => setValue(name, event.target.value)}
-        type="text"
-        inputMode="decimal"
-        autoComplete="off"
-        placeholder={placeholder}
-        aria-invalid={name === "usableArea" && areaError ? true : undefined}
-        aria-describedby={name === "usableArea" && areaError ? "valuation-area-error" : undefined}
-        className="w-full border-0 bg-transparent p-0 text-xl text-ink placeholder:text-muted/60 focus-visible:outline-none focus-visible:ring-0"
-      />
+      <div className="flex items-baseline gap-2 border-b-2 border-line pb-1 transition-colors duration-200 focus-within:border-accent">
+        <input
+          id={`valuation-${name}`}
+          value={values[name]}
+          onChange={(event) => setValue(name, event.target.value)}
+          type="text"
+          inputMode="decimal"
+          autoComplete="off"
+          placeholder={placeholder}
+          aria-invalid={name === "usableArea" && areaError ? true : undefined}
+          aria-describedby={name === "usableArea" && areaError ? "valuation-area-error" : undefined}
+          className={bigInputClassName}
+        />
+        <span aria-hidden="true" className="font-display text-2xl italic text-brass-text">
+          m²
+        </span>
+      </div>
       {extra}
-    </div>
+    </QuestionCard>
   );
 
   return (
-    <form noValidate onSubmit={handleSubmit}>
+    <form noValidate onSubmit={handleSubmit} className="space-y-3">
       <p className="font-semibold text-ink">Para estimar el valor de la propiedad necesitamos algunos datos:</p>
 
-      <div className="pb-5 pt-5">
+      <ValuationProgress done={doneCount} total={FIELD_COUNT} />
+
+      <QuestionCard number={1} done={isDone("address") && isDone("commune")}>
         <label htmlFor="valuation-address" className={questionClassName}>
           Dirección de la propiedad
         </label>
@@ -211,11 +280,12 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
             </option>
           ))}
         </select>
-      </div>
+      </QuestionCard>
 
-      {choiceGroup("propertyType", "valuation-type-label", "¿Qué tipo de propiedad es?", propertyTypeOptions)}
-      {choiceGroup("operation", "valuation-operation-label", "¿Qué precio quieres conocer?", operationOptions)}
+      {choiceGroup(2, "propertyType", "valuation-type-label", "¿Qué tipo de propiedad es?", propertyTypeOptions)}
+      {choiceGroup(3, "operation", "valuation-operation-label", "¿Qué precio quieres conocer?", operationOptions)}
       {areaField(
+        4,
         "usableArea",
         "Superficie construida en m² (estimada)",
         "Ej. 130",
@@ -225,17 +295,48 @@ export function ValuationForm({ onContinue, onLocationChange }: ValuationFormPro
           </p>
         ),
       )}
-      {areaField("totalArea", "Superficie total en m² (estimada)", "Ej. 200")}
-      {countGroup("bedrooms", "valuation-bedrooms-label", "Número de dormitorios", 1, VALUATION_MAX_BEDROOMS)}
-      {countGroup("bathrooms", "valuation-bathrooms-label", "Número de baños", 1, VALUATION_MAX_BATHROOMS)}
-      {countGroup("parkingSpaces", "valuation-parking-label", "Número de estacionamientos", 0, VALUATION_MAX_PARKING_SPACES)}
-      {choiceGroup("hasStorage", "valuation-storage-label", "¿Tiene bodega?", storageOptions)}
+      {areaField(5, "totalArea", "Superficie total en m² (estimada)", "Ej. 200")}
+      {countGroup(6, "bedrooms", "valuation-bedrooms-label", "Número de dormitorios", 1, VALUATION_MAX_BEDROOMS)}
+      {countGroup(7, "bathrooms", "valuation-bathrooms-label", "Número de baños", 1, VALUATION_MAX_BATHROOMS)}
+      {countGroup(8, "parkingSpaces", "valuation-parking-label", "Número de estacionamientos", 0, VALUATION_MAX_PARKING_SPACES)}
+      <QuestionCard number={9} done={isDone("constructionYear")}>
+        <label htmlFor="valuation-constructionYear" className={questionClassName}>
+          Año de construcción
+        </label>
+        <div className="flex items-baseline gap-2 border-b-2 border-line pb-1 transition-colors duration-200 focus-within:border-accent">
+        <input
+          id="valuation-constructionYear"
+          name="constructionYear"
+          value={values.constructionYear}
+          onChange={(event) => setValue("constructionYear", event.target.value)}
+          type="text"
+          inputMode="numeric"
+          autoComplete="off"
+          maxLength={4}
+          placeholder={`Ej. ${new Date().getFullYear() - 15}`}
+          aria-invalid={yearError ? true : undefined}
+          aria-describedby={yearError ? "valuation-year-error" : "valuation-year-hint"}
+          className={bigInputClassName}
+        />
+        </div>
+        <p id="valuation-year-hint" className="mt-3 flex items-start gap-2 text-sm text-muted">
+          <svg aria-hidden="true" viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0 text-brass-text" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round">
+            <path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3Z" />
+          </svg>
+          Es de los datos que más pesan en el precio: una propiedad más nueva vale más.
+        </p>
+        {yearError && (
+          <p id="valuation-year-error" role="alert" className={errorClassName}>
+            {yearError}
+          </p>
+        )}
+      </QuestionCard>
 
-      <div className="flex justify-end pt-5">
+      <div className="flex justify-end pt-3">
         <button
           type="submit"
           disabled={!parsed.success}
-          className="h-12 min-w-44 rounded-full bg-accent px-8 font-semibold text-on-accent transition-[background-color,transform,opacity] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-muted/40 disabled:text-on-accent/80"
+          className="cta-pulse h-12 min-w-44 rounded-full bg-accent px-8 font-semibold text-on-accent transition-[background-color,transform,opacity] duration-200 hover:-translate-y-px hover:bg-accent-hover active:translate-y-0 disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-muted/40 disabled:text-on-accent/80 disabled:shadow-none disabled:[animation:none]"
         >
           Continuar
         </button>

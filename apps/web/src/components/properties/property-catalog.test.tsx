@@ -18,6 +18,7 @@ vi.mock("@/hooks/use-filter-options", () => ({
 
 const buildProperty = (index: number): PropertySummary => ({
   id: `5eed0000-0000-4000-8000-${String(index).padStart(12, "0")}`,
+  code: 5888 + index,
   title: `Propiedad ${index}`,
   operationType: "SALE",
   propertyType: "HOUSE",
@@ -132,23 +133,24 @@ describe("PropertyCatalog", () => {
       expect(useProperties).toHaveBeenCalledWith({ region: ["region-del-biobio"], page: 2, pageSize: 12, search: "Las Condes", sort: undefined });
     });
 
-    it("shows a labelled search field with the active search and a way to clear it", () => {
+    it("has no search field, only a chip with the active search and a way to remove it", () => {
       currentSearch = "search=providencia";
       mockResult({ data: response([buildProperty(1)], 1, 1) });
       const html = renderToStaticMarkup(<PropertyCatalog />);
 
-      expect(html).toContain('role="search"');
-      expect(html).toContain('for="catalog-search"');
-      expect(html).toContain('value="providencia"');
-      expect(html).toContain("Limpiar búsqueda");
+      expect(html).not.toContain('role="search"');
+      expect(html).not.toContain('type="search"');
+      expect(html).toContain("Búsqueda:");
+      expect(html).toContain("providencia");
+      expect(html).toContain("Quitar búsqueda");
       expect(html).toContain('href="/properties"');
     });
 
-    it("does not offer to clear when there is no search", () => {
+    it("shows no chip and no search field when there is no search", () => {
       mockResult({ data: response([buildProperty(1)], 1, 1) });
       const html = renderToStaticMarkup(<PropertyCatalog />);
-      expect(html).toContain('role="search"');
-      expect(html).not.toContain("Limpiar búsqueda");
+      expect(html).not.toContain('role="search"');
+      expect(html).not.toContain("Quitar búsqueda");
     });
 
     it("includes the search in the results summary", () => {

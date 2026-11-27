@@ -43,6 +43,7 @@ const validRequest = () => ({
   bedrooms: 3,
   bathrooms: 2,
   parkingSpaces: 1,
+  constructionYear: 2010,
   amenities: [] as string[],
 });
 
@@ -85,19 +86,41 @@ describe.skipIf(!hasDatabaseUrl)("valuations API", () => {
     await prisma.property.deleteMany({ where: { commune } });
   });
 
-  it("estimates from the published properties of the commune", async () => {
+  it("blends the published properties of the commune with the sector reference", async () => {
     const { status, body } = await postValuation(validRequest());
     expect(status).toBe(200);
-    expect(body as ValuationResult).toEqual({
-      status: "ok",
-      estimate: 120_000_000,
-      low: 110_000_000,
-      high: 130_000_000,
-      pricePerSquareMeter: 1_200_000,
-      comparablesCount: 3,
-      scope: "commune",
-      uf: { value: 40_000, estimate: 3_000, low: 2_750, high: 3_250 },
-    });
+    const result = body as Extract<ValuationResult, { status: "ok" }>;
+    expect(result).toMatchObject({ status: "ok", comparablesCount: 3, scope: "commune", basis: "mixed", confidence: "medium" });
+    expect(result.low).toBeLessThan(result.estimate);
+    expect(result.estimate).toBeLessThan(result.high);
+    expect(result.uf).toMatchObject({ value: 40_000 });
+  });
+
+  it("always gives a figure, even with no comparables at all (a house for rent)", async () => {
+    const { status, body } = await postValuation({ ...validRequest(), propertyType: "HOUSE", operation: "RENT", commune: "Penco" });
+    expect(status).toBe(200);
+    const result = body as Extract<ValuationResult, { status: "ok" }>;
+    expect(result).toMatchObject({ status: "ok", basis: "reference", confidence: "low", comparablesCount: 0, uf: null });
+    expect(result.estimate).toBeGreaterThan(0);
+  });
+
+  it("prices by the sector nearest to the located address", async () => {
+    const expensive = (await postValuation({ ...validRequest(), propertyType: "HOUSE", commune: "Concepción", latitude: -36.792, longitude: -73.058 })).body as ValuationResult;
+    const cheap = (await postValuation({ ...validRequest(), propertyType: "HOUSE", commune: "Concepción", latitude: -36.826, longitude: -73.056 })).body as ValuationResult;
+    expect(expensive.status === "ok" && expensive.sector).toBe("Lomas de San Andrés");
+    expect(cheap.status === "ok" && cheap.sector).toBe("Bajo Tucapel");
+    expect(expensive.estimate).toBeGreaterThan(cheap.estimate);
+  });
+
+  it("values a newer building higher than an old one", async () => {
+    const recent = (await postValuation({ ...validRequest(), constructionYear: new Date().getFullYear() - 1 })).body as ValuationResult;
+    const old = (await postValuation({ ...validRequest(), constructionYear: 1950 })).body as ValuationResult;
+    expect(recent.estimate).toBeGreaterThan(old.estimate);
+  });
+
+  it("asks for the construction year", async () => {
+    const { constructionYear: _omitted, ...withoutYear } = validRequest();
+    expect((await postValuation(withoutYear)).status).toBe(400);
   });
 
   it("raises the price with amenities", async () => {
@@ -112,8 +135,7 @@ describe.skipIf(!hasDatabaseUrl)("valuations API", () => {
     ufValue.current = 40_000;
     const rent = await postValuation({ ...validRequest(), operation: "RENT" });
     // No rent comparables in the commune, so it widens to the portal; any "ok" rent answer has no UF.
-    const rentBody = rent.body as ValuationResult;
-    if (rentBody.status === "ok") expect(rentBody.uf).toBeNull();
+    expect((rent.body as ValuationResult).uf).toBeNull();
   });
 
   it("rejects an unknown amenity", async () => {
@@ -124,7 +146,7 @@ describe.skipIf(!hasDatabaseUrl)("valuations API", () => {
     const { status, body } = await postValuation({ ...validRequest(), commune: `Otra ${testRunId}` });
     expect(status).toBe(200);
     const result = body as ValuationResult;
-    // The three comparables above count for every commune at portal scope, so it is never insufficient here.
+    // The three comparables above count for every commune at portal scope.
     expect(result.status).toBe("ok");
     if (result.status === "ok") expect(result.scope).toBe("portal");
   });

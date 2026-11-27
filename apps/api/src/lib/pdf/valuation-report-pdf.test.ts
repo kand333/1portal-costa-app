@@ -18,7 +18,8 @@ const request: ValuationRequest = {
   bedrooms: 3,
   bathrooms: 2,
   parkingSpaces: 1,
-  amenities: ["pool", "heatedPool", "concierge"],
+  amenities: ["pool", "storage", "concierge"],
+  constructionYear: 2010,
 };
 const result: OkResult = {
   status: "ok",
@@ -29,6 +30,9 @@ const result: OkResult = {
   comparablesCount: 4,
   scope: "portal",
   uf: null,
+  basis: "mixed",
+  confidence: "medium",
+  sector: "Centro",
 };
 
 const render = (overrides: { request?: ValuationRequest; quote?: { value: number; date: string } | null } = {}) =>

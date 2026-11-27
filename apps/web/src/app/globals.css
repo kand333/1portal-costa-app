@@ -1,26 +1,35 @@
 @import "tailwindcss";
 
-/* Palette sampled from the reference video: cream and sand grounds, warm near-black ink, orange (with an ember gradient) and a charcoal-green night. The logo blue only appears in the logo and one split block. Light only. */
+/* Dark theme: graphite page, dark-grey surfaces, deep-navy bands, warm-white ink and an orange that carries the emphasis (prices, codes, figures, links). Text pairs are AA (see tokens-contrast.test.ts). Dark only. */
 :root {
-  --paper: #fef7e5;
-  --sand: #eae3c9;
-  --surface: #ffffff;
-  --ink: #231a14;
-  --muted: #6b6257;
-  --line: #e3dac0;
-  --night: #263031;
+  --paper: #14181d;
+  --sand: #101a2e;
+  --surface: #1f252c;
+  --surface-raised: #29313a;
+  --ink: #f5efe6;
+  --muted: #a7afba;
+  --line: rgb(255 255 255 / 0.12);
+  --night: #0a1224;
   --accent: #f56908;
-  --accent-hover: #e4540a;
-  --on-accent: #231a14;
+  --accent-hover: #ff7f2a;
+  --on-accent: #1a0e05;
   --brass: #f56908;
-  --brass-text: #b84300;
-  --brand-blue: #0e4a87;
-  /* Deep navy of the logo (sampled from logo-mark.png), used by the top contact bar. */
+  --brass-text: #ff8a3d;
+  --brand-blue: #2e64b5;
+  /* Dark text for the few light chips (logo badge, map pins, WhatsApp green). */
+  --ink-on-light: #1a1410;
+  /* Positive and error states, AA on the dark surfaces. */
+  --success: #4ade80;
+  --danger: #ff7b72;
+  /* The "contact an agent" colour: a teal that is neither the orange nor the blue of the rest of the page. */
+  --agent: #2dd4bf;
+  --on-agent: #06201c;
+  /* Deep navy of the logo, used by the top contact bar. */
   --navy: #001c58;
   /* The contact bar only shows from 640 px up; the hero subtracts its height from the viewport. */
   --top-bar-height: 0px;
   --ember: linear-gradient(135deg, #f56908, #ea2403);
-  --shadow-ink: 35 26 20;
+  --shadow-ink: 0 0 0;
 }
 
 @media (min-width: 640px) {
@@ -29,15 +38,11 @@
   }
 }
 
-/* A dark scene: remaps the tokens so any section can use the same utilities on the charcoal ground. */
+/* A deeper navy scene: any section can use the same utilities on it. */
 .night {
-  --paper: #263031;
-  --surface: #323d3e;
-  --ink: #fef7e5;
-  --muted: rgb(254 247 229 / 0.72);
-  --line: rgb(255 255 255 / 0.16);
-  --brass-text: #ff8a3d;
-  --shadow-ink: 0 0 0;
+  --paper: #0a1224;
+  --surface: #13203a;
+  --line: rgb(255 255 255 / 0.14);
   background: var(--paper);
   color: var(--ink);
 }
@@ -47,6 +52,12 @@
   --color-sand: var(--sand);
   --color-night: var(--night);
   --color-brand-blue: var(--brand-blue);
+  --color-success: var(--success);
+  --color-danger: var(--danger);
+  --color-agent: var(--agent);
+  --color-on-agent: var(--on-agent);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink-on-light: var(--ink-on-light);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
@@ -65,7 +76,7 @@
 
 @layer base {
   html {
-    color-scheme: light;
+    color-scheme: dark;
     scroll-padding-top: 6.5rem;
   }
 
@@ -201,6 +212,28 @@
 .font-display {
   font-weight: 400;
   letter-spacing: -0.02em;
+}
+
+/* Headline duet: the body of the title in a heavy upright, its key word in a light italic (orange, or plain on blue). */
+.display-heavy {
+  font-weight: 700;
+}
+.display-accent {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--brass-text);
+}
+.figure-orange {
+  color: var(--brass-text);
+}
+.display-accent-agent {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--agent);
+}
+.display-accent-plain {
+  font-style: italic;
+  font-weight: 400;
 }
 
 /* Tiles rise into place as they enter the viewport, driven by scroll (no JavaScript). Browsers without scroll timelines just show them. */
@@ -404,11 +437,11 @@
 }
 
 .map-tiles {
-  filter: grayscale(0.5) sepia(0.3) saturate(0.85) brightness(1.04) contrast(0.92);
+  filter: invert(0.92) hue-rotate(180deg) grayscale(0.35) brightness(0.9) contrast(0.95);
 }
 
 .commune-map .leaflet-control-attribution {
-  background: rgb(254 247 229 / 0.85);
+  background: rgb(20 24 29 / 0.85);
   color: var(--muted);
   font-size: 10px;
 }
@@ -423,8 +456,8 @@
   padding: 0.3rem 0.7rem 0.3rem 0.4rem;
   border-radius: 9999px;
   background: #fff;
-  box-shadow: 0 2px 10px rgb(35 26 20 / 0.22);
-  color: var(--ink);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 0.4);
+  color: var(--ink-on-light);
   font-size: 0.75rem;
   font-weight: 600;
   line-height: 1;
@@ -595,5 +628,40 @@
   .hero-fit-title {
     max-width: 64rem;
     font-size: clamp(2rem, 7.2vh, 4.5rem);
+  }
+}
+
+/* Tasador: a chosen chip "pops" once, and a progress bar fills smoothly. Both stand still when motion is reduced. */
+@keyframes chip-pop {
+  45% {
+    transform: scale(1.12);
+  }
+}
+
+.chip-pop[aria-pressed="true"] {
+  animation: chip-pop 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-pop[aria-pressed="true"] {
+    animation: none;
+  }
+}
+
+/* The agent card breathes very slowly: a barely visible teal halo. It stands still when motion is reduced. */
+@keyframes agent-glow {
+  50% {
+    box-shadow: 0 0 0 6px rgb(45 212 191 / 0.06), 0 14px 34px -16px rgb(45 212 191 / 0.5);
+  }
+}
+
+.agent-glow {
+  box-shadow: 0 10px 30px -18px rgb(45 212 191 / 0.4);
+  animation: agent-glow 6s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agent-glow {
+    animation: none;
   }
 }

@@ -5,6 +5,7 @@ import { PropertyResults } from "./property-results";
 
 const property: PropertySummary = {
   id: "5eed0000-0000-4000-8000-000000000001",
+  code: 5888,
   title: "Casa de prueba",
   operationType: "SALE",
   propertyType: "HOUSE",

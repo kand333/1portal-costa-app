@@ -2,8 +2,6 @@
 
 import { DEFAULT_PAGE_SIZE } from "@portal/shared/limits";
 import { usePathname, useSearchParams } from "next/navigation";
-import { useState } from "react";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { useProperties } from "@/hooks/use-properties";
 import { countActiveFilters, parseCatalogFilters } from "@/lib/catalog-filters";
 import { buildCatalogQuery } from "@/lib/catalog-query";
@@ -11,7 +9,7 @@ import { parseSortParam } from "@/lib/catalog-sort";
 import { parsePageParam } from "@/lib/pagination";
 import { parseSearchParam } from "@/lib/property-search";
 import { CatalogFiltersPanel } from "./catalog-filters-panel";
-import { CatalogSearchForm } from "./catalog-search-form";
+import { CatalogSearchChip } from "./catalog-search-chip";
 import { CatalogSortSelect } from "./catalog-sort-select";
 import { Pagination } from "./pagination";
 import { PropertyResults } from "./property-results";
@@ -25,12 +23,6 @@ export function PropertyCatalog() {
   const filters = parseCatalogFilters(new URLSearchParams(searchParams.toString()));
   const hasFilters = countActiveFilters(filters) > 0;
   const sort = parseSortParam(searchParams.get("sort"));
-
-  // Filters start open next to the results on large screens and folded on small ones, until the
-  // user toggles them.
-  const isLargeScreen = useMediaQuery("(min-width: 1024px)");
-  const [filtersOpenChoice, setFiltersOpenChoice] = useState<boolean | null>(null);
-  const areFiltersOpen = filtersOpenChoice ?? isLargeScreen;
 
   const { data, error, isLoading, isValidating, mutate } = useProperties(
     buildCatalogQuery(new URLSearchParams(searchParams.toString())),
@@ -53,24 +45,14 @@ export function PropertyCatalog() {
   else if (search) emptyMessage = `No encontramos propiedades que coincidan con «${search}». Prueba con otras palabras.`;
 
   return (
-    <div className={areFiltersOpen ? "lg:grid lg:grid-cols-[19rem_minmax(0,1fr)] lg:items-start lg:gap-10" : undefined}>
-      {/* When open on large screens: sticky and scrollable, since the panel may be taller than the screen. */}
-      <aside
-        aria-label="Filtros"
-        className={
-          areFiltersOpen ? "mb-6 lg:sticky lg:top-24 lg:mb-0 lg:max-h-[calc(100vh-7rem)] lg:overflow-y-auto" : "mb-2"
-        }
-      >
-        <CatalogFiltersPanel
-          filters={filters}
-          isOpen={areFiltersOpen}
-          onToggle={() => setFiltersOpenChoice(!areFiltersOpen)}
-          closeAfterApply={!isLargeScreen}
-        />
+    <div>
+      {/* The filter bar sits above the results (on phones only operation and comuna show; the rest opens with «Más filtros»). */}
+      <aside aria-label="Filtros" className="mb-6">
+        <CatalogFiltersPanel filters={filters} />
       </aside>
 
       <div>
-        <CatalogSearchForm search={search} />
+        <CatalogSearchChip search={search} />
 
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <p aria-live="polite" className="min-h-6 text-muted tabular-nums">
@@ -100,7 +82,7 @@ export function PropertyCatalog() {
             skeletonCount={DEFAULT_PAGE_SIZE}
             loadingLabel="Cargando propiedades"
             emptyMessage={emptyMessage}
-            layout={areFiltersOpen ? "withSidebar" : "full"}
+            layout="full"
           />
 
           {data && (

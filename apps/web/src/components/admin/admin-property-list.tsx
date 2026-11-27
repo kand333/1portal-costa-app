@@ -15,6 +15,7 @@ import { formatLocation, formatPrice, operationLabels, propertyTypeLabels } from
 import { AdminPropertyFilters } from "./admin-property-filters";
 import { ADMIN_FEATURES_PATH } from "@/lib/admin-features";
 import { DeletePropertyButton } from "./delete-property-button";
+import { PublicationButtons } from "./publication-buttons";
 
 const dateFormatter = new Intl.DateTimeFormat("es-CL", { day: "numeric", month: "short", year: "numeric" });
 const dateTimeFormatter = new Intl.DateTimeFormat("es-CL", { dateStyle: "medium", timeStyle: "short" });
@@ -59,7 +60,7 @@ function AdminPropertyRow({ property }: { property: AdminPropertySummary }) {
           </h2>
           <p className="mt-0.5 text-sm text-muted">
             {propertyTypeLabels[property.propertyType]} en {operationLabels[property.operationType].toLowerCase()} ·{" "}
-            {formatLocation(property.commune, property.city)}
+            {formatLocation(property.commune, property.city)} · Cód. {property.code}
           </p>
           <p className="mt-1 font-display text-xl font-semibold text-ink tabular-nums lining-nums">
             {formatPrice(property.price, property.currency, property.operationType)}
@@ -81,20 +82,23 @@ function AdminPropertyRow({ property }: { property: AdminPropertySummary }) {
           </dd>
         </dl>
       ) : (
-      <div className="flex flex-wrap items-center gap-2 sm:justify-end">
-        {property.isPublished && (
-          <Link href={`/properties/${property.id}`} aria-label={`Ver «${property.title}» en el portal`} className={actionClassName}>
-            Ver
+      <div className="flex flex-col gap-2 sm:items-end">
+        <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+          {property.isPublished && (
+            <Link href={`/properties/${property.id}`} aria-label={`Ver «${property.title}» en el portal`} className={actionClassName}>
+              Ver
+            </Link>
+          )}
+          <Link
+            href={`${ADMIN_PROPERTIES_PATH}/${property.id}/edit`}
+            aria-label={`Editar «${property.title}»`}
+            className={actionClassName}
+          >
+            Editar
           </Link>
-        )}
-        <Link
-          href={`${ADMIN_PROPERTIES_PATH}/${property.id}/edit`}
-          aria-label={`Editar «${property.title}»`}
-          className={actionClassName}
-        >
-          Editar
-        </Link>
-        <DeletePropertyButton propertyId={property.id} propertyTitle={property.title} />
+          <DeletePropertyButton propertyId={property.id} propertyTitle={property.title} />
+        </div>
+        <PublicationButtons propertyId={property.id} propertyTitle={property.title} isPublished={property.isPublished} />
       </div>
       )}
     </li>

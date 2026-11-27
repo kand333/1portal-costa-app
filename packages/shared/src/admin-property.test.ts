@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adminPropertyListQuerySchema, propertyInputSchema } from "./admin-property";
+import { adminPropertyListQuerySchema, propertyInputSchema, propertyPublicationSchema } from "./admin-property";
 
 const valid = {
   title: "  Casa con piscina  ",
@@ -118,5 +118,17 @@ describe("adminPropertyListQuerySchema filters", () => {
   ])("rejects %o", (query, message) => {
     const result = adminPropertyListQuerySchema.safeParse(query);
     expect(result.success ? null : result.error.issues[0].message).toBe(message);
+  });
+});
+
+describe("propertyPublicationSchema", () => {
+  it("accepts a boolean isPublished", () => {
+    expect(propertyPublicationSchema.parse({ isPublished: true })).toEqual({ isPublished: true });
+    expect(propertyPublicationSchema.parse({ isPublished: false })).toEqual({ isPublished: false });
+  });
+
+  it.each([{}, { isPublished: "true" }, { isPublished: null }])("rejects %o", (body) => {
+    const result = propertyPublicationSchema.safeParse(body);
+    expect(result.success ? null : result.error.issues[0].message).toBe("Indica si la propiedad está publicada");
   });
 });

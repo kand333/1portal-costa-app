@@ -64,6 +64,8 @@ model User {
 
 model Property {
   id            String        @id @default(uuid(7)) @db.Uuid
+  // Public listing number («Cód. 5888»): assigned by the database, starts at 5888 (see its migration).
+  code          Int           @unique @default(autoincrement())
   title         String
   description   String
   operationType OperationType
@@ -221,4 +223,39 @@ model Lead {
 
   @@index([userId])
   @@index([createdAt])
+}
+
+// Reference prices of the price estimator (sector table). A city has a base price in UF per square meter by
+// property type; each sector multiplies it by its own coefficient. Edited by hand from the admin.
+model ValuationCity {
+  id               String   @id @default(uuid(7)) @db.Uuid
+  name             String   @unique
+  houseUfPerM2     Float
+  apartmentUfPerM2 Float
+  landUfPerM2      Float
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  sectors ValuationSector[]
+}
+
+model ValuationSector {
+  id          String   @id @default(uuid(7)) @db.Uuid
+  cityId      String   @db.Uuid
+  name        String
+  commune     String
+  // Approximate centre: the estimator picks the nearest sector to the located address.
+  latitude    Float
+  longitude   Float
+  coefficient Float
+  note        String   @default("")
+  // "estimado" (rough figure) or "muestreo" (sample of real listings).
+  source      String   @default("estimado")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  city ValuationCity @relation(fields: [cityId], references: [id], onDelete: Cascade)
+
+  @@unique([cityId, name])
+  @@index([commune])
 }

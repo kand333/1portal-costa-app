@@ -13,6 +13,19 @@ export type PropertyProblem = {
 
 export const PROPERTY_PROBLEMS: readonly PropertyProblem[] = [
   {
+    id: "ley-del-mono",
+    label: "Ley del Mono: ampliaciones sin permiso",
+    meaning:
+      "La Ley 20.898, conocida como «Ley del Mono», permite regularizar ante la municipalidad viviendas y ampliaciones de autoconstrucción que se levantaron sin permiso, siempre que cumplan sus requisitos.",
+    blocks:
+      "Mientras la obra no está regularizada, los metros reales no calzan con los registrados y el banco o quien compra puede objetar la venta. Los límites de superficie y de avalúo, y los plazos, han cambiado y hay cambios en trámite, así que se revisa cada caso.",
+    steps: [
+      "Revisar si tu vivienda o ampliación puede acogerse a la ley, según su superficie, su avalúo y cuándo se construyó.",
+      "Reunir el levantamiento de lo construido y la documentación que pide la Dirección de Obras Municipales.",
+      "Presentar la solicitud y obtener el certificado de regularización.",
+    ],
+  },
+  {
     id: "sin-escritura",
     label: "Sin escritura inscrita",
     meaning: "Compraste o te traspasaron la propiedad, pero la compraventa no quedó inscrita a tu nombre en el Conservador de Bienes Raíces.",
@@ -47,13 +60,24 @@ export const PROPERTY_PROBLEMS: readonly PropertyProblem[] = [
   },
   {
     id: "herencia",
-    label: "Herencia sin posesión efectiva",
-    meaning: "El dueño falleció y la propiedad sigue inscrita a su nombre; los herederos aún no la tienen a su nombre.",
+    label: "Posesión efectiva pendiente",
+    meaning: "El dueño falleció y la propiedad sigue inscrita a su nombre; los herederos aún no tienen la posesión efectiva inscrita.",
     blocks: "Los herederos no pueden vender hasta inscribir la posesión efectiva y luego la propiedad a su nombre.",
     steps: [
-      "Tramitar la posesión efectiva de la herencia.",
+      "Tramitar la posesión efectiva de la herencia (ante el Registro Civil o el tribunal, según el caso).",
       "Inscribirla en el Conservador de Bienes Raíces.",
-      "Definir entre los herederos quién vende y cómo se reparte.",
+      "Inscribir la propiedad a nombre de los herederos, para poder venderla.",
+    ],
+  },
+  {
+    id: "herederos-negociacion",
+    label: "Herencia con varios herederos",
+    meaning: "La propiedad pertenece a varios herederos y no se ponen de acuerdo en venderla, en el precio o en cómo repartir lo que se obtenga.",
+    blocks: "Para vender hace falta que todos los herederos firmen. Un solo desacuerdo detiene la venta, y las visitas de compradores se pierden mientras tanto.",
+    steps: [
+      "Reunir a los herederos y acordar por escrito el precio mínimo y quién los representa.",
+      "Negociar las diferencias con apoyo de un profesional y definir cómo se reparte lo que se obtenga.",
+      "Firmar la venta con todos los herederos (o con poder de quien los represente) y repartir según lo acordado.",
     ],
   },
   {

@@ -155,14 +155,13 @@ function drawMarket(doc: PDFKit.PDFDocument, content: ReportContent) {
 
   if (content.market.amenities.length > 0) {
     doc.y += 6;
-    subheading(doc, "Amenidades consideradas");
+    subheading(doc, "Amenidades de la propiedad");
     table(
       doc,
-      content.market.amenities.map((amenity) => ({ cells: [amenity.label, amenity.adjustment] })),
+      content.market.amenities.map((label) => ({ cells: [label, "Informada por el propietario"] })),
       [170, 334, 0],
     );
   }
-
 }
 
 function drawConclusion(doc: PDFKit.PDFDocument, content: ReportContent) {

@@ -100,7 +100,7 @@ export function AuthForm({ mode }: { mode: Mode }) {
           <button
             type="button"
             onClick={() => logOut().catch(() => setFormError("No pudimos cerrar la sesión"))}
-            className="border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+            className="border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink"
           >
             Cerrar sesión
           </button>

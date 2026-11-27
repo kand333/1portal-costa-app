@@ -211,6 +211,8 @@ Navegación pública inicial:
 - Arrendar
 - Ingresar
 
+Navegación pública vigente (Paso 51): Inicio, Compra o Arrienda, Vender, Tasar, Regularizar y Entrar a mi cuenta; el menú horizontal aparece desde `lg` (debajo, botón de menú). A la derecha de la cabecera, siempre visibles y también en celular, «Ver propiedades» (desde `xl`) y «Tasar gratis». En celular, una barra inferior «Quiero vender» queda fija en todo momento (portada y `/vender`). `/vender` es la página de venta con corredora (tasación gratis, cómo funciona, qué incluye, vitrina, preguntas) con su propio formulario de un paso (comuna, tipo, valor estimado, plazo, nombre, celular y email opcional; origen `vender`). El catálogo tiene los filtros principales en una barra superior («Más filtros» para el resto) y las miniaturas marcan «En venta» (verde) o «Arriendo» (azul) arriba a la izquierda.
+
 ---
 
 ## 8. Catálogo
@@ -614,3 +616,11 @@ El producto está funcionalmente terminado cuando:
 ## 27. Identidad visual
 
 La portada se rediseña con la identidad PropiZoom (paleta del logo, solo tema claro) y una experiencia animada por scroll, con una composición móvil propia y movimiento reducido respetado. Detalle técnico en `plan.md` §18.
+
+Propiedades (Paso 52): cada propiedad tiene un código público correlativo (`Cód. 5888`, empieza en 5888; lo asigna la base de datos). La tarjeta muestra, bajo la foto: precio en UF (venta, con el valor en pesos al lado; solo pesos si no hay UF del día; arriendo en pesos por mes), título, comuna, código y tres cuadros (dormitorios, baños, m²); la etiqueta «En venta» es naranja y «Arriendo» azul. La ficha tiene migas, cifras clave, descripción, «Lo que tiene», ubicación, tarjeta del ejecutivo (Felipe Smith, WhatsApp/llamada/agendar visita), compartir y, en celular, una barra inferior con precio y contacto. Sin video.
+
+Landing (Paso 53): "Proyectos destacados" aparece inmediatamente después de la foto de inicio y muestra como máximo 8 propiedades destacadas; la portada ya no lista propiedades nuevas en venta ni en arriendo (siguen en el catálogo).
+
+Diseño (Paso 55): el sitio usa un tema oscuro (grafito, azul oscuro y naranja) en todas las páginas públicas; sin cambios funcionales. La landing, `/vender` y `/regularizacion` pierden bloques que repetían información.
+
+Tasador (Paso 56): siempre entrega un valor, con su nivel de confianza (alta, media o baja/referencial) y el origen (comparables, mezcla o tabla de referencia por sector). Pide el año de construcción (obligatorio, pesa en el precio); la bodega pasa a amenidad (+2 %). El administrador mantiene la tabla de referencia por sector en «Tasación por sector». Para ver el precio se piden nombre y correo (se guarda como consulta de tasación); la pantalla muestra al menos 3 propiedades comparadas y confianza «Media (referencial)».

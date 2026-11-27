@@ -23,7 +23,7 @@ function IndicatorGroup({ id, title, indicators, action }: IndicatorGroupProps) 
         {action && (
           <Link
             href={action.href}
-            className="inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-ink transition-colors duration-200 hover:border-ink"
+            className="inline-flex border-b border-brass pb-0.5 text-sm font-semibold text-brass-text transition-colors duration-200 hover:border-ink"
           >
             {action.label}
           </Link>

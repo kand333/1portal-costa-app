@@ -5,11 +5,10 @@ import { cn } from "@/lib/cn";
 
 const STATEMENT = "Compra o vende con un corredor que conoce tu comuna";
 
-const steps: { label: string; title: string; kicker: string; description: string; ground: string; art: ReactNode }[] = [
+const steps: { label: string; title: string; description: string; ground: string; art: ReactNode }[] = [
   {
     label: "Paso 1",
     title: "Cuéntanos qué buscas",
-    kicker: "Comuna y tipo de propiedad",
     description: "Toma menos de un minuto.",
     ground: "bg-sand",
     art: <PhoneMockup />,
@@ -17,7 +16,6 @@ const steps: { label: string; title: string; kicker: string; description: string
   {
     label: "Paso 2",
     title: "Te mostramos proyectos",
-    kicker: "Selección para ti",
     description: "Un corredor local te presenta los proyectos y propiedades que calzan con lo que buscas.",
     ground: "bg-paper",
     art: <IsometricHouse />,
@@ -25,7 +23,6 @@ const steps: { label: string; title: string; kicker: string; description: string
   {
     label: "Paso 3",
     title: "Te acompañamos hasta la escritura",
-    kicker: "Reserva, financiamiento y cierre",
     description: "Te guiamos en cada trámite, y si eres dueño, también tasamos y vendemos tu propiedad.",
     ground: "bg-sand",
     art: <IsometricCity />,
@@ -62,9 +59,8 @@ export function LeadSteps() {
             >
               <div className="mx-auto grid w-full max-w-7xl items-center gap-12 lg:grid-cols-2">
                 <div className="max-w-md">
-                  <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-muted">{step.label}</p>
+                  <p className="font-mono text-xs font-medium uppercase tracking-[0.2em] text-brass-text">{step.label}</p>
                   <h3 className="mt-6 text-4xl font-medium tracking-tight text-ink sm:text-5xl">{step.title}</h3>
-                  <p className="mt-6 font-mono text-xs font-medium uppercase tracking-[0.18em] text-ink">{step.kicker}</p>
                   <p className="mt-4 text-lg leading-relaxed text-muted">{step.description}</p>
                   {index === 0 && (
                     <Link

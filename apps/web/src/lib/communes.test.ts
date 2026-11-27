@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMMUNE_NAMES, COVERAGE_COMMUNES } from "./communes";
+import { COMMUNE_NAMES, COVERAGE_COMMUNES, communeSlug } from "./communes";
 
 describe("COVERAGE_COMMUNES", () => {
   it("places every commune inside Gran Concepción, with unique names", () => {
@@ -14,5 +14,13 @@ describe("COVERAGE_COMMUNES", () => {
 
   it("starts with Concepción, the hub of the network lines", () => {
     expect(COVERAGE_COMMUNES[0].name).toBe("Concepción");
+  });
+});
+
+describe("communeSlug", () => {
+  it("drops accents and joins words with hyphens", () => {
+    expect(communeSlug("Concepción")).toBe("concepcion");
+    expect(communeSlug("San Pedro de la Paz")).toBe("san-pedro-de-la-paz");
+    expect(communeSlug("Hualpén")).toBe("hualpen");
   });
 });

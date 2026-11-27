@@ -9,6 +9,7 @@ describe("adminNavigationItems", () => {
       "Administrar usuarios",
       "Consultas",
       "Leads",
+      "Tasación por sector",
       "Mi cuenta",
     ]);
   });
@@ -24,6 +25,7 @@ describe("getActiveAdminSection", () => {
     ["/admin/inquiries", "inquiries"],
     ["/admin/inquiries/11111111-1111-4111-8111-111111111111", "inquiries"],
     ["/admin/leads", "leads"],
+    ["/admin/valuation-sectors", "valuation"],
     ["/admin/account", "account"],
   ])("%s → %s", (pathname, section) => {
     expect(getActiveAdminSection(pathname)).toBe(section);

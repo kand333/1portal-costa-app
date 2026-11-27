@@ -30,8 +30,22 @@ export const metadata: Metadata = {
 
 const SHORTCUTS = [
   { href: "/tasador-propiedades", title: "Tasar mi propiedad", text: "Conoce su valor en minutos, gratis." },
-  { href: "/properties?operation=SALE", title: "Comprar", text: "Revisa proyectos y propiedades en venta." },
   { href: "/#tasacion-gratis", title: "Vender con una corredora", text: "Pide tu tasación y hablamos de cómo venderla." },
+] as const;
+
+const FREQUENT_CASES = [
+  {
+    title: "Ley del Mono",
+    text: "Una ampliación o una vivienda de autoconstrucción sin permiso puede regularizarse ante la municipalidad si cumple los requisitos de la ley. Es lo que más frena ventas en casas antiguas.",
+  },
+  {
+    title: "Posesión efectiva",
+    text: "Si el dueño falleció, los herederos no pueden vender hasta inscribir la posesión efectiva y la propiedad a su nombre. Te explicamos el orden de los trámites.",
+  },
+  {
+    title: "Herederos y negociación",
+    text: "Cuando hay varios herederos, todos deben firmar. Te ayudamos a ordenar la conversación, fijar un precio y acordar el reparto para poder vender.",
+  },
 ] as const;
 
 const QUESTIONS = [
@@ -97,8 +111,8 @@ export default function RegularizationPage() {
             ¿Tu propiedad tiene problemas para venderse? Te mostramos el camino.
           </h1>
           <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted">
-            Casa sin escritura, ampliación sin permiso, herencia sin inscribir. Elige qué le pasa a la tuya y ve qué significa, por
-            qué frena la venta y cuál es el camino habitual.
+            Ampliaciones que se pueden regularizar con la Ley del Mono, posesión efectiva pendiente, herencias con varios herederos,
+            escritura sin inscribir. Elige qué le pasa a la tuya y ve qué significa, por qué frena la venta y cuál es el camino habitual.
           </p>
           <a
             href="#explorador"
@@ -108,6 +122,24 @@ export default function RegularizationPage() {
           </a>
         </div>
         <BlueprintArt />
+      </section>
+
+      <section aria-labelledby="cases-title" className="mx-auto w-full max-w-7xl px-4 pb-4 sm:px-6 lg:px-8">
+        <h2 id="cases-title" className="font-display text-3xl text-ink sm:text-5xl">
+          Tres casos que vemos todo el tiempo
+        </h2>
+        <ul className="mt-8 grid gap-4 md:grid-cols-3">
+          {FREQUENT_CASES.map((item) => (
+            <li key={item.title} className="rounded-[1.5rem] border border-line/70 bg-surface p-6 shadow-soft">
+              <h3 className="text-xl font-semibold text-ink">{item.title}</h3>
+              <p className="mt-2 leading-relaxed text-muted">{item.text}</p>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-6 max-w-3xl text-sm leading-relaxed text-muted">
+          La Ley del Mono (Ley 20.898) tiene límites de superficie y de avalúo y plazos que han cambiado, y hay modificaciones en
+          trámite en el Congreso. Por eso revisamos cada caso antes de decirte qué vía corresponde.
+        </p>
       </section>
 
       <section id="explorador" aria-labelledby="explorer-title" className="scroll-mt-24 border-y border-line bg-sand">
@@ -163,7 +195,7 @@ export default function RegularizationPage() {
           <a
             href={consultationUrl ?? "/tasador-propiedades"}
             {...(consultationUrl ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-            className="inline-flex min-h-12 shrink-0 items-center rounded-lg bg-white px-6 font-bold text-ink shadow-soft transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="inline-flex min-h-12 shrink-0 items-center rounded-lg bg-accent px-6 font-bold text-on-accent shadow-soft transition-transform duration-200 hover:-translate-y-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
           >
             {consultationUrl ? "Escribir por WhatsApp" : "Pedir tasación gratis"}
           </a>

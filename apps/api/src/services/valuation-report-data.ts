@@ -1,11 +1,11 @@
 import {
   VALUATION_AMENITY_LABELS,
+  displayedComparables,
   type ValuationRequest,
   type ValuationResult,
 } from "@portal/shared/valuation";
 import { REPORT_BRAND } from "@/lib/pdf/report-brand";
 import type { UfQuote } from "@/lib/uf-value";
-import { AMENITY_ADJUSTMENT } from "@/services/valuation-algorithm";
 
 type OkResult = Extract<ValuationResult, { status: "ok" }>;
 
@@ -42,7 +42,8 @@ export type ReportContent = {
   characteristics: FactRow[];
   market: {
     stats: { label: string; value: string }[];
-    amenities: { label: string; adjustment: string }[];
+    /** Names of the amenities the owner marked; the report never states their effect on the price. */
+    amenities: string[];
     notes: string[];
   };
   recommendations: string[];
@@ -67,8 +68,6 @@ const millions = (clp: number) =>
   clp >= 1_000_000 ? `$${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 1 }).format(clp / 1_000_000)} millones` : pesos(clp);
 const squareMeters = (amount: number) =>
   `${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 1 }).format(amount)} m²`;
-const percent = (share: number) =>
-  `+${new Intl.NumberFormat("es-CL", { maximumFractionDigits: 1 }).format(share * 100)} %`;
 const longDate = (date: Date) =>
   new Intl.DateTimeFormat("es-CL", { dateStyle: "long", timeZone: TIME_ZONE }).format(date);
 /** `YYYY-MM-DD` of a UF quote, shown as a long date without shifting it by the time zone. */
@@ -100,26 +99,34 @@ export function buildReportContent(
       : "No se pudo obtener el valor de la UF al emitir este informe: falta actualizar la conversión, por eso el valor se muestra en pesos."
     : "Los arriendos se expresan en pesos chilenos mensuales.";
 
-  // Informative only: it does not enter the price. Null when the person did not say.
-  const storage = request.hasStorage === undefined ? null : request.hasStorage ? "Sí" : "No";
+  // Only what the owner marked: the report never says how much each amenity moves the price.
+  const amenityLabels = request.amenities.map((amenity) => VALUATION_AMENITY_LABELS[amenity]);
 
-  const amenities = request.amenities.map((amenity) => ({
-    label: VALUATION_AMENITY_LABELS[amenity],
-    adjustment: percent(AMENITY_ADJUSTMENT[amenity]),
-  }));
-
-  const scopeText =
+  const sectorText = result.sector ? `el sector ${result.sector} (${request.commune})` : request.commune;
+  const publishedText =
     result.scope === "commune"
       ? `propiedades publicadas en ${request.commune}`
       : `propiedades publicadas en todo el portal, porque en ${request.commune} hay pocas comparables`;
+  const scopeText =
+    result.basis === "reference"
+      ? `la tabla de referencia de precios por sector de ${sectorText}`
+      : result.basis === "mixed"
+        ? `${publishedText}, combinadas con la tabla de referencia de ${sectorText}`
+        : publishedText;
+  const sourceBase =
+    result.basis === "reference" ? "Tabla de referencia de precios por sector del portal" : "Precios publicados en el portal y tabla de referencia por sector";
 
   const recommendations: string[] = [];
-  if (result.comparablesCount < SMALL_SAMPLE) {
+  if (result.basis === "reference") {
     recommendations.push(
-      `La muestra es pequeña (${countLabel(result.comparablesCount, "propiedad comparable", "propiedades comparables")}): toma el rango como una orientación amplia y no como una cifra exacta.`,
+      "El valor sale de la tabla de referencia por sector, que se revisa y actualiza a mano. Tómalo como una orientación inicial y pide una tasación con un corredor para afinarlo.",
+    );
+  } else if (result.comparablesCount < SMALL_SAMPLE) {
+    recommendations.push(
+      `La muestra es pequeña (${countLabel(displayedComparables(result.comparablesCount), "propiedad comparable", "propiedades comparables")}): toma el rango como una orientación amplia y no como una cifra exacta.`,
     );
   }
-  if (result.scope === "portal") {
+  if (result.scope === "portal" && result.basis !== "reference") {
     recommendations.push(
       `Como en ${request.commune} hay pocas propiedades comparables, el valor incluye propiedades de otras comunas. Un corredor puede afinarlo con casos de la zona.`,
     );
@@ -127,15 +134,9 @@ export function buildReportContent(
   recommendations.push(
     `Un precio de publicación dentro del rango (${money(result.low)} a ${money(result.high)}) es coherente con las propiedades comparadas. Sobre el extremo alto quedas por encima del percentil 75 del precio por m² de esa muestra.`,
   );
-  if (amenities.length > 0) {
-    recommendations.push(
-      "Las amenidades que marcaste se valoraron con porcentajes fijos del modelo, no con ventas reales. Destácalas en la publicación, pero no las uses para justificar un precio fuera del rango.",
-    );
-  }
-
   const pending = [
     "Superficies, dormitorios, baños, estacionamientos y amenidades: los informó el propietario y no se verificaron con documentos.",
-    "Bodega, año de construcción, materialidad, terminaciones y estado de conservación: sin antecedentes.",
+    "Materialidad, terminaciones y estado de conservación: sin antecedentes.",
     "Título de dominio, gravámenes y avalúo fiscal: no se revisaron.",
   ];
 
@@ -156,12 +157,16 @@ export function buildReportContent(
       mid: { label: "Valor de referencia", value: money(result.estimate), sub: toUf ? millions(result.estimate) : null },
       high: { label: "Máximo probable", value: money(result.high), sub: toUf ? millions(result.high) : null },
       stats: [
-        { label: "Propiedades comparadas", value: String(result.comparablesCount), sub: result.scope === "commune" ? `Publicadas en ${request.commune}` : "Publicadas en todo el portal" },
-        { label: isSale ? "Por m² construido" : "Por m² construido al mes", value: toUf ? uf1(result.pricePerSquareMeter / ufQuote!.value) : pesos(result.pricePerSquareMeter), sub: "Mediana de la muestra" },
+        {
+          label: "Propiedades comparadas",
+          value: String(displayedComparables(result.comparablesCount)),
+          sub: result.basis === "reference" ? "Referencia por sector" : result.scope === "commune" ? `Publicadas en ${request.commune}` : "Publicadas en todo el portal",
+        },
+        { label: isSale ? "Por m² construido" : "Por m² construido al mes", value: toUf ? uf1(result.pricePerSquareMeter / ufQuote!.value) : pesos(result.pricePerSquareMeter), sub: result.basis === "reference" ? "Referencia del sector" : "Mediana de la muestra" },
         { label: "Superficie construida", value: squareMeters(request.usableArea), sub: `${squareMeters(request.totalArea)} totales` },
         { label: "Dormitorios y baños", value: `${request.bedrooms} y ${request.bathrooms}`, sub: countLabel(request.parkingSpaces, "estacionamiento", "estacionamientos") },
       ],
-      sourceNote: `Con precios publicados en el portal${isSale && ufQuote ? ` y la UF de mindicador.cl del ${quoteDate(ufQuote.date)}` : ""}.`,
+      sourceNote: `${sourceBase}${isSale && ufQuote ? ` y la UF de mindicador.cl del ${quoteDate(ufQuote.date)}` : ""}.`,
     },
     summary: {
       facts: [
@@ -173,7 +178,7 @@ export function buildReportContent(
         { label: "Dormitorios", value: String(request.bedrooms) },
         { label: "Baños", value: String(request.bathrooms) },
         { label: "Estacionamientos", value: String(request.parkingSpaces) },
-        { label: "Bodega", value: storage ?? "Sin antecedentes" },
+        { label: "Año de construcción", value: String(request.constructionYear) },
       ],
       meaning: [
         `Es el precio al que se ofrecen hoy propiedades parecidas a la tuya: ${request.operation === "SALE" ? "de venta" : "de arriendo"}, del mismo tipo y con características similares. Sirve como punto de partida para decidir a qué precio publicar.`,
@@ -193,33 +198,35 @@ export function buildReportContent(
       { label: "Estacionamientos", value: String(request.parkingSpaces), status: "informed" },
       {
         label: "Amenidades",
-        value: amenities.length ? amenities.map((amenity) => amenity.label).join(", ") : "Ninguna informada",
+        value: amenityLabels.length ? amenityLabels.join(", ") : "Ninguna informada",
         status: "informed",
       },
-      { label: "Bodega", value: storage ?? "Sin antecedentes", status: storage ? "informed" : "pending" },
-      { label: "Año de construcción", value: "Sin antecedentes", status: "pending" },
+      { label: "Año de construcción", value: String(request.constructionYear), status: "informed" },
       { label: "Materialidad y terminaciones", value: "Sin antecedentes", status: "pending" },
       { label: "Estado de conservación", value: "Sin antecedentes", status: "pending" },
     ],
     market: {
       stats: [
-        { label: "Propiedades comparadas", value: String(result.comparablesCount) },
-        { label: "Origen de la muestra", value: result.scope === "commune" ? request.commune : "Todo el portal" },
+        { label: "Propiedades comparadas", value: String(displayedComparables(result.comparablesCount)) },
+        {
+          label: "Origen de la muestra",
+          value: result.basis === "reference" ? "Tabla de referencia por sector" : result.scope === "commune" ? request.commune : "Todo el portal",
+        },
         { label: "Precio mediano por m² construido", value: pesos(result.pricePerSquareMeter) },
         { label: "Rango del valor estimado", value: `${money(result.low)} a ${money(result.high)}` },
       ],
-      amenities,
+      amenities: amenityLabels,
       notes: [
         `El valor se calculó con ${scopeText}, del mismo tipo (${propertyTypeNames[request.propertyType].toLowerCase()}) y operación (${operationNames[request.operation].toLowerCase()}).`,
         "Son precios publicados en el portal, no precios efectivos de venta o de arriendo cerrados.",
-        "Método: mediana del precio por m² de la muestra (sin valores atípicos) por los m² construidos informados, con ajustes acotados por dormitorios, baños, estacionamientos y amenidades. El rango va del percentil 25 al 75 del precio por m².",
+        "Método: precio por m² de referencia del sector (tabla revisada a mano), combinado con la mediana de las propiedades comparables publicadas (sin valores atípicos): cada comparable pesa más a medida que hay más. Se multiplica por los m² construidos informados, con ajustes acotados por dormitorios, baños y estacionamientos, y por el año de construcción (cada año de diferencia con el inmueble típico mueve el precio un 0,7 %).",
         "No se incluye información del entorno (comercio, transporte, salud, educación) porque este informe no consulta fuentes externas para ello.",
       ],
     },
     recommendations,
     conclusion: {
       synthesis: `Para ${propertyTypeNames[request.propertyType].toLowerCase()} de ${squareMeters(request.usableArea)} construidos en ${request.address}, ${request.commune}, el valor de referencia de ${isSale ? "venta" : "arriendo"} es ${headline}, con un rango probable de ${money(result.low)} a ${money(result.high)}.`,
-      source: `Propiedades publicadas en el portal${isSale && ufQuote ? " y valor de la UF de mindicador.cl" : ""}. Estimación automatizada de ${REPORT_BRAND.name}.`,
+      source: `${sourceBase}${isSale && ufQuote ? " y valor de la UF de mindicador.cl" : ""}. Estimación automatizada de ${REPORT_BRAND.name}.`,
       referenceDate: longDate(issuedAt),
       pending,
       scope: [

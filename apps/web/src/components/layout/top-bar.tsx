@@ -29,7 +29,7 @@ const iconLinkClassName =
 const iconBubbleClassName =
   "flex size-7 items-center justify-center rounded-full border border-accent/60 transition-colors duration-200 group-hover/icon:border-accent group-hover/icon:bg-accent group-hover/icon:text-white group-focus-visible/icon:bg-accent group-focus-visible/icon:text-white";
 const textLinkClassName =
-  "inline-flex min-h-11 items-center gap-2 whitespace-nowrap text-paper transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-white";
+  "inline-flex min-h-11 items-center gap-2 whitespace-nowrap text-ink transition-colors duration-200 hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-[-4px] focus-visible:outline-white";
 
 /** Contact strip above the menu: email, WhatsApp, today's UF and the social networks that are configured. Scrolls away. */
 export async function TopBar() {
@@ -40,7 +40,7 @@ export async function TopBar() {
   const socialLinks = configuredSocialLinks();
 
   return (
-    <div className="relative z-40 hidden bg-[var(--navy)] text-paper sm:block" style={{ height: "var(--top-bar-height)" }}>
+    <div className="relative z-40 hidden bg-[var(--navy)] text-ink sm:block" style={{ height: "var(--top-bar-height)" }}>
       <div className="mx-auto flex h-full max-w-6xl items-center justify-center gap-x-1 sm:gap-x-5 px-3 text-xs font-medium sm:px-6">
         <div className="flex min-w-0 items-center justify-center gap-x-1 sm:gap-x-5">
           <a href={`mailto:${CONTACT_EMAIL}`} aria-label={`Escribir a ${CONTACT_EMAIL}`} className={textLinkClassName}>
@@ -59,7 +59,7 @@ export async function TopBar() {
             </a>
           )}
           {uf !== null && (
-            <span className="hidden min-h-11 items-center gap-2 text-paper/90 md:inline-flex" title="Valor de la UF hoy">
+            <span className="hidden min-h-11 items-center gap-2 text-ink/90 md:inline-flex" title="Valor de la UF hoy">
               <span aria-hidden="true" className="h-4 w-px bg-paper/25" />
               {formatUf(uf)}
             </span>

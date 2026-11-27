@@ -5,6 +5,7 @@ import { PropertyGrid, PropertyGridSkeleton } from "./property-grid";
 
 const buildProperty = (id: string, title: string): PropertySummary => ({
   id,
+  code: 5888,
   title,
   operationType: "SALE",
   propertyType: "HOUSE",
@@ -37,6 +38,11 @@ describe("PropertyGrid", () => {
     const html = renderToStaticMarkup(<PropertyGrid properties={[buildProperty("a", "Casa")]} layout="withSidebar" />);
     expect(html).toContain("xl:grid-cols-3");
     expect(html).not.toContain("lg:grid-cols-3");
+  });
+
+  it("adds a fourth column on wide screens in the wide layout", () => {
+    const html = renderToStaticMarkup(<PropertyGrid properties={[buildProperty("a", "Casa")]} layout="wide" />);
+    expect(html).toContain("xl:grid-cols-4");
   });
 
   it("uses a responsive grid: 1 column on phones, 2 on tablets, 3 on desktop", () => {

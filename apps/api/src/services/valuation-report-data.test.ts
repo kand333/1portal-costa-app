@@ -14,7 +14,8 @@ const request: ValuationRequest = {
   bedrooms: 3,
   bathrooms: 2,
   parkingSpaces: 1,
-  amenities: ["pool", "heatedPool"],
+  amenities: ["pool", "storage"],
+  constructionYear: 2010,
 };
 const result: OkResult = {
   status: "ok",
@@ -25,6 +26,9 @@ const result: OkResult = {
   comparablesCount: 7,
   scope: "commune",
   uf: null,
+  basis: "mixed",
+  confidence: "medium",
+  sector: "Centro",
 };
 const issuedAt = new Date("2026-10-23T15:00:00Z");
 const quote = { value: 40_000, date: "2026-10-23" };
@@ -64,17 +68,33 @@ describe("buildReportContent", () => {
     const rows = buildReportContent(request, result, issuedAt, quote).characteristics;
     expect(rows.find((row) => row.label === "Superficie construida")).toMatchObject({ value: "70 m²", status: "informed" });
     expect(rows.find((row) => row.label === "Superficie total")).toMatchObject({ value: "80 m²", status: "informed" });
-    for (const label of ["Bodega", "Año de construcción", "Materialidad y terminaciones", "Estado de conservación"]) {
+    expect(rows.find((row) => row.label === "Año de construcción")).toMatchObject({ value: "2010", status: "informed" });
+    for (const label of ["Materialidad y terminaciones", "Estado de conservación"]) {
       expect(rows.find((row) => row.label === label)).toMatchObject({ value: "Sin antecedentes", status: "pending" });
     }
   });
 
-  it("reports the storage the owner declared, and still does not touch the price", () => {
-    const withStorage = buildReportContent({ ...request, hasStorage: true }, result, issuedAt, quote);
-    expect(withStorage.characteristics.find((row) => row.label === "Bodega")).toMatchObject({ value: "Sí", status: "informed" });
-    const without = buildReportContent({ ...request, hasStorage: false }, result, issuedAt, quote);
-    expect(without.characteristics.find((row) => row.label === "Bodega")).toMatchObject({ value: "No", status: "informed" });
-    expect(withStorage.hero.headline).toBe(without.hero.headline);
+  it("lists the amenities the owner marked, and never says how much they raise the price", () => {
+    const content = buildReportContent(request, result, issuedAt, quote);
+    expect(content.characteristics.find((row) => row.label === "Amenidades")?.value).toContain("Bodega");
+    expect(JSON.stringify(content)).not.toMatch(new RegExp("\\+\\d+(,\\d)? %"));
+    expect(content.market.amenities).toEqual(["Piscina", "Bodega"]);
+    expect(content.recommendations.join(" ")).not.toContain("amenidades");
+    expect(content.market.notes.join(" ")).not.toContain("amenidades");
+  });
+
+  it("shows at least 3 compared properties, even with no listings behind the figure", () => {
+    const content = buildReportContent(request, { ...result, comparablesCount: 1, basis: "reference", confidence: "low" }, issuedAt, quote);
+    expect(content.hero.stats[0]).toMatchObject({ value: "3" });
+    expect(content.market.stats[0]).toMatchObject({ value: "3" });
+  });
+
+  it("says plainly when the figure rests only on the sector reference", () => {
+    const content = buildReportContent(request, { ...result, comparablesCount: 0, basis: "reference", confidence: "low" }, issuedAt, quote);
+    expect(content.recommendations.join(" ")).toContain("tabla de referencia por sector");
+    expect(content.hero.stats[0]).toMatchObject({ value: "3", sub: "Referencia por sector" });
+    expect(content.market.stats).toContainEqual({ label: "Origen de la muestra", value: "Tabla de referencia por sector" });
+    expect(content.recommendations.join(" ")).not.toContain("La muestra es pequeña");
   });
 
   it("uses the request data and never fixed figures", () => {
@@ -92,17 +112,13 @@ describe("buildReportContent", () => {
     expect(text).not.toContain("DATOS DE PRUEBA");
   });
 
-  it("warns about a small sample and about a portal-wide scope, and lists amenity adjustments", () => {
+  it("warns about a small sample and about a portal-wide scope, ", () => {
     const content = buildReportContent(request, { ...result, comparablesCount: SMALL_SAMPLE - 1, scope: "portal" }, issuedAt, quote);
     expect(content.recommendations.join(" ")).toContain("La muestra es pequeña");
     expect(content.recommendations.join(" ")).toContain("otras comunas");
-    expect(content.market.amenities).toEqual([
-      { label: "Piscina", adjustment: "+1,5 %" },
-      { label: "Piscina temperada", adjustment: "+2 %" },
-    ]);
     const calm = buildReportContent({ ...request, amenities: [] }, result, issuedAt, quote);
     expect(calm.recommendations.join(" ")).not.toContain("La muestra es pequeña");
-    expect(calm.market.amenities).toEqual([]);
+    expect(calm.characteristics.find((row) => row.label === "Amenidades")?.value).toBe("Ninguna informada");
   });
 
   it("states that it is referential, not a professional appraisal, and that it has no environment data", () => {

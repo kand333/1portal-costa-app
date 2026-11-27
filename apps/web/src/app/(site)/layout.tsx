@@ -5,11 +5,14 @@ import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { TopBar } from "@/components/layout/top-bar";
 import { WhatsAppButton } from "@/components/layout/whatsapp-button";
+import { UfValueProvider } from "@/components/properties/uf-value-context";
+import { fetchUfValue } from "@/lib/uf-server";
 
 /** Public site: header, content and footer. `/admin` has its own layout instead. */
-export default function SiteLayout({ children }: { children: ReactNode }) {
+export default async function SiteLayout({ children }: { children: ReactNode }) {
+  const ufValue = await fetchUfValue();
   return (
-    <>
+    <UfValueProvider value={ufValue}>
       <SkipLink />
       <TopBar />
       <SiteHeader />
@@ -19,6 +22,6 @@ export default function SiteLayout({ children }: { children: ReactNode }) {
       <SiteFooter />
       <WhatsAppButton />
       <GoogleAnalytics />
-    </>
+    </UfValueProvider>
   );
 }
